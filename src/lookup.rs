@@ -32,6 +32,7 @@ fn sockaddr_to_addr(storage: &c::sockaddr_storage,
 }
 
 #[derive(Debug)]
+/// A struct that holds a linked list of lookup results.
 pub struct LookupHost {
   original: *mut c::addrinfo,
   cur: *mut c::addrinfo,
@@ -59,6 +60,7 @@ impl Drop for LookupHost {
   }
 }
 
+/// Lookup a hostname via dns, return an iterator of ip addresses.
 pub fn lookup_host(host: &str) -> Result<LookupHost, self::Error> {
   // FIXME: THis should be called for Windows.
   //init();
@@ -100,9 +102,13 @@ pub fn lookup_host(host: &str) -> Result<LookupHost, self::Error> {
 // }
 
 #[derive(Debug)]
+/// Errors that can occur looking up a hostname.
 pub enum Error {
+  /// A generic IO error
   IOError(io::Error),
+  /// A Null Error
   NulError(NulError),
+  /// An unspecific error
   Generic
 }
 
