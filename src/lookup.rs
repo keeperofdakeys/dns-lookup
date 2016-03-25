@@ -2,7 +2,7 @@ use std::mem;
 use std::ffi::{CString, NulError};
 use std::ptr;
 use std::io;
-use std::net::SocketAddr;
+use std::net::{SocketAddr, IpAddr};
 use addr::{MySocketAddrV4, MySocketAddrV6};
 use libc as c;
 
@@ -39,14 +39,14 @@ pub struct LookupHost {
 }
 
 impl Iterator for LookupHost {
-  type Item = io::Result<SocketAddr>;
-  fn next(&mut self) -> Option<io::Result<SocketAddr>> {
+  type Item = io::Result<IpAddr>;
+  fn next(&mut self) -> Option<io::Result<IpAddr>> {
   unsafe {
     if self.cur.is_null() { return None }
     let ret = sockaddr_to_addr(mem::transmute((*self.cur).ai_addr),
            (*self.cur).ai_addrlen as usize);
     self.cur = (*self.cur).ai_next as *mut c::addrinfo;
-    Some(ret)
+    Some(ret.map(|s| s.ip()))
   }
   }
 }
