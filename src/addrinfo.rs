@@ -1,6 +1,10 @@
 use libc as c;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
+use std::ptr;
+use std::io;
+use std::error::Error;
+use std::fmt;
 
 /// Address family
 pub enum Family {
@@ -95,37 +99,132 @@ impl Protocol {
   }
 }
 
-pub struct AddrInfo<'a> {
+pub struct AddrInfo {
   pub flags: c::c_int,
   pub family: Family,
   pub socktype: SockType,
   pub protocol: Protocol,
   pub sockaddr: SocketAddr,
-  pub canonname: Option<&'a str>,
-  next: *const c::addrinfo,
+  pub canonname: String,
 }
 
-use std::ptr;
+impl AddrInfo {
+  unsafe fn from_ptr<'a>(a: *mut c::addrinfo) -> Result<Self, AddrInfoError> {
+    if a.is_null() {
+      return try!(Err("Pointer is null."));
+    }
+    let addrinfo = *a;
 
-impl<'a> AddrInfo<'a> {
-  // FIXME: Return an appropriate error type.
-  /// Create an AddrInfo struct from a c addrinfo struct.
-  fn from_addrinfo(a: c::addrinfo) -> Result<Self, ()> {
-    let canonname = unsafe {
-      CStr::from_ptr(a.ai_canonname)
-        .to_str()
-        .ok()
-    };
     Ok(AddrInfo {
       flags: 0,
-      family: Family::Inet,
-      socktype: SockType::Stream,
-      protocol: Protocol::Inet,
+      family: try!(
+        Family::from_int(addrinfo.ai_family)
+          .ok_or("Could not find valid address family")
+      ),
+      socktype: try!(
+        SockType::from_int(addrinfo.ai_socktype)
+          .ok_or("Could not find valid socket type")
+      ),
+      protocol: try!(
+        Protocol::from_int(addrinfo.ai_protocol)
+          .ok_or("Could not find valid protocol")
+      ),
       sockaddr: SocketAddr::V4(
         SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 0)
       ),
-      canonname: canonname,
-      next: ptr::null()
+      canonname:
+        CStr::from_ptr(addrinfo.ai_canonname)
+          .to_str()
+          .unwrap()
+          .to_owned()
     })
+  }
+}
+
+pub struct AddrInfoIter {
+  orig: *mut c::addrinfo,
+  cur: *mut c::addrinfo,
+}
+
+impl AddrInfoIter {
+  // FIXME: Return an appropriate error type.
+  /// Create an AddrInfo struct from a c addrinfo struct.
+  fn new(host: &str) -> Result<Self, ()> {
+    let c_host = CString::new(host).unwrap();
+    let mut res = ptr::null_mut();
+    unsafe {
+      c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res);
+    }
+    Ok(AddrInfoIter {
+      orig: res,
+      cur: res,
+    })
+  } 
+}
+
+impl Iterator for AddrInfoIter {
+  type Item = Result<AddrInfo, AddrInfoError>;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    unsafe {
+      if self.cur.is_null() { return None; }
+      let ret = AddrInfo::from_ptr(self.cur);
+      self.cur = (*self.cur).ai_next as *mut c::addrinfo;
+      Some(ret)
+    }
+  }
+}
+
+unsafe impl Sync for AddrInfoIter {}
+unsafe impl Send for AddrInfoIter {}
+
+impl Drop for AddrInfoIter { 
+    fn drop(&mut self) { 
+        unsafe { c::freeaddrinfo(self.orig) } 
+    } 
+}
+
+pub enum AddrInfoError {
+  IOError(io::Error),
+  Other(String)
+}
+
+impl From<io::Error> for AddrInfoError {
+  fn from(err: io::Error) -> Self {
+    AddrInfoError::IOError(err)
+  }
+}
+
+impl<'a> From<&'a str> for AddrInfoError {
+  fn from(err: &'a str) -> Self {
+    AddrInfoError::Other(err.to_owned())
+  }
+}
+
+impl Error for AddrInfoError {
+  fn description(&self) -> &str {
+    match *self {
+      AddrInfoError::IOError(ref err) => "IO Error",
+      AddrInfoError::Other(ref err_str) => &err_str
+    }
+  }
+
+  fn cause(&self) -> Option<&Error> {
+    match *self {
+      AddrInfoError::IOError(ref err) => Some(err),
+      AddrInfoError::Other(_) => None
+    }
+  }
+}
+
+impl fmt::Display for AddrInfoError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.description())
+  }
+}
+
+impl fmt::Debug for AddrInfoError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.description())
   }
 }
