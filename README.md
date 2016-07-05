@@ -1,7 +1,7 @@
 # dns_lookup
 A small libc::getaddrinfo wrapper for Rust to perform dns lookups.
 
-[Documentation](http://keeperofdakeys.github.io/dns-lookup/dns_lookup/lookup/index.html)
+[Documentation](https://keeperofdakeys.github.io/dns-lookup/dns_lookup)
 
 ## Usage
 ```rust
