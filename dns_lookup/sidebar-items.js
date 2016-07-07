@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["LookupError","Errors that can occur looking up a hostname."]],"fn":[["lookup_addr",""],["lookup_host","Lookup a hostname via dns, return an iterator of ip addresses."]]});
+initSidebarItems({"fn":[["lookup_addr",""],["lookup_host","Lookup a hostname via dns, return an iterator of ip addresses."]]});
