@@ -30,7 +30,8 @@ impl MySocketAddrV4 {
   }
 
   fn into_inner(self) -> (*const c::sockaddr, c::socklen_t) {
-    (&self.inner as *const _ as *const _, mem::size_of_val(&self.inner) as c::socklen_t)
+    (&self.inner as *const c::sockaddr_in as  *const c::sockaddr,
+     mem::size_of_val(&self.inner) as c::socklen_t)
   }
 }
 
@@ -78,7 +79,8 @@ impl MySocketAddrV6 {
   }
 
   fn into_inner(self) -> (*const c::sockaddr, c::socklen_t) {
-    (&self.inner as *const _ as *const _, mem::size_of_val(&self.inner) as c::socklen_t)
+    (&self.inner as *const c::sockaddr_in6 as *const c::sockaddr,
+     mem::size_of_val(&self.inner) as c::socklen_t)
   }
 }
 
