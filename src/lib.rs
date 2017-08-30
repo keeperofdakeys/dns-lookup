@@ -8,7 +8,7 @@
 //! it.
 //!
 //! ```rust
-//!  use dns_lookup::{lookup_host, lookup_addr};
+//!  use dns_lookup::lookup_host;
 //!
 //!  let hostname = "localhost";
 //!  let ips: Vec<std::net::IpAddr> =
@@ -22,7 +22,7 @@
 //!
 //!
 //! ```rust
-//!  use dns_lookup::{lookup_host, lookup_addr};
+//!  use dns_lookup::lookup_addr;
 //!
 //!  let ip: std::net::IpAddr = "127.0.0.1".parse().unwrap();
 //!  let hostname = lookup_addr(&ip).unwrap();

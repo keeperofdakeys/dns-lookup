@@ -115,7 +115,8 @@ pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
 ///
 /// Returns the hostname as a String, or an io::Error on failure.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
-  let (inner, len) = ip_to_sockaddr(addr);
+  let socket = ip_to_sockaddr(addr);
+  let (inner, len) = socket.into_inner();
   let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
 
   let data = unsafe {

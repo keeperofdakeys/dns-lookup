@@ -2,6 +2,22 @@ use libc as c;
 use std::mem;
 use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6, IpAddr, Ipv4Addr, Ipv6Addr};
 
+pub enum MySocketAddr {
+  V4(MySocketAddrV4),
+  V6(MySocketAddrV6),
+}
+
+impl MySocketAddr {
+  pub fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
+    match *self {
+      MySocketAddr::V4(ref s) =>
+        s.into_inner(),
+      MySocketAddr::V6(ref s) =>
+        s.into_inner()
+    }
+  }
+}
+
 /// A wrapper around a libc sockaddr_in.
 pub struct MySocketAddrV4 {
   inner: c::sockaddr_in
@@ -25,11 +41,10 @@ impl MySocketAddrV4 {
       }
   }
 
-  fn port (&self) -> u16 {
-    self.inner.sin_port
+  fn port (&self) -> u16 { self.inner.sin_port
   }
 
-  fn into_inner(self) -> (*const c::sockaddr, c::socklen_t) {
+  fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
     (&self.inner as *const c::sockaddr_in as  *const c::sockaddr,
      mem::size_of_val(&self.inner) as c::socklen_t)
   }
@@ -78,7 +93,7 @@ impl MySocketAddrV6 {
     self.inner.sin6_port
   }
 
-  fn into_inner(self) -> (*const c::sockaddr, c::socklen_t) {
+  fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
     (&self.inner as *const c::sockaddr_in6 as *const c::sockaddr,
      mem::size_of_val(&self.inner) as c::socklen_t)
   }
@@ -120,13 +135,13 @@ fn ipv6_to_inner(ip: &Ipv6Addr) -> c::in6_addr {
 }
 
 /// Turn an IpAddr into a libc (socketaddr, length) pair.
-pub fn ip_to_sockaddr(ip: &IpAddr) ->  (*const c::sockaddr, c::socklen_t) {
+pub fn ip_to_sockaddr(ip: &IpAddr) ->  MySocketAddr {
   match ip {
     &IpAddr::V4(ipv4) => {
-      MySocketAddrV4::new(&ipv4, 0).into_inner()
+      MySocketAddr::V4(MySocketAddrV4::new(&ipv4, 0))
     },
     &IpAddr::V6(ipv6) => {
-      MySocketAddrV6::new(&ipv6, 0, 0, 0).into_inner()
+      MySocketAddr::V6(MySocketAddrV6::new(&ipv6, 0, 0, 0))
     },
   }
 }
@@ -165,4 +180,44 @@ fn test_ipv6_conversion() {
       ip.clone()
     }).collect();
   assert_eq!(ips, converted);
+}
+
+#[test]
+fn test_ipv4_to_sockaddr() {
+  use std::net::IpAddr;
+
+  let ips: Vec<IpAddr> =
+    ["127.0.0.1", "8.8.8.8", "172.16.0.1", "192.168.0.1"].iter()
+    .map(|a| a.parse().unwrap())
+    .collect();
+  let sockets: Vec<_> = ips.iter().map(|a| (a, ip_to_sockaddr(a))).collect();
+
+  for (ip, socket) in sockets {
+    let socket = match socket {
+      MySocketAddr::V4(s) => s,
+      MySocketAddr::V6(_) =>
+        panic!("Got Ipv6Addr, expected Ipv4Addr"),
+    };
+    assert_eq!(ip, socket.ip());
+  }
+}
+
+#[test]
+fn test_ipv6_to_sockadr() {
+  use std::net::IpAddr;
+
+  let ips: Vec<IpAddr> =
+    ["::1", "fe80::1", "2017::DEAD:BEEF", "1234:5678:90ab:cdef:1357:9ace:2468:0bdf"].iter()
+    .map(|a| a.parse().unwrap())
+    .collect();
+  let sockets: Vec<_> = ips.iter().map(|a| (a, ip_to_sockaddr(a))).collect();
+
+  for (ip, socket) in sockets {
+    let socket = match socket {
+      MySocketAddr::V4(_) =>
+        panic!("Got Ipv4Addr, expected Ipv6Addr"),
+      MySocketAddr::V6(s) => s,
+    };
+    assert_eq!(ip, socket.ip());
+  }
 }
