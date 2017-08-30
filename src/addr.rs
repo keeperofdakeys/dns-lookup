@@ -130,3 +130,39 @@ pub fn ip_to_sockaddr(ip: &IpAddr) ->  (*const c::sockaddr, c::socklen_t) {
     },
   }
 }
+
+#[test]
+fn test_ipv4_conversion() {
+  use std::net::Ipv4Addr;
+  let ips: Vec<Ipv4Addr> =
+    ["127.0.0.1", "8.8.8.8", "172.16.0.1", "192.168.0.1"].iter()
+    .map(|a| a.parse().unwrap())
+    .collect();
+  let converted: Vec<_> = ips.iter()
+    .map(|ip| {
+      let in_addr = ipv4_to_inner(ip);
+      let ip = unsafe {
+          &*(&in_addr as *const c::in_addr as *const Ipv4Addr)
+      };
+      ip.clone()
+    }).collect();
+  assert_eq!(ips, converted);
+}
+
+#[test]
+fn test_ipv6_conversion() {
+  use std::net::Ipv6Addr;
+  let ips: Vec<Ipv6Addr> =
+    ["::1", "fe80::1", "2017::DEAD:BEEF", "1234:5678:90ab:cdef:1357:9ace:2468:0bdf"].iter()
+    .map(|a| a.parse().unwrap())
+    .collect();
+  let converted: Vec<_> = ips.iter()
+    .map(|ip| {
+      let in6_addr = ipv6_to_inner(ip);
+      let ip = unsafe {
+          &*(&in6_addr as *const c::in6_addr as *const Ipv6Addr)
+      };
+      ip.clone()
+    }).collect();
+  assert_eq!(ips, converted);
+}
