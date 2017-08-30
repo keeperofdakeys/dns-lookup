@@ -32,7 +32,7 @@
 extern crate libc;
 
 mod addr;
-mod addrinfo;
+// mod addrinfo;
 mod err;
 mod lookup;
 
