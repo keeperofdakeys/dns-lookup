@@ -1,5 +1,5 @@
-use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6, Ipv4Addr, Ipv6Addr};
 use libc as c;
+use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6, Ipv4Addr, Ipv6Addr};
 
 pub struct MySocketAddrV4 {
   inner: c::sockaddr_in

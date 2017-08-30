@@ -1,7 +1,7 @@
+use libc as c;
 use std::ffi::{CStr};
 use std::io;
 use std::str;
-use libc as c;
 
 #[cfg(all(not(windows), not(unix)))]
 pub fn lookup_errno(err: c::c_int) -> io::Result<()> {

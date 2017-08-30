@@ -1,9 +1,9 @@
-use std::mem;
-use std::ptr;
-use std::io;
-use std::ffi::CString;
-use std::net::{SocketAddr, IpAddr};
 use libc as c;
+use std::ffi::CString;
+use std::io;
+use std::mem;
+use std::net::{SocketAddr, IpAddr};
+use std::ptr;
 
 use addr::{MySocketAddrV4, MySocketAddrV6};
 use err::lookup_errno;

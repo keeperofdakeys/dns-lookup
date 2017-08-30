@@ -1,10 +1,10 @@
 use libc as c;
+use std::error::Error;
 use std::ffi::{CStr, CString};
+use std::fmt;
+use std::io;
 use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
 use std::ptr;
-use std::io;
-use std::error::Error;
-use std::fmt;
 
 /// Address family
 pub enum Family {
