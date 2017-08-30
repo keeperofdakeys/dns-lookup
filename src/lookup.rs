@@ -1,10 +1,12 @@
 use std::mem;
-use std::ffi::{CString, NulError};
 use std::ptr;
 use std::io;
+use std::ffi::CString;
 use std::net::{SocketAddr, IpAddr};
-use addr::{MySocketAddrV4, MySocketAddrV6};
 use libc as c;
+
+use addr::{MySocketAddrV4, MySocketAddrV6};
+use err::lookup_errno;
 
 fn sockaddr_to_addr(storage: &c::sockaddr_storage,
           len: usize) -> io::Result<SocketAddr> {
@@ -40,14 +42,16 @@ pub struct LookupHost {
 
 impl Iterator for LookupHost {
   type Item = io::Result<IpAddr>;
+
+  /// Loop through the linked list, returning the next IP.
   fn next(&mut self) -> Option<io::Result<IpAddr>> {
-  unsafe {
-    if self.cur.is_null() { return None }
-    let ret = sockaddr_to_addr(mem::transmute((*self.cur).ai_addr),
-           (*self.cur).ai_addrlen as usize);
-    self.cur = (*self.cur).ai_next as *mut c::addrinfo;
-    Some(ret.map(|s| s.ip()))
-  }
+    unsafe {
+      if self.cur.is_null() { return None }
+      let ret = sockaddr_to_addr(mem::transmute((*self.cur).ai_addr),
+             (*self.cur).ai_addrlen as usize);
+      self.cur = (*self.cur).ai_next as *mut c::addrinfo;
+      Some(ret.map(|s| s.ip()))
+    }
   }
 }
 
@@ -56,37 +60,71 @@ unsafe impl Send for LookupHost {}
 
 impl Drop for LookupHost {
   fn drop(&mut self) {
-  unsafe { c::freeaddrinfo(self.original) }
+    unsafe { c::freeaddrinfo(self.original) }
   }
 }
 
+#[cfg(windows)]
+fn init_windows_sockets() {
+  static START: Once = Once::new();
+
+  START.call_once(|| unsafe {
+      let mut data: c::WSADATA = mem::zeroed();
+      let ret = c::WSAStartup(0x202, // version 2.2
+                              &mut data);
+      assert_eq!(ret, 0);
+
+      let _ = sys_common::at_exit(|| { c::WSACleanup(); });
+    });
+}
+
 /// Lookup a hostname via dns, return an iterator of ip addresses.
-pub fn lookup_host(host: &str) -> Result<LookupHost, self::Error> {
-  // FIXME: THis should be called for Windows.
-  //init();
+pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
+  // FIXME: Initialise windows sockets somehow :/
+  #[cfg(windows)]
+  init_windows_sockets();
 
   let c_host = try!(CString::new(host));
+  let mut hints: c::addrinfo = unsafe { mem::zeroed() };
+  hints.ai_socktype = c::SOCK_STREAM;
   let mut res = ptr::null_mut();
+  // unsafe {
+  //   match c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res) {
+  //     0 => Ok(LookupHost { original: res, cur: res }),
+  //     _ => Err(::Error::Generic),
+  //   }
   unsafe {
-    match c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res) {
-      0 => Ok(LookupHost { original: res, cur: res }),
-      _ => Err(Error::Generic),
+    match lookup_errno(c::getaddrinfo(c_host.as_ptr(), ptr::null(), &hints, &mut res)) {
+      Ok(_) => {
+          Ok(LookupHost { original: res, cur: res })
+      },
+      #[cfg(unix)]
+      Err(e) => {
+          // The lookup failure could be caused by using a stale /etc/resolv.conf.
+          // See https://github.com/rust-lang/rust/issues/41570.
+          // We therefore force a reload of the nameserver information.
+          c::res_init();
+          Err(e)
+      },
+      // the cfg is needed here to avoid an "unreachable pattern" warning
+      #[cfg(not(unix))]
+      Err(e) => Err(e),
     }
   }
 }
 
-pub fn lookup_addr(addr: &IpAddr) -> Result<String, self::Error> {
+pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
   unimplemented!();
 }
+
 // FIXME: To go from SocketAddr -> c socket ptr is a wee bit harder.
-//
 // pub fn lookup_addr(addr: &IpAddr) -> Result<LookupHost, self::Error> {
 //   // FIXME: This should be called for Windows.
 //   // init();
 // 
 //   let saddr = SocketAddr::new(*addr, 0);
 //   let (inner, len) = saddr.into_inner();
-//   let mut hostbuf = [0 as c_char; c::NI_MAXHOST as usize];
+//   let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
 // 
 //   let data = unsafe {
 //     try!(cvt_gai(c::getnameinfo(inner, len,
@@ -104,31 +142,10 @@ pub fn lookup_addr(addr: &IpAddr) -> Result<String, self::Error> {
 //   }
 // }
 
-#[derive(Debug)]
-/// Errors that can occur looking up a hostname.
-pub enum Error {
-  /// A generic IO error
-  IOError(io::Error),
-  /// A Null Error
-  NulError(NulError),
-  /// An unspecific error
-  Generic
-}
-
-impl From<io::Error> for Error {
-  fn from(err: io::Error) -> Self {
-    Error::IOError(err)
-  }
-}
-
-impl From<NulError> for Error {
-  fn from(err: NulError) -> Self {
-    Error::NulError(err)
-  }
-}
-
 #[test]
 fn test_localhost() {
-  // FIXME: I should test the values I get back
-  let _ = lookup_host("localhost").unwrap().collect::<Result<Vec<_>, _>>().unwrap();
+  // TODO: Find a better test here?
+  let ips = lookup_host("localhost").unwrap().collect::<io::Result<Vec<_>>>().unwrap();
+  assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
+  assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
 }
