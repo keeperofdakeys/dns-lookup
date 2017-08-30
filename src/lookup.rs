@@ -88,11 +88,6 @@ pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
   let mut hints: c::addrinfo = unsafe { mem::zeroed() };
   hints.ai_socktype = c::SOCK_STREAM;
   let mut res = ptr::null_mut();
-  // unsafe {
-  //   match c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res) {
-  //     0 => Ok(LookupHost { original: res, cur: res }),
-  //     _ => Err(::Error::Generic),
-  //   }
   unsafe {
     match lookup_errno(c::getaddrinfo(c_host.as_ptr(), ptr::null(), &hints, &mut res)) {
       Ok(_) => {
