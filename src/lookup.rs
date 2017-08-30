@@ -1,11 +1,12 @@
 use libc as c;
-use std::ffi::CString;
+use std::ffi::{CString, CStr};
 use std::io;
 use std::mem;
 use std::net::{SocketAddr, IpAddr};
 use std::ptr;
+use std::str;
 
-use addr::{MySocketAddrV4, MySocketAddrV6};
+use addr::{MySocketAddrV4, MySocketAddrV6, ip_to_sockaddr};
 use err::lookup_errno;
 
 fn sockaddr_to_addr(storage: &c::sockaddr_storage,
@@ -78,13 +79,15 @@ impl Drop for LookupHost {
 //     });
 // }
 
-/// Lookup a hostname via dns, return an iterator of ip addresses.
+/// Lookup the address for a given hostname via DNS.
+///
+/// Returns an iterator of IP Addresses, or an io::Error on failure.
 pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
   // FIXME: Initialise windows sockets somehow :/
   // #[cfg(windows)]
   // init_windows_sockets();
 
-  let c_host = try!(CString::new(host));
+  let c_host = (CString::new(host))?;
   let mut hints: c::addrinfo = unsafe { mem::zeroed() };
   hints.ai_socktype = c::SOCK_STREAM;
   let mut res = ptr::null_mut();
@@ -108,34 +111,28 @@ pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
   }
 }
 
+/// Lookup the hostname of a given IP Address via DNS.
+///
+/// Returns the hostname as a String, or an io::Error on failure.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
-  unimplemented!();
-}
+  let (inner, len) = ip_to_sockaddr(addr);
+  let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
 
-// FIXME: To go from SocketAddr -> c socket ptr is a wee bit harder.
-// pub fn lookup_addr(addr: &IpAddr) -> Result<LookupHost, self::Error> {
-//   // FIXME: This should be called for Windows.
-//   // init();
-// 
-//   let saddr = SocketAddr::new(*addr, 0);
-//   let (inner, len) = saddr.into_inner();
-//   let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
-// 
-//   let data = unsafe {
-//     try!(cvt_gai(c::getnameinfo(inner, len,
-//                   hostbuf.as_mut_ptr(),
-//                   c::NI_MAXHOST,
-//                   ptr::null_mut(), 0, 0)));
-// 
-//     CStr::from_ptr(hostbuf.as_ptr())
-//   };
-// 
-//   match from_utf8(data.to_bytes()) {
-//     Ok(name) => Ok(name.to_owned()),
-//     Err(_) => Err(io::Error::new(io::ErrorKind::Other,
-//                    "failed to lookup address information"))
-//   }
-// }
+  let data = unsafe {
+    lookup_errno(c::getnameinfo(inner, len,
+                  hostbuf.as_mut_ptr(),
+                  c::NI_MAXHOST,
+                  ptr::null_mut(), 0, 0))?;
+
+    CStr::from_ptr(hostbuf.as_ptr())
+  };
+
+  match str::from_utf8(data.to_bytes()) {
+    Ok(name) => Ok(name.to_owned()),
+    Err(_) => Err(io::Error::new(io::ErrorKind::Other,
+                   "failed to lookup address information"))
+  }
+}
 
 #[test]
 fn test_localhost() {
@@ -143,4 +140,7 @@ fn test_localhost() {
   let ips = lookup_host("localhost").unwrap().collect::<io::Result<Vec<_>>>().unwrap();
   assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
   assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
+
+  let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
+  assert_eq!(name.unwrap(), "localhost");
 }
