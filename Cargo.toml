@@ -16,4 +16,4 @@ include = [
 ]
 
 [dependencies]
-libc = "0.2.13"
+libc = "^0.2"
