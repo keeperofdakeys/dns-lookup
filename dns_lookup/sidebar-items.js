@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["lookup_addr",""],["lookup_host","Lookup a hostname via dns, return an iterator of ip addresses."]]});
+initSidebarItems({"fn":[["lookup_addr","Lookup the hostname of a given IP Address via DNS."],["lookup_host","Lookup the address for a given hostname via DNS."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["lookup_addr",""],["lookup_host","Lookup a hostname via dns, return an iterator of ip addresses."]]});
