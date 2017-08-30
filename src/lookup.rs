@@ -64,25 +64,25 @@ impl Drop for LookupHost {
   }
 }
 
-#[cfg(windows)]
-fn init_windows_sockets() {
-  static START: Once = Once::new();
-
-  START.call_once(|| unsafe {
-      let mut data: c::WSADATA = mem::zeroed();
-      let ret = c::WSAStartup(0x202, // version 2.2
-                              &mut data);
-      assert_eq!(ret, 0);
-
-      let _ = sys_common::at_exit(|| { c::WSACleanup(); });
-    });
-}
+// fn init_windows_sockets() {
+//   use std::sync;
+//   static START: Once = sync::Once::new();
+// 
+//   START.call_once(|| unsafe {
+//       let mut data: c::WSADATA = mem::zeroed();
+//       let ret = c::WSAStartup(0x202, // version 2.2
+//                               &mut data);
+//       assert_eq!(ret, 0);
+// 
+//       let _ = sys_common::at_exit(|| { c::WSACleanup(); });
+//     });
+// }
 
 /// Lookup a hostname via dns, return an iterator of ip addresses.
 pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
   // FIXME: Initialise windows sockets somehow :/
-  #[cfg(windows)]
-  init_windows_sockets();
+  // #[cfg(windows)]
+  // init_windows_sockets();
 
   let c_host = try!(CString::new(host));
   let mut hints: c::addrinfo = unsafe { mem::zeroed() };
