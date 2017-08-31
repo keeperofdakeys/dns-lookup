@@ -109,26 +109,20 @@ pub struct AddrInfo {
 }
 
 impl AddrInfo {
-  unsafe fn from_ptr<'a>(a: *mut c::addrinfo) -> Result<Self, AddrInfoError> {
+  unsafe fn from_ptr<'a>(a: *mut c::addrinfo) -> io::Result<Self> {
     if a.is_null() {
-      return try!(Err("Pointer is null."));
+      return Err(io::Error::new(io::ErrorKind::Other, "Supplied pointer is null."))?;
     }
     let addrinfo = *a;
 
     Ok(AddrInfo {
       flags: 0,
-      family: try!(
-        Family::from_int(addrinfo.ai_family)
-          .ok_or("Could not find valid address family")
-      ),
-      socktype: try!(
-        SockType::from_int(addrinfo.ai_socktype)
-          .ok_or("Could not find valid socket type")
-      ),
-      protocol: try!(
-        Protocol::from_int(addrinfo.ai_protocol)
-          .ok_or("Could not find valid protocol")
-      ),
+      family: Family::from_int(addrinfo.ai_family)
+        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid address family"))?,
+      socktype: SockType::from_int(addrinfo.ai_socktype)
+        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid socket type"))?,
+      protocol: Protocol::from_int(addrinfo.ai_protocol)
+        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid protocol"))?,
       sockaddr: SocketAddr::V4(
         SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 0)
       ),
@@ -163,7 +157,7 @@ impl AddrInfoIter {
 }
 
 impl Iterator for AddrInfoIter {
-  type Item = Result<AddrInfo, AddrInfoError>;
+  type Item = io::Result<AddrInfo>;
 
   fn next(&mut self) -> Option<Self::Item> {
     unsafe {
@@ -182,49 +176,4 @@ impl Drop for AddrInfoIter {
     fn drop(&mut self) { 
         unsafe { c::freeaddrinfo(self.orig) } 
     } 
-}
-
-pub enum AddrInfoError {
-  IOError(io::Error),
-  Other(String)
-}
-
-impl From<io::Error> for AddrInfoError {
-  fn from(err: io::Error) -> Self {
-    AddrInfoError::IOError(err)
-  }
-}
-
-impl<'a> From<&'a str> for AddrInfoError {
-  fn from(err: &'a str) -> Self {
-    AddrInfoError::Other(err.to_owned())
-  }
-}
-
-impl Error for AddrInfoError {
-  fn description(&self) -> &str {
-    match *self {
-      AddrInfoError::IOError(ref err) => "IO Error",
-      AddrInfoError::Other(ref err_str) => &err_str
-    }
-  }
-
-  fn cause(&self) -> Option<&Error> {
-    match *self {
-      AddrInfoError::IOError(ref err) => Some(err),
-      AddrInfoError::Other(_) => None
-    }
-  }
-}
-
-impl fmt::Display for AddrInfoError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", self.description())
-  }
-}
-
-impl fmt::Debug for AddrInfoError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", self.description())
-  }
 }
