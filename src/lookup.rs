@@ -6,33 +6,8 @@ use std::net::{SocketAddr, IpAddr};
 use std::ptr;
 use std::str;
 
-use addr::{MySocketAddrV4, MySocketAddrV6, ip_to_sockaddr};
+use addr::{MySocketAddr, ip_to_sockaddr};
 use err::lookup_errno;
-
-fn sockaddr_to_addr(storage: &c::sockaddr_storage,
-          len: usize) -> io::Result<SocketAddr> {
-  match storage.ss_family as c::c_int {
-    c::AF_INET => {
-      assert!(len as usize >= mem::size_of::<c::sockaddr_in>());
-      Ok(
-        MySocketAddrV4
-          ::from(unsafe { *(storage as *const _ as *const c::sockaddr_in) })
-          .into()
-      )
-    }
-    c::AF_INET6 => {
-      assert!(len as usize >= mem::size_of::<c::sockaddr_in6>());
-      Ok(
-        MySocketAddrV6
-          ::from(unsafe { *(storage as *const _ as *const c::sockaddr_in6) })
-          .into()
-      )
-    }
-    _ => {
-      Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid argument"))
-    }
-  }
-}
 
 #[derive(Debug)]
 /// A struct that holds a linked list of lookup results.
@@ -48,8 +23,10 @@ impl Iterator for LookupHost {
   fn next(&mut self) -> Option<io::Result<IpAddr>> {
     unsafe {
       if self.cur.is_null() { return None }
-      let ret = sockaddr_to_addr(mem::transmute((*self.cur).ai_addr),
-             (*self.cur).ai_addrlen as usize);
+      let ret: io::Result<SocketAddr> =
+        MySocketAddr::from_inner(
+          mem::transmute((*self.cur).ai_addr), (*self.cur).ai_addrlen
+      ).map(|s| s.into());
       self.cur = (*self.cur).ai_next as *mut c::addrinfo;
       Some(ret.map(|s| s.ip()))
     }
@@ -138,9 +115,18 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
 #[test]
 fn test_localhost() {
   // TODO: Find a better test here?
-  let ips = lookup_host("localhost").unwrap().collect::<io::Result<Vec<_>>>().unwrap();
-  assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
-  assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
+  let ips = lookup_host("localhost").unwrap().collect::<Vec<_>>();
+  let mut safe_ips = vec!();
+  println!("{:?}", ips);
+  for ip in ips {
+    let ip = match ip {
+      Ok(ip) => ip,
+      Err(_) => continue,
+    };
+    safe_ips.push(ip);
+  }
+  assert!(safe_ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
+  assert!(!safe_ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
 
   let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
   assert_eq!(name.unwrap(), "localhost");

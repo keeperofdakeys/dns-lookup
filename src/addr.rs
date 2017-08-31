@@ -1,4 +1,5 @@
 use libc as c;
+use std::io;
 use std::mem;
 use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6, IpAddr, Ipv4Addr, Ipv6Addr};
 
@@ -14,6 +15,52 @@ impl MySocketAddr {
         s.into_inner(),
       MySocketAddr::V6(ref s) =>
         s.into_inner()
+    }
+  }
+
+  pub fn from_inner(sock: *mut c::sockaddr, sock_len: c::socklen_t) -> io::Result<Self> {
+    // let family: c::sa_family_t = unsafe {
+    //   match storage.as_ref() {
+    //     Some(s) => (*s).ss_family,
+    //     None => return Err(io::Error::new(io::ErrorKind::Other, "Socket address null")),
+    //   }
+    // };
+    let family;
+    unsafe {
+      family = (*sock).sa_family;
+    }
+
+    match family as c::c_int {
+      c::AF_INET => {
+        assert!(sock_len as usize >= mem::size_of::<c::sockaddr_in>());
+        Ok(
+          MySocketAddr::V4(
+            MySocketAddrV4
+              ::from(unsafe { *(sock as *const _ as *const c::sockaddr_in) })
+          )
+        )
+      }
+      c::AF_INET6 => {
+        assert!(sock_len as usize >= mem::size_of::<c::sockaddr_in6>());
+        Ok(
+          MySocketAddr::V6(
+            MySocketAddrV6
+              ::from(unsafe { *(sock as *const _ as *const c::sockaddr_in6) })
+          )
+        )
+      }
+      _ => {
+        Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid argument"))
+      }
+    }
+  }
+}
+
+impl Into<SocketAddr> for MySocketAddr {
+  fn into(self) -> SocketAddr {
+    match self {
+      MySocketAddr::V4(s) => SocketAddr::V4(s.into()),
+      MySocketAddr::V6(s) => SocketAddr::V6(s.into()),
     }
   }
 }
@@ -56,11 +103,9 @@ impl From<c::sockaddr_in> for MySocketAddrV4 {
   }
 }
 
-impl Into<SocketAddr> for MySocketAddrV4 {
-  fn into(self) -> SocketAddr {
-    SocketAddr::V4(
-      SocketAddrV4::new(self.ip().clone(), self.port())
-    )
+impl Into<SocketAddrV4> for MySocketAddrV4 {
+  fn into(self) -> SocketAddrV4 {
+    SocketAddrV4::new(self.ip().clone(), self.port())
   }
 }
 
@@ -105,11 +150,9 @@ impl From<c::sockaddr_in6> for MySocketAddrV6 {
   }
 }
 
-impl Into<SocketAddr> for MySocketAddrV6 {
-  fn into(self) -> SocketAddr {
-    SocketAddr::V6(
-      SocketAddrV6::new(self.ip().clone(), self.port(), 0, 0)
-    )
+impl Into<SocketAddrV6> for MySocketAddrV6 {
+  fn into(self) -> SocketAddrV6 {
+    SocketAddrV6::new(self.ip().clone(), self.port(), 0, 0)
   }
 }
 
