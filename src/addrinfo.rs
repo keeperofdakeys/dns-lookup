@@ -1,3 +1,5 @@
+#![allow(dead_code, unused)]
+
 use libc as c;
 use std::error::Error;
 use std::ffi::{CStr, CString};
@@ -6,8 +8,13 @@ use std::io;
 use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
 use std::ptr;
 
+use addr::MySocketAddr;
 use err::lookup_errno;
 
+// During development.
+
+// FIXME: We need more of these.
+#[derive(Copy, Clone, Debug)]
 /// Address family
 pub enum Family {
   /// Unspecified
@@ -37,6 +44,7 @@ impl Family {
   }
 }
 
+#[derive(Copy, Clone, Debug)]
 /// Types of Sockets
 pub enum SockType {
   /// Sequenced, reliable, connection-based byte streams.
@@ -66,6 +74,8 @@ impl SockType {
   }
 }
 
+// FIXME: We need more of these
+#[derive(Copy, Clone, Debug)]
 /// Socket Protocol
 pub enum Protocol {
   /// Unspecificed.
@@ -101,13 +111,14 @@ impl Protocol {
   }
 }
 
+#[derive(Clone, Debug)]
 pub struct AddrInfo {
   pub flags: c::c_int,
   pub family: Family,
   pub socktype: SockType,
   pub protocol: Protocol,
   pub sockaddr: SocketAddr,
-  pub canonname: String,
+  pub canonname: Option<String>,
 }
 
 impl AddrInfo {
@@ -125,51 +136,10 @@ impl AddrInfo {
         .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid socket type"))?,
       protocol: Protocol::from_int(addrinfo.ai_protocol)
         .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid protocol"))?,
-      sockaddr: SocketAddr::V4(
-        SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 0)
+      sockaddr: MySocketAddr::from_inner(addrinfo.ai_addr, addrinfo.ai_addrlen)?.into(),
+      canonname: addrinfo.ai_canonname.as_ref().map(|s|
+        CStr::from_ptr(s).to_str().unwrap().to_owned()
       ),
-      canonname:
-        CStr::from_ptr(addrinfo.ai_canonname)
-          .to_str()
-          .unwrap()
-          .to_owned()
-    })
-  }
-}
-
-pub fn getaddrinfo() {
-  fn new(host: Option<&str>, service: Option<&str>, hints: Option<&AddrInfo>) -> io::Result<AddrInfoIter> {
-    // We must have at least host or service.
-    if host.is_none() && service.is_none() {
-      return Err(io::Error::new(io::ErrorKind::Other, "Either host or service must be supplied"));
-    }
-
-    if hints.is_none() {
-      unimplemented!();
-    }
-
-    // Allocate CStrings, and keep around to free.
-    let host = match host {
-      Some(host_str) => Some(CString::new(host_str)?),
-      None => None
-    };
-    let c_host = host.map_or(ptr::null(), |s| s.as_ptr());
-    let service = match service {
-      Some(service_str) => Some(CString::new(service_str)?),
-      None => None
-    };
-    let c_service = service.map_or(ptr::null(), |s| s.as_ptr());
-
-    let mut res = ptr::null_mut();
-    unsafe {
-      lookup_errno(
-        c::getaddrinfo(c_host, c_service, ptr::null(), &mut res)
-      )?
-    };
-
-    Ok(AddrInfoIter {
-      orig: res,
-      cur: res,
     })
   }
 }
@@ -191,8 +161,6 @@ impl Iterator for AddrInfoIter {
     }
   }
 }
-
-
 
 impl AddrInfoIter {
   /// Create an AddrInfo struct from a c addrinfo struct.
@@ -216,4 +184,51 @@ impl Drop for AddrInfoIter {
     fn drop(&mut self) {
         unsafe { c::freeaddrinfo(self.orig) }
     }
+}
+
+pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<&AddrInfo>)
+    -> io::Result<AddrInfoIter> {
+  // We must have at least host or service.
+  if host.is_none() && service.is_none() {
+    return Err(io::Error::new(io::ErrorKind::Other, "Either host or service must be supplied"));
+  }
+
+  if hints.is_some() {
+    unimplemented!();
+  }
+
+  // Allocate CStrings, and keep around to free.
+  let host = match host {
+    Some(host_str) => Some(CString::new(host_str)?),
+    None => None
+  };
+  let c_host = host.as_ref().map_or(ptr::null(), |s| s.as_ptr());
+  let service = match service {
+    Some(service_str) => Some(CString::new(service_str)?),
+    None => None
+  };
+  let c_service = service.as_ref().map_or(ptr::null(), |s| s.as_ptr());
+
+  let mut res = ptr::null_mut();
+  unsafe {
+    match lookup_errno(c::getaddrinfo(c_host, c_service, ptr::null(), &mut res)) {
+      Ok(_) => {
+        Ok(AddrInfoIter { orig: res, cur: res })
+      },
+      #[cfg(unix)]
+      Err(e) => {
+        c::res_init();
+        Err(e)
+      },
+      #[cfg(not(unix))]
+      Err(e) => Err(e),
+    }
+  }
+}
+
+#[test]
+fn test_getaddrinfo() {
+  for entry in getaddrinfo(Some("localhost"), None, None).unwrap() {
+    println!("{:?}", entry);
+  }
 }
