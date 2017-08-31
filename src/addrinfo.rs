@@ -6,6 +6,8 @@ use std::io;
 use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
 use std::ptr;
 
+use err::lookup_errno;
+
 /// Address family
 pub enum Family {
   /// Unspecified
@@ -135,25 +137,46 @@ impl AddrInfo {
   }
 }
 
-pub struct AddrInfoIter {
-  orig: *mut c::addrinfo,
-  cur: *mut c::addrinfo,
-}
+pub fn getaddrinfo() {
+  fn new(host: Option<&str>, service: Option<&str>, hints: Option<&AddrInfo>) -> io::Result<AddrInfoIter> {
+    // We must have at least host or service.
+    if host.is_none() && service.is_none() {
+      return Err(io::Error::new(io::ErrorKind::Other, "Either host or service must be supplied"));
+    }
 
-impl AddrInfoIter {
-  // FIXME: Return an appropriate error type.
-  /// Create an AddrInfo struct from a c addrinfo struct.
-  fn new(host: &str) -> Result<Self, ()> {
-    let c_host = CString::new(host).unwrap();
+    if hints.is_none() {
+      unimplemented!();
+    }
+
+    // Allocate CStrings, and keep around to free.
+    let host = match host {
+      Some(host_str) => Some(CString::new(host_str)?),
+      None => None
+    };
+    let c_host = host.map_or(ptr::null(), |s| s.as_ptr());
+    let service = match service {
+      Some(service_str) => Some(CString::new(service_str)?),
+      None => None
+    };
+    let c_service = service.map_or(ptr::null(), |s| s.as_ptr());
+
     let mut res = ptr::null_mut();
     unsafe {
-      c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res);
-    }
+      lookup_errno(
+        c::getaddrinfo(c_host, c_service, ptr::null(), &mut res)
+      )?
+    };
+
     Ok(AddrInfoIter {
       orig: res,
       cur: res,
     })
-  } 
+  }
+}
+
+pub struct AddrInfoIter {
+  orig: *mut c::addrinfo,
+  cur: *mut c::addrinfo,
 }
 
 impl Iterator for AddrInfoIter {
@@ -169,11 +192,28 @@ impl Iterator for AddrInfoIter {
   }
 }
 
+
+
+impl AddrInfoIter {
+  /// Create an AddrInfo struct from a c addrinfo struct.
+  fn new(host: &str) -> io::Result<Self> {
+    let c_host = CString::new(host).unwrap();
+    let mut res = ptr::null_mut();
+    unsafe {
+      c::getaddrinfo(c_host.as_ptr(), ptr::null(), ptr::null(), &mut res);
+    }
+    Ok(AddrInfoIter {
+      orig: res,
+      cur: res,
+    })
+  }
+}
+
 unsafe impl Sync for AddrInfoIter {}
 unsafe impl Send for AddrInfoIter {}
 
-impl Drop for AddrInfoIter { 
-    fn drop(&mut self) { 
-        unsafe { c::freeaddrinfo(self.orig) } 
-    } 
+impl Drop for AddrInfoIter {
+    fn drop(&mut self) {
+        unsafe { c::freeaddrinfo(self.orig) }
+    }
 }
