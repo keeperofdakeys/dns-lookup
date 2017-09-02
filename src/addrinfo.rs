@@ -22,7 +22,9 @@ pub enum Family {
   /// Ipv4
   Inet,
   /// Ipv6
-  Inet6
+  Inet6,
+  /// Unknown.
+  Other(u16),
 }
 
 impl Family {
@@ -31,7 +33,7 @@ impl Family {
       0 => Family::Unspec,
       c::AF_INET => Family::Inet,
       c::AF_INET6 => Family::Inet6,
-      _ => return None,
+      _ => Family::Other(int as u16),
     })
   }
 
@@ -40,6 +42,7 @@ impl Family {
       Family::Unspec => 0,
       Family::Inet => c::AF_INET,
       Family::Inet6 => c::AF_INET6,
+      Family::Other(i) => i as c::c_int,
     }
   }
 }
@@ -53,6 +56,8 @@ pub enum SockType {
   DGram,
   /// Raw protocol interface.
   Raw,
+  /// Unknown.
+  Other(u16),
 }
 
 impl SockType {
@@ -61,7 +66,7 @@ impl SockType {
       c::SOCK_STREAM => SockType::Stream,
       c::SOCK_DGRAM => SockType::DGram,
       c::SOCK_RAW => SockType::Raw,
-      _ => return None,
+      _ => SockType::Other(int as u16),
     })
   }
 
@@ -70,6 +75,7 @@ impl SockType {
       SockType::Stream => c::SOCK_STREAM,
       SockType::DGram => c::SOCK_DGRAM,
       SockType::Raw => c::SOCK_RAW,
+      SockType::Other(i) => i as c::c_int,
     }
   }
 }
@@ -86,27 +92,34 @@ pub enum Protocol {
   Unix,
   /// POSIX name for PF_LOCAL.
   File,
-  /// IP Protocol Family.
+  /// IPv4 Protocol Family.
   Inet,
+  /// IPv6 Protocol Family.
+  Inet6,
+  /// Unknown.
+  Other(u16),
 }
 
 impl Protocol {
   fn from_int(int: c::c_int) -> Option<Self> {
     Some(match int {
-      0 => Protocol::Unspec,
-      1 => Protocol::Local,
-      2 => Protocol::Inet,
-      _ => return None,
+      c::PF_UNSPEC => Protocol::Unspec,
+      c::PF_LOCAL => Protocol::Local,
+      c::PF_INET => Protocol::Inet,
+      c::PF_INET6 => Protocol::Inet6,
+      _ => Protocol::Other(int as u16),
     })
   }
 
   fn to_int(&self) -> c::c_int {
     match *self {
-      Protocol::Unspec => 0,
-      Protocol::Local => 1,
-      Protocol::Unix => 1,
-      Protocol::File => 1,
-      Protocol::Inet => 2,
+      Protocol::Unspec => c::PF_UNSPEC,
+      Protocol::Local => c::PF_LOCAL,
+      Protocol::Unix => c::PF_LOCAL,
+      Protocol::File => c::PF_LOCAL,
+      Protocol::Inet => c::PF_INET,
+      Protocol::Inet6 => c::PF_INET6,
+      Protocol::Other(i) => i as c::c_int,
     }
   }
 }
@@ -131,11 +144,20 @@ impl AddrInfo {
     Ok(AddrInfo {
       flags: 0,
       family: Family::from_int(addrinfo.ai_family)
-        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid address family"))?,
+        .ok_or(
+          io::Error::new(io::ErrorKind::Other,
+          format!("Could not find family for: {}", addrinfo.ai_family))
+        )?,
       socktype: SockType::from_int(addrinfo.ai_socktype)
-        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid socket type"))?,
+        .ok_or(
+          io::Error::new(io::ErrorKind::Other,
+          format!("Could not find socket type for: {}", addrinfo.ai_socktype))
+        )?,
       protocol: Protocol::from_int(addrinfo.ai_protocol)
-        .ok_or(io::Error::new(io::ErrorKind::Other, "Could not find valid protocol"))?,
+        .ok_or(
+          io::Error::new(io::ErrorKind::Other,
+          format!("Could not find protocol for: {}", addrinfo.ai_protocol))
+        )?,
       sockaddr: MySocketAddr::from_inner(addrinfo.ai_addr, addrinfo.ai_addrlen)?.into(),
       canonname: addrinfo.ai_canonname.as_ref().map(|s|
         CStr::from_ptr(s).to_str().unwrap().to_owned()
