@@ -115,18 +115,9 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
 #[test]
 fn test_localhost() {
   // TODO: Find a better test here?
-  let ips = lookup_host("localhost").unwrap().collect::<Vec<_>>();
-  let mut safe_ips = vec!();
-  println!("{:?}", ips);
-  for ip in ips {
-    let ip = match ip {
-      Ok(ip) => ip,
-      Err(_) => continue,
-    };
-    safe_ips.push(ip);
-  }
-  assert!(safe_ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
-  assert!(!safe_ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
+  let ips = lookup_host("localhost").unwrap().collect::<io::Result<Vec<_>>>().unwrap();
+  assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
+  assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
 
   let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
   assert_eq!(name.unwrap(), "localhost");
