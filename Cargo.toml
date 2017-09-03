@@ -6,7 +6,7 @@ description = "A simple dns resolving api, much like rust's unstable api."
 documentation = "https://keeperofdakeys.github.io/dns-lookup/dns_lookup"
 repository = "https://github.com/keeperofdakeys/dns-lookup/"
 readme = "README.md"
-keywords = ["dns", "resolve", "lookup"]
+keywords = ["dns", "resolve", "lookup", "getaddrinfo", "getnameinfo"]
 license = "MIT/Apache-2.0"
 include = [
     "src/**",
