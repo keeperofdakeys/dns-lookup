@@ -14,7 +14,7 @@ use err::lookup_errno;
 // During development.
 
 // FIXME: We need more of these.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 /// Address family
 pub enum Family {
   /// Unspecified
@@ -47,7 +47,7 @@ impl Family {
   }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 /// Types of Sockets
 pub enum SockType {
   /// Sequenced, reliable, connection-based byte streams.
@@ -81,7 +81,7 @@ impl SockType {
 }
 
 // FIXME: We need more of these
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 /// Socket Protocol
 pub enum Protocol {
   /// Unspecificed.
@@ -124,7 +124,7 @@ impl Protocol {
   }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct AddrInfo {
   pub flags: c::c_int,
   pub family: Family,

@@ -1,46 +1,13 @@
 use libc as c;
-use std::ffi::{CString, CStr};
+use std::ffi::{CStr};
 use std::io;
-use std::mem;
-use std::net::{SocketAddr, IpAddr};
+use std::net::IpAddr;
 use std::ptr;
 use std::str;
 
-use addr::{MySocketAddr, ip_to_sockaddr};
+use addr::ip_to_sockaddr;
 use err::lookup_errno;
-
-#[derive(Debug)]
-/// A struct that holds a linked list of lookup results.
-pub struct LookupHost {
-  original: *mut c::addrinfo,
-  cur: *mut c::addrinfo,
-}
-
-impl Iterator for LookupHost {
-  type Item = io::Result<IpAddr>;
-
-  /// Loop through the linked list, returning the next IP.
-  fn next(&mut self) -> Option<io::Result<IpAddr>> {
-    unsafe {
-      if self.cur.is_null() { return None }
-      let ret: io::Result<SocketAddr> =
-        MySocketAddr::from_inner(
-          mem::transmute((*self.cur).ai_addr), (*self.cur).ai_addrlen
-      ).map(|s| s.into());
-      self.cur = (*self.cur).ai_next as *mut c::addrinfo;
-      Some(ret.map(|s| s.ip()))
-    }
-  }
-}
-
-unsafe impl Sync for LookupHost {}
-unsafe impl Send for LookupHost {}
-
-impl Drop for LookupHost {
-  fn drop(&mut self) {
-    unsafe { c::freeaddrinfo(self.original) }
-  }
-}
+use addrinfo::getaddrinfo;
 
 // fn init_windows_sockets() {
 //   use std::sync;
@@ -59,32 +26,29 @@ impl Drop for LookupHost {
 /// Lookup the address for a given hostname via DNS.
 ///
 /// Returns an iterator of IP Addresses, or an io::Error on failure.
-pub fn lookup_host(host: &str) -> io::Result<LookupHost> {
+pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
   // FIXME: Initialise windows sockets somehow :/
   // #[cfg(windows)]
   // init_windows_sockets();
 
-  let c_host = (CString::new(host))?;
-  let mut hints: c::addrinfo = unsafe { mem::zeroed() };
-  hints.ai_socktype = c::SOCK_STREAM;
-  let mut res = ptr::null_mut();
-  unsafe {
-    match lookup_errno(c::getaddrinfo(c_host.as_ptr(), ptr::null(), &hints, &mut res)) {
-      Ok(_) => {
-          Ok(LookupHost { original: res, cur: res })
-      },
-      #[cfg(unix)]
-      Err(e) => {
-          // The lookup failure could be caused by using a stale /etc/resolv.conf.
-          // See https://github.com/rust-lang/rust/issues/41570.
-          // We therefore force a reload of the nameserver information.
+  match getaddrinfo(Some(host), None, None) {
+    Ok(addrs) => {
+      let addrs: io::Result<Vec<_>> = addrs.map(|r| r.map(|a| a.sockaddr.ip())).collect();
+      addrs
+    },
+    #[cfg(unix)]
+    Err(e) => {
+        // The lookup failure could be caused by using a stale /etc/resolv.conf.
+        // See https://github.com/rust-lang/rust/issues/41570.
+        // We therefore force a reload of the nameserver information.
+        unsafe {
           c::res_init();
-          Err(e)
-      },
-      // the cfg is needed here to avoid an "unreachable pattern" warning
-      #[cfg(not(unix))]
-      Err(e) => Err(e),
-    }
+        }
+        Err(e)
+    },
+    // the cfg is needed here to avoid an "unreachable pattern" warning
+    #[cfg(not(unix))]
+    Err(e) => Err(e),
   }
 }
 
@@ -115,7 +79,7 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
 #[test]
 fn test_localhost() {
   // TODO: Find a better test here?
-  let ips = lookup_host("localhost").unwrap().collect::<io::Result<Vec<_>>>().unwrap();
+  let ips = lookup_host("localhost").unwrap();
   assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
   assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
 
