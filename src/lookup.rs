@@ -6,8 +6,9 @@ use std::ptr;
 use std::str;
 
 use addr::ip_to_sockaddr;
+use addrinfo::{getaddrinfo, AddrInfoHints};
 use err::lookup_errno;
-use addrinfo::getaddrinfo;
+use types::*;
 
 // fn init_windows_sockets() {
 //   use std::sync;
@@ -31,7 +32,12 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
   // #[cfg(windows)]
   // init_windows_sockets();
 
-  match getaddrinfo(Some(host), None, None) {
+  let hints = AddrInfoHints {
+    socktype: SockType::Stream,
+    ..AddrInfoHints::default()
+  };
+
+  match getaddrinfo(Some(host), None, Some(hints)) {
     Ok(addrs) => {
       let addrs: io::Result<Vec<_>> = addrs.map(|r| r.map(|a| a.sockaddr.ip())).collect();
       addrs
