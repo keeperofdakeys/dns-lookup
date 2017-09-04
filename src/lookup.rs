@@ -66,6 +66,7 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
   let (inner, len) = socket.into_inner();
   let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
 
+  // FIXME: We need some flags, IE: NI_NAMEREQD
   let data = unsafe {
     lookup_errno(c::getnameinfo(inner, len,
                   hostbuf.as_mut_ptr(),

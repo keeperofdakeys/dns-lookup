@@ -55,5 +55,5 @@ pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<Str
 
 #[test]
 fn test_getnameinfo() {
-  println!("{:?}", getnameinfo(&SocketAddr::new("127.0.0.1".parse().unwrap(), 53), 0));
+  println!("{:?}", getnameinfo(&SocketAddr::new("0.0.0.0".parse().unwrap(), 999), 0));
 }
