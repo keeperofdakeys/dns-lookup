@@ -32,6 +32,7 @@ extern crate libc;
 
 mod addr;
 mod addrinfo;
+mod nameinfo;
 mod types;
 mod err;
 mod lookup;
