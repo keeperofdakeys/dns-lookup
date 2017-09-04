@@ -3,6 +3,7 @@ use std::io;
 use std::mem;
 use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6, IpAddr, Ipv4Addr, Ipv6Addr};
 
+#[derive(Copy, Clone)]
 pub enum MySocketAddr {
   V4(MySocketAddrV4),
   V6(MySocketAddrV6),
@@ -74,6 +75,7 @@ impl From<MySocketAddr> for SocketAddr {
   }
 }
 
+#[derive(Copy, Clone)]
 /// A wrapper around a libc sockaddr_in.
 pub struct MySocketAddrV4 {
   inner: c::sockaddr_in
@@ -124,6 +126,7 @@ impl From<SocketAddrV4> for MySocketAddrV4 {
   }
 }
 
+#[derive(Copy, Clone)]
 /// A wrapper around a libc sockaddr_in6.
 pub struct MySocketAddrV6 {
   inner: c::sockaddr_in6
