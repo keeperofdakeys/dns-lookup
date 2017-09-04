@@ -56,9 +56,18 @@ impl MySocketAddr {
   }
 }
 
-impl Into<SocketAddr> for MySocketAddr {
-  fn into(self) -> SocketAddr {
-    match self {
+impl From<SocketAddr> for MySocketAddr {
+  fn from(sock: SocketAddr) -> MySocketAddr {
+    match sock {
+      SocketAddr::V4(s) => MySocketAddr::V4(s.into()),
+      SocketAddr::V6(s) => MySocketAddr::V6(s.into()),
+    }
+  }
+}
+
+impl From<MySocketAddr> for SocketAddr {
+  fn from(sock: MySocketAddr) -> SocketAddr {
+    match sock {
       MySocketAddr::V4(s) => SocketAddr::V4(s.into()),
       MySocketAddr::V6(s) => SocketAddr::V6(s.into()),
     }
@@ -103,9 +112,15 @@ impl From<c::sockaddr_in> for MySocketAddrV4 {
   }
 }
 
-impl Into<SocketAddrV4> for MySocketAddrV4 {
-  fn into(self) -> SocketAddrV4 {
-    SocketAddrV4::new(self.ip().clone(), self.port())
+impl From<MySocketAddrV4> for SocketAddrV4 {
+  fn from(sock: MySocketAddrV4) -> SocketAddrV4 {
+    SocketAddrV4::new(sock.ip().clone(), sock.port())
+  }
+}
+
+impl From<SocketAddrV4> for MySocketAddrV4 {
+  fn from(sock: SocketAddrV4) -> MySocketAddrV4 {
+    MySocketAddrV4::new(sock.ip(), sock.port())
   }
 }
 
@@ -150,9 +165,15 @@ impl From<c::sockaddr_in6> for MySocketAddrV6 {
   }
 }
 
-impl Into<SocketAddrV6> for MySocketAddrV6 {
-  fn into(self) -> SocketAddrV6 {
-    SocketAddrV6::new(self.ip().clone(), self.port(), 0, 0)
+impl From<MySocketAddrV6> for SocketAddrV6 {
+  fn from(sock: MySocketAddrV6) -> SocketAddrV6 {
+    SocketAddrV6::new(sock.ip().clone(), sock.port(), 0, 0)
+  }
+}
+
+impl From<SocketAddrV6> for MySocketAddrV6 {
+  fn from(sock: SocketAddrV6) -> MySocketAddrV6 {
+    MySocketAddrV6::new(sock.ip(), sock.port(), 0, 0)
   }
 }
 
