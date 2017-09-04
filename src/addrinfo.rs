@@ -128,6 +128,8 @@ impl Drop for AddrInfoIter {
     }
 }
 
+
+// TODO: AsRef<OsStr>
 pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<AddrInfoHints>)
     -> io::Result<AddrInfoIter> {
   // We must have at least host or service.
