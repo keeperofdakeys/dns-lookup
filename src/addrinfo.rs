@@ -162,6 +162,10 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
       },
       #[cfg(unix)]
       Err(e) => {
+        // The lookup failure could be caused by using a stale /etc/resolv.conf.
+        // See https://github.com/rust-lang/rust/issues/41570.
+        // We therefore force a reload of the nameserver information.
+        // This was fixed in glibc 2.26, so this can probably be removed in five years.
         c::res_init();
         Err(e)
       },
