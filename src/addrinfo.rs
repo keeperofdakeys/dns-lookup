@@ -10,7 +10,7 @@ use err::lookup_errno;
 use types::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-/// A strcut used as the hints argument to getaddrinfo.
+/// A struct used as the hints argument to getaddrinfo.
 pub struct AddrInfoHints {
   /// Type of this socket, Unspec for none.
   pub socktype: SockType,
