@@ -1,0 +1,13 @@
+[package]
+name = "dns-utils"
+version = "0.1.0"
+authors = ["Josh <keeperofdakeys@gmail.com>"]
+
+[dependencies]
+argparse = "0.2"
+libc = "*"
+dns-lookup = { path = ".." }
+
+[[bin]]
+path="src/test.rs"
+name="test"
