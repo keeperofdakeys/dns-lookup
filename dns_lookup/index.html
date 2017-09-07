@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Crate dns_lookup</p><div class="block items"><ul><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'dns_lookup', ty: 'mod', relpath: '../'};</script>
+        <p class='location'>Crate dns_lookup</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'dns_lookup', ty: 'mod', relpath: '../'};</script>
     </nav>
 
     <nav class="sub">
@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/lib.rs.html#1-39' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/dns_lookup/lib.rs.html#1-62' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='dns_lookup' class='section-header'><a href='#dns_lookup'>dns_lookup</a></h1>
 <p>A small wrapper for libc to perform simple DNS lookups.</p>
@@ -62,10 +62,9 @@ it.</p>
 <pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">dns_lookup</span>::<span class="ident">lookup_host</span>;
 
- <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="string">&quot;localhost&quot;</span>;
- <span class="kw">let</span> <span class="ident">ips</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span><span class="op">&gt;</span> <span class="op">=</span>
-   <span class="ident">lookup_host</span>(<span class="ident">hostname</span>).<span class="ident">unwrap</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>().<span class="ident">unwrap</span>();
- <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ips</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;127.0.0.1&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()));</pre>
+  <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="string">&quot;localhost&quot;</span>;
+  <span class="kw">let</span> <span class="ident">ips</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">lookup_host</span>(<span class="ident">hostname</span>).<span class="ident">unwrap</span>();
+  <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ips</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;127.0.0.1&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()));</pre>
 
 <h1 id='lookup_addr' class='section-header'><a href='#lookup_addr'><code>lookup_addr</code></a></h1>
 <p>Given an IP Address, return the reverse DNS entry (hostname) for the
@@ -74,11 +73,83 @@ given IP Address.</p>
 <pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">dns_lookup</span>::<span class="ident">lookup_addr</span>;
 
- <span class="kw">let</span> <span class="ident">ip</span>: <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span> <span class="op">=</span> <span class="string">&quot;127.0.0.1&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
- <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="ident">lookup_addr</span>(<span class="kw-2">&amp;</span><span class="ident">ip</span>).<span class="ident">unwrap</span>();
- <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hostname</span>, <span class="string">&quot;localhost&quot;</span>);</pre>
-</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+  <span class="kw">let</span> <span class="ident">ip</span>: <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span> <span class="op">=</span> <span class="string">&quot;127.0.0.1&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+  <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="ident">lookup_addr</span>(<span class="kw-2">&amp;</span><span class="ident">ip</span>).<span class="ident">unwrap</span>();
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hostname</span>, <span class="string">&quot;localhost&quot;</span>);</pre>
+
+<h1 id='getaddrinfo' class='section-header'><a href='#getaddrinfo'><code>getaddrinfo</code></a></h1>
+<pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">dns_lookup</span>::{<span class="ident">getaddrinfo</span>, <span class="ident">AddrInfoHints</span>};
+
+  <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="string">&quot;localhost&quot;</span>;
+  <span class="kw">let</span> <span class="ident">service</span> <span class="op">=</span> <span class="string">&quot;ssh&quot;</span>;
+  <span class="kw">let</span> <span class="ident">hints</span> <span class="op">=</span> <span class="ident">AddrInfoHints</span> {
+    <span class="ident">socktype</span>: <span class="ident">dns_lookup</span>::<span class="ident">SockType</span>::<span class="ident">Stream</span>,
+    .. <span class="ident">AddrInfoHints</span>::<span class="ident">default</span>()
+  };
+  <span class="kw">let</span> <span class="ident">sockets</span> <span class="op">=</span>
+    <span class="ident">getaddrinfo</span>(<span class="prelude-val">Some</span>(<span class="ident">hostname</span>), <span class="prelude-val">Some</span>(<span class="ident">service</span>), <span class="prelude-val">Some</span>(<span class="ident">hints</span>))
+      .<span class="ident">unwrap</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+  <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">sockets</span>);
+  <span class="kw">for</span> <span class="ident">socket</span> <span class="kw">in</span> <span class="ident">sockets</span> {
+    <span class="comment">// Try connecting to socket</span>
+    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">socket</span>);
+  }</pre>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.AddrInfo.html"
+                                  title='struct dns_lookup::AddrInfo'>AddrInfo</a></td>
+                           <td class='docblock-short'>
+                                <p>Struct that stores socket information, as returned by getaddrinfo.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.AddrInfoHints.html"
+                                  title='struct dns_lookup::AddrInfoHints'>AddrInfoHints</a></td>
+                           <td class='docblock-short'>
+                                <p>A struct used as the hints argument to getaddrinfo.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.AddrInfoIter.html"
+                                  title='struct dns_lookup::AddrInfoIter'>AddrInfoIter</a></td>
+                           <td class='docblock-short'>
+                                <p>An iterator of AddrInfo structs, wrapping a linked-list
+returned by getaddrinfo.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.AddrFamily.html"
+                                  title='enum dns_lookup::AddrFamily'>AddrFamily</a></td>
+                           <td class='docblock-short'>
+                                <p>Socket Address Family</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.ProtoFamily.html"
+                                  title='enum dns_lookup::ProtoFamily'>ProtoFamily</a></td>
+                           <td class='docblock-short'>
+                                <p>Socket Protocol Family</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.SockType.html"
+                                  title='enum dns_lookup::SockType'>SockType</a></td>
+                           <td class='docblock-short'>
+                                <p>Socket Type</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.getaddrinfo.html"
+                                  title='fn dns_lookup::getaddrinfo'>getaddrinfo</a></td>
+                           <td class='docblock-short'>
+                                <p>Retrieve socket information for a host, service, or both. Acts as a thin wrapper
+around the libc getaddrinfo.</p>
+                           </td>
+                       </tr>
                        <tr class=' module-item'>
                            <td><a class="fn" href="fn.lookup_addr.html"
                                   title='fn dns_lookup::lookup_addr'>lookup_addr</a></td>

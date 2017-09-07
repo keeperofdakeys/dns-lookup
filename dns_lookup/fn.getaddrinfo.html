@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `lookup_addr` fn in crate `dns_lookup`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, lookup_addr">
+    <meta name="description" content="API documentation for the Rust `getaddrinfo` fn in crate `dns_lookup`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, getaddrinfo">
 
-    <title>dns_lookup::lookup_addr - Rust</title>
+    <title>dns_lookup::getaddrinfo - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'lookup_addr', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'getaddrinfo', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,14 +44,21 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>dns_lookup</a>::<wbr><a class="fn" href=''>lookup_addr</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>dns_lookup</a>::<wbr><a class="fn" href=''>getaddrinfo</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/lookup.rs.html#64-84' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn lookup_addr(addr: &amp;<a class="enum" href="https://doc.rust-lang.org/nightly/std/net/ip/enum.IpAddr.html" title="enum std::net::ip::IpAddr">IpAddr</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;</pre><div class='docblock'><p>Lookup the hostname of a given IP Address via DNS.</p>
+               </span><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#152-197' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn getaddrinfo(<br>&nbsp;&nbsp;&nbsp;&nbsp;host: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;service: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;hints: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../dns_lookup/struct.AddrInfoHints.html" title="struct dns_lookup::AddrInfoHints">AddrInfoHints</a>&gt;<br>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="../dns_lookup/struct.AddrInfoIter.html" title="struct dns_lookup::AddrInfoIter">AddrInfoIter</a>&gt;</pre><div class='docblock'><p>Retrieve socket information for a host, service, or both. Acts as a thin wrapper
+around the libc getaddrinfo.</p>
 
-<p>Returns the hostname as a String, or an io::Error on failure.</p>
+<p>The only portable way to support International Domain Names (UTF8 DNS names) is to
+manually convert to puny code before calling this function - which can be done using
+the idna crate. However some libc backends may support this natively, or by using
+bitflags in the hints argument.</p>
+
+<p>Resolving names from non-UTF8 locales is currently not supported (as the interface uses
+&amp;str). Raise an issue if this is a concern for you.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 

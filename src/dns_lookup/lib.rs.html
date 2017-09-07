@@ -82,6 +82,29 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! # dns_lookup</span>
 <span class="doccomment">//! A small wrapper for libc to perform simple DNS lookups.</span>
@@ -93,12 +116,11 @@
 <span class="doccomment">//! it.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//!  use dns_lookup::lookup_host;</span>
+<span class="doccomment">//!   use dns_lookup::lookup_host;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!  let hostname = &quot;localhost&quot;;</span>
-<span class="doccomment">//!  let ips: Vec&lt;std::net::IpAddr&gt; =</span>
-<span class="doccomment">//!    lookup_host(hostname).unwrap().collect::&lt;std::io::Result&lt;_&gt;&gt;().unwrap();</span>
-<span class="doccomment">//!  assert!(ips.contains(&amp;&quot;127.0.0.1&quot;.parse().unwrap()));</span>
+<span class="doccomment">//!   let hostname = &quot;localhost&quot;;</span>
+<span class="doccomment">//!   let ips: Vec&lt;std::net::IpAddr&gt; = lookup_host(hostname).unwrap();</span>
+<span class="doccomment">//!   assert!(ips.contains(&amp;&quot;127.0.0.1&quot;.parse().unwrap()));</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # `lookup_addr`</span>
@@ -107,21 +129,45 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//!  use dns_lookup::lookup_addr;</span>
+<span class="doccomment">//!   use dns_lookup::lookup_addr;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!  let ip: std::net::IpAddr = &quot;127.0.0.1&quot;.parse().unwrap();</span>
-<span class="doccomment">//!  let hostname = lookup_addr(&amp;ip).unwrap();</span>
-<span class="doccomment">//!  assert_eq!(hostname, &quot;localhost&quot;);</span>
+<span class="doccomment">//!   let ip: std::net::IpAddr = &quot;127.0.0.1&quot;.parse().unwrap();</span>
+<span class="doccomment">//!   let hostname = lookup_addr(&amp;ip).unwrap();</span>
+<span class="doccomment">//!   assert_eq!(hostname, &quot;localhost&quot;);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # `getaddrinfo`</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//!   use dns_lookup::{getaddrinfo, AddrInfoHints};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   let hostname = &quot;localhost&quot;;</span>
+<span class="doccomment">//!   let service = &quot;ssh&quot;;</span>
+<span class="doccomment">//!   let hints = AddrInfoHints {</span>
+<span class="doccomment">//!     socktype: dns_lookup::SockType::Stream,</span>
+<span class="doccomment">//!     .. AddrInfoHints::default()</span>
+<span class="doccomment">//!   };</span>
+<span class="doccomment">//!   let sockets =</span>
+<span class="doccomment">//!     getaddrinfo(Some(hostname), Some(service), Some(hints))</span>
+<span class="doccomment">//!       .unwrap().collect::&lt;std::io::Result&lt;Vec&lt;_&gt;&gt;&gt;().unwrap();</span>
+<span class="doccomment">//!   println!(&quot;{:?}&quot;, sockets);</span>
+<span class="doccomment">//!   for socket in sockets {</span>
+<span class="doccomment">//!     // Try connecting to socket</span>
+<span class="doccomment">//!     println!(&quot;{:?}&quot;, socket);</span>
+<span class="doccomment">//!   }</span>
 <span class="doccomment">//! ```</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
 
 <span class="kw">mod</span> <span class="ident">addr</span>;
-<span class="comment">// mod addrinfo;</span>
+<span class="kw">mod</span> <span class="ident">addrinfo</span>;
+<span class="kw">mod</span> <span class="ident">nameinfo</span>;
+<span class="kw">mod</span> <span class="ident">types</span>;
 <span class="kw">mod</span> <span class="ident">err</span>;
 <span class="kw">mod</span> <span class="ident">lookup</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lookup</span>::{<span class="ident">lookup_host</span>, <span class="ident">lookup_addr</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">addrinfo</span>::{<span class="ident">getaddrinfo</span>, <span class="ident">AddrInfoIter</span>, <span class="ident">AddrInfo</span>, <span class="ident">AddrInfoHints</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

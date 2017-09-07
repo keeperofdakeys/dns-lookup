@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ProtoFamily` enum in crate `dns_lookup`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ProtoFamily">
+
+    <title>dns_lookup::ProtoFamily - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc enum">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Enum ProtoFamily</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'ProtoFamily', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>dns_lookup</a>::<wbr><a class="enum" href=''>ProtoFamily</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/dns_lookup/types.rs.html#262-355' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum ProtoFamily {
+    Unspec,
+    Local,
+    Unix,
+    File,
+    Inet,
+    Ax25,
+    Ipx,
+    Appletalk,
+    Netrom,
+    Bridge,
+    Atmpvc,
+    X25,
+    Inet6,
+    Rose,
+    Decnet,
+    Netbeui,
+    Security,
+    Key,
+    Netlink,
+    Route,
+    Packet,
+    Ash,
+    Econet,
+    Atmsvc,
+    Rds,
+    Sna,
+    Irda,
+    Pppox,
+    Wanpipe,
+    Llc,
+    Ib,
+    Mpls,
+    Can,
+    Tipc,
+    Bluetooth,
+    Iucv,
+    Rxrpc,
+    Isdn,
+    Phonet,
+    Ieee802154,
+    Caif,
+    Alg,
+    Nfc,
+    Vsock,
+    Max,
+    Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>),
+}</pre><div class='docblock'><p>Socket Protocol Family</p>
+</div><h2 id='variants' class='variants'>Variants</h2>
+<span id='variant.Unspec' class='variant'><span id='Unspec.v' class='invisible'><code>Unspec</code></span></span><div class='docblock'><p>Unspecified.</p>
+</div><span id='variant.Local' class='variant'><span id='Local.v' class='invisible'><code>Local</code></span></span><div class='docblock'><p>Local to host (pipes and file-domain).</p>
+</div><span id='variant.Unix' class='variant'><span id='Unix.v' class='invisible'><code>Unix</code></span></span><div class='docblock'><p>POSIX name for PF_LOCAL.</p>
+</div><span id='variant.File' class='variant'><span id='File.v' class='invisible'><code>File</code></span></span><div class='docblock'><p>Another non-standard name for PF_LOCAL.</p>
+</div><span id='variant.Inet' class='variant'><span id='Inet.v' class='invisible'><code>Inet</code></span></span><div class='docblock'><p>IP protocol family.</p>
+</div><span id='variant.Ax25' class='variant'><span id='Ax25.v' class='invisible'><code>Ax25</code></span></span><div class='docblock'><p>Amateur Radio AX.25.</p>
+</div><span id='variant.Ipx' class='variant'><span id='Ipx.v' class='invisible'><code>Ipx</code></span></span><div class='docblock'><p>Novell Internet Protocol.</p>
+</div><span id='variant.Appletalk' class='variant'><span id='Appletalk.v' class='invisible'><code>Appletalk</code></span></span><div class='docblock'><p>Appletalk DDP.</p>
+</div><span id='variant.Netrom' class='variant'><span id='Netrom.v' class='invisible'><code>Netrom</code></span></span><div class='docblock'><p>Amateur radio NetROM.</p>
+</div><span id='variant.Bridge' class='variant'><span id='Bridge.v' class='invisible'><code>Bridge</code></span></span><div class='docblock'><p>Multiprotocol bridge.</p>
+</div><span id='variant.Atmpvc' class='variant'><span id='Atmpvc.v' class='invisible'><code>Atmpvc</code></span></span><div class='docblock'><p>ATM PVCs.</p>
+</div><span id='variant.X25' class='variant'><span id='X25.v' class='invisible'><code>X25</code></span></span><div class='docblock'><p>Reserved for X.25 project.</p>
+</div><span id='variant.Inet6' class='variant'><span id='Inet6.v' class='invisible'><code>Inet6</code></span></span><div class='docblock'><p>IP version 6.</p>
+</div><span id='variant.Rose' class='variant'><span id='Rose.v' class='invisible'><code>Rose</code></span></span><div class='docblock'><p>Amateur Radio X.25 PLP.</p>
+</div><span id='variant.Decnet' class='variant'><span id='Decnet.v' class='invisible'><code>Decnet</code></span></span><div class='docblock'><p>Reserved for DECnet project.</p>
+</div><span id='variant.Netbeui' class='variant'><span id='Netbeui.v' class='invisible'><code>Netbeui</code></span></span><div class='docblock'><p>Reserved for 802.2LLC project.</p>
+</div><span id='variant.Security' class='variant'><span id='Security.v' class='invisible'><code>Security</code></span></span><div class='docblock'><p>Security callback pseudo AF.</p>
+</div><span id='variant.Key' class='variant'><span id='Key.v' class='invisible'><code>Key</code></span></span><div class='docblock'><p>PF_KEY key management API.</p>
+</div><span id='variant.Netlink' class='variant'><span id='Netlink.v' class='invisible'><code>Netlink</code></span></span><div class='docblock'><p>Alias to emulate 4.4BSD.</p>
+</div><span id='variant.Route' class='variant'><span id='Route.v' class='invisible'><code>Route</code></span></span><div class='docblock'><p>Alias to emulate 4.4BSD.</p>
+</div><span id='variant.Packet' class='variant'><span id='Packet.v' class='invisible'><code>Packet</code></span></span><div class='docblock'><p>Packet family.</p>
+</div><span id='variant.Ash' class='variant'><span id='Ash.v' class='invisible'><code>Ash</code></span></span><div class='docblock'><p>Ash.</p>
+</div><span id='variant.Econet' class='variant'><span id='Econet.v' class='invisible'><code>Econet</code></span></span><div class='docblock'><p>Acorn Econet.</p>
+</div><span id='variant.Atmsvc' class='variant'><span id='Atmsvc.v' class='invisible'><code>Atmsvc</code></span></span><div class='docblock'><p>ATM SVCs.</p>
+</div><span id='variant.Rds' class='variant'><span id='Rds.v' class='invisible'><code>Rds</code></span></span><div class='docblock'><p>RDS sockets.</p>
+</div><span id='variant.Sna' class='variant'><span id='Sna.v' class='invisible'><code>Sna</code></span></span><div class='docblock'><p>Linux SNA Project</p>
+</div><span id='variant.Irda' class='variant'><span id='Irda.v' class='invisible'><code>Irda</code></span></span><div class='docblock'><p>IRDA sockets.</p>
+</div><span id='variant.Pppox' class='variant'><span id='Pppox.v' class='invisible'><code>Pppox</code></span></span><div class='docblock'><p>PPPoX sockets.</p>
+</div><span id='variant.Wanpipe' class='variant'><span id='Wanpipe.v' class='invisible'><code>Wanpipe</code></span></span><div class='docblock'><p>Wanpipe API sockets.</p>
+</div><span id='variant.Llc' class='variant'><span id='Llc.v' class='invisible'><code>Llc</code></span></span><div class='docblock'><p>Linux LLC.</p>
+</div><span id='variant.Ib' class='variant'><span id='Ib.v' class='invisible'><code>Ib</code></span></span><div class='docblock'><p>Native InfiniBand address.</p>
+</div><span id='variant.Mpls' class='variant'><span id='Mpls.v' class='invisible'><code>Mpls</code></span></span><div class='docblock'><p>MPLS.</p>
+</div><span id='variant.Can' class='variant'><span id='Can.v' class='invisible'><code>Can</code></span></span><div class='docblock'><p>Controller Area Network.</p>
+</div><span id='variant.Tipc' class='variant'><span id='Tipc.v' class='invisible'><code>Tipc</code></span></span><div class='docblock'><p>TIPC sockets.</p>
+</div><span id='variant.Bluetooth' class='variant'><span id='Bluetooth.v' class='invisible'><code>Bluetooth</code></span></span><div class='docblock'><p>Bluetooth sockets.</p>
+</div><span id='variant.Iucv' class='variant'><span id='Iucv.v' class='invisible'><code>Iucv</code></span></span><div class='docblock'><p>IUCV sockets.</p>
+</div><span id='variant.Rxrpc' class='variant'><span id='Rxrpc.v' class='invisible'><code>Rxrpc</code></span></span><div class='docblock'><p>RxRPC sockets.</p>
+</div><span id='variant.Isdn' class='variant'><span id='Isdn.v' class='invisible'><code>Isdn</code></span></span><div class='docblock'><p>mISDN sockets.</p>
+</div><span id='variant.Phonet' class='variant'><span id='Phonet.v' class='invisible'><code>Phonet</code></span></span><div class='docblock'><p>Phonet sockets.</p>
+</div><span id='variant.Ieee802154' class='variant'><span id='Ieee802154.v' class='invisible'><code>Ieee802154</code></span></span><div class='docblock'><p>IEEE 802.15.4 sockets.</p>
+</div><span id='variant.Caif' class='variant'><span id='Caif.v' class='invisible'><code>Caif</code></span></span><div class='docblock'><p>CAIF sockets.</p>
+</div><span id='variant.Alg' class='variant'><span id='Alg.v' class='invisible'><code>Alg</code></span></span><div class='docblock'><p>Algorithm sockets.</p>
+</div><span id='variant.Nfc' class='variant'><span id='Nfc.v' class='invisible'><code>Nfc</code></span></span><div class='docblock'><p>NFC sockets.</p>
+</div><span id='variant.Vsock' class='variant'><span id='Vsock.v' class='invisible'><code>Vsock</code></span></span><div class='docblock'><p>vSockets.</p>
+</div><span id='variant.Max' class='variant'><span id='Max.v' class='invisible'><code>Max</code></span></span><div class='docblock'><p>For now..</p>
+</div><span id='variant.Other' class='variant'><span id='Other.v' class='invisible'><code>Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>)</code></span></span><div class='docblock'><p>Unknown (This variant is for error reporting, as undefined numbers may be later defined).</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#357-462' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_int' class="method"><span id='from_int.v' class='invisible'><code>fn <a href='#method.from_int' class='fnname'>from_int</a>(int: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Self&gt;</code></span></h4>
+<h4 id='method.to_int' class="method"><span id='to_int.v' class='invisible'><code>fn <a href='#method.to_int' class='fnname'>to_int</a>(&amp;self) -&gt; <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code></span></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#260' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#260' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#260' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#260' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "dns_lookup";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
