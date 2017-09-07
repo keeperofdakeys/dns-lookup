@@ -14,13 +14,16 @@ use types::*;
 pub struct AddrInfoHints {
   /// Type of this socket, Unspec for none.
   pub socktype: SockType,
-  /// Protcol family for this socket, Unspec for none..
+  /// Protcol family for this socket, Unspec for none.
   pub protocol: ProtoFamily,
-  /// Address family for this socket (usually matches protocol family),
-  /// Unspec for none..
+  /// Address family for this socket. Unspec for none.
   pub address: AddrFamily,
-  /// Optional bitmask arguments. Bitwise OR this with flags from
-  /// libc to change getaddrinfo's behaviour.
+  /// Optional bitmask arguments. Bitwise OR bitflags to change the
+  /// behaviour of getaddrinfo.
+  ///
+  /// The actual bitflags are not provided by this crate, and are
+  /// usually exported in the libc crate. Some backends have custom
+  /// flags, which may be a portability issue.
   pub flags: u32,
 }
 
@@ -48,6 +51,9 @@ impl Default for AddrInfoHints {
   }
 }
 
+/// Struct that stores socket information, as returned by getaddrinfo.
+///
+/// This maps to the same definition provided by libc backends.
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddrInfo {
   /// Type of this socket.
@@ -101,6 +107,11 @@ impl AddrInfo {
   }
 }
 
+/// An iterator of AddrInfo structs, wrapping a linked-list
+/// returned by getaddrinfo.
+///
+/// It's recommended to use `.collect<io::Result<..>>()` on this
+/// to collapse possible errors.
 pub struct AddrInfoIter {
   orig: *mut c::addrinfo,
   cur: *mut c::addrinfo,
@@ -128,8 +139,16 @@ impl Drop for AddrInfoIter {
     }
 }
 
-
-// TODO: AsRef<OsStr>
+/// Retrieve socket information for a host, service, or both. Acts as a thin wrapper
+/// around the libc getaddrinfo.
+///
+/// The only portable way to support International Domain Names (UTF8 DNS names) is to
+/// manually convert to puny code before calling this function - which can be done using
+/// the idna crate. However some libc backends may support this natively, or by using
+/// bitflags in the hints argument.
+///
+/// Resolving names from non-UTF8 locales is currently not supported (as the interface uses
+/// &str). Raise an issue if this is a concern for you.
 pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<AddrInfoHints>)
     -> io::Result<AddrInfoIter> {
   // We must have at least host or service.
