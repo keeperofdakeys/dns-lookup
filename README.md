@@ -9,6 +9,9 @@ the given IP Address.
 [Documentation](https://keeperofdakeys.github.io/dns-lookup/dns_lookup)
 
 ## Usage
+
+### Simple API
+
 ```rust
 use dns_lookup::{lookup_host, lookup_addr};
 
@@ -26,3 +29,26 @@ use dns_lookup::{lookup_host, lookup_addr};
   assert_eq!(hostname, "localhost");
 }
 ```
+
+### libc API
+```rust
+use dns_lookup::{getaddrinfo, AddrInfoHints};
+
+{
+  use dns_lookup::{getaddrinfo, AddrInfoHints};
+
+  let hostname = "localhost";
+  let service = "ssh";
+  let hints = AddrInfoHints {
+    socktype: dns_lookup::SockType::Stream,
+    .. AddrInfoHints::default()
+  };
+  let sockets =
+    getaddrinfo(Some(hostname), Some(service), Some(hints))
+      .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
+  println!("{:?}", sockets);
+  for socket in sockets {
+    // Try connecting to socket
+    println!("{:?}", socket);
+  }
+}

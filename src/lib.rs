@@ -8,11 +8,11 @@
 //! it.
 //!
 //! ```rust
-//!  use dns_lookup::lookup_host;
+//!   use dns_lookup::lookup_host;
 //!
-//!  let hostname = "localhost";
-//!  let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
-//!  assert!(ips.contains(&"127.0.0.1".parse().unwrap()));
+//!   let hostname = "localhost";
+//!   let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+//!   assert!(ips.contains(&"127.0.0.1".parse().unwrap()));
 //! ```
 //!
 //! # `lookup_addr`
@@ -21,11 +21,31 @@
 //!
 //!
 //! ```rust
-//!  use dns_lookup::lookup_addr;
+//!   use dns_lookup::lookup_addr;
 //!
-//!  let ip: std::net::IpAddr = "127.0.0.1".parse().unwrap();
-//!  let hostname = lookup_addr(&ip).unwrap();
-//!  assert_eq!(hostname, "localhost");
+//!   let ip: std::net::IpAddr = "127.0.0.1".parse().unwrap();
+//!   let hostname = lookup_addr(&ip).unwrap();
+//!   assert_eq!(hostname, "localhost");
+//! ```
+//!
+//! # `getaddrinfo`
+//! ```rust
+//!   use dns_lookup::{getaddrinfo, AddrInfoHints};
+//!
+//!   let hostname = "localhost";
+//!   let service = "ssh";
+//!   let hints = AddrInfoHints {
+//!     socktype: dns_lookup::SockType::Stream,
+//!     .. AddrInfoHints::default()
+//!   };
+//!   let sockets =
+//!     getaddrinfo(Some(hostname), Some(service), Some(hints))
+//!       .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
+//!   println!("{:?}", sockets);
+//!   for socket in sockets {
+//!     // Try connecting to socket
+//!     println!("{:?}", socket);
+//!   }
 //! ```
 
 extern crate libc;
