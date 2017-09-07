@@ -100,7 +100,7 @@ impl MySocketAddrV4 {
   }
 
   fn port (&self) -> u16 {
-    self.inner.sin_port
+    self.inner.sin_port.to_be()
   }
 
   fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
@@ -154,7 +154,7 @@ impl MySocketAddrV6 {
   }
 
   fn port (&self) -> u16 {
-    self.inner.sin6_port
+    self.inner.sin6_port.to_be()
   }
 
   fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
