@@ -1,6 +1,6 @@
 [package]
 name = "dns-lookup"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Josh Driver <keeperofdakeys@gmail.com>"]
 description = "A simple dns resolving api, much like rust's unstable api."
 documentation = "https://keeperofdakeys.github.io/dns-lookup/dns_lookup"
