@@ -202,7 +202,7 @@ fn test_getaddrinfo() {
     flags: c::AI_CANONNAME as u32,
     ..AddrInfoHints::default()
   };
-  for entry in getaddrinfo(Some("localhost"), None, Some(hints)).unwrap() {
+  for entry in getaddrinfo(Some("localhost"), Some("ssh"), Some(hints)).unwrap() {
     println!("{:?}", entry);
   }
 }
