@@ -41,11 +41,29 @@
 //!   let sockets =
 //!     getaddrinfo(Some(hostname), Some(service), Some(hints))
 //!       .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
-//!   println!("{:?}", sockets);
+//!
 //!   for socket in sockets {
 //!     // Try connecting to socket
-//!     println!("{:?}", socket);
+//!     let _ = socket;
 //!   }
+//! ```
+//!
+//! # `getnameinfo`
+//! ```rust
+//!   use dns_lookup::getnameinfo;
+//!   use std::net::{IpAddr, SocketAddr};
+//!
+//!   let ip: IpAddr = "127.0.0.1".parse().unwrap();
+//!   let port = 22;
+//!   let socket: SocketAddr = (ip, port).into();
+//!
+//!   let (name, service) = match getnameinfo(&socket, 0) {
+//!     Ok((n, s)) => (n, s),
+//!     Err(e) => panic!("Failed to lookup socket {:?}", e),
+//!   };
+//!
+//!   println!("{:?} {:?}", name, service);
+//!   let _ = (name, service);
 //! ```
 
 extern crate libc;
@@ -59,4 +77,5 @@ mod lookup;
 
 pub use lookup::{lookup_host, lookup_addr};
 pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};
+pub use nameinfo::getnameinfo;
 pub use types::*;

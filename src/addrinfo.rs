@@ -139,16 +139,16 @@ impl Drop for AddrInfoIter {
     }
 }
 
-/// Retrieve socket information for a host, service, or both. Acts as a thin wrapper
-/// around the libc getaddrinfo.
+/// Retrieve socket information for a host, service, or both. Acts as a thin
+/// wrapper around the libc getaddrinfo.
 ///
-/// The only portable way to support International Domain Names (UTF8 DNS names) is to
-/// manually convert to puny code before calling this function - which can be done using
-/// the idna crate. However some libc backends may support this natively, or by using
-/// bitflags in the hints argument.
+/// The only portable way to support International Domain Names (UTF8 DNS
+/// names) is to manually convert to puny code before calling this function -
+/// which can be done using the `idna` crate. However some libc backends may
+/// support this natively, or by using bitflags in the hints argument.
 ///
-/// Resolving names from non-UTF8 locales is currently not supported (as the interface uses
-/// &str). Raise an issue if this is a concern for you.
+/// Resolving names from non-UTF8 locales is currently not supported (as the
+/// interface uses &str). Raise an issue if this is a concern for you.
 pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<AddrInfoHints>)
     -> io::Result<AddrInfoIter> {
   // We must have at least host or service.
@@ -203,6 +203,10 @@ fn test_getaddrinfo() {
     ..AddrInfoHints::default()
   };
   for entry in getaddrinfo(Some("localhost"), Some("ssh"), Some(hints)).unwrap() {
+    if entry.is_err() {
+      println!(":P {:?}", entry);
+      continue;
+    }
     println!("{:?}", entry);
   }
 }
