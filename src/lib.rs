@@ -1,4 +1,4 @@
-//! # dns_lookup
+//! # `dns_lookup`
 //! A small wrapper for libc to perform simple DNS lookups.
 //!
 //! Two main functions are provided.

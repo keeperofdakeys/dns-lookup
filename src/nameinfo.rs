@@ -19,8 +19,8 @@ use err::lookup_errno;
 /// you.
 pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<String>, Option<String>)> {
   // Convert the socket into our type, so we can get a sockaddr_in{,6} ptr.
-  let sock: MySocketAddr = sock.clone().into();
-  let (c_sock, c_sock_len) = sock.into_inner();
+  let sock: MySocketAddr = (*sock).into();
+  let (c_sock, c_sock_len) = sock.as_ptr();
 
   // Allocate buffers for name and service strings.
   let mut c_host = [0 as c::c_char; c::NI_MAXHOST as usize];

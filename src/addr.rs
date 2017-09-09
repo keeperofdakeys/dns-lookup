@@ -10,12 +10,12 @@ pub enum MySocketAddr {
 }
 
 impl MySocketAddr {
-  pub fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
+  pub fn as_ptr(&self) -> (*const c::sockaddr, c::socklen_t) {
     match *self {
       MySocketAddr::V4(ref s) =>
-        s.into_inner(),
+        s.as_ptr(),
       MySocketAddr::V6(ref s) =>
-        s.into_inner()
+        s.as_ptr()
     }
   }
 
@@ -31,7 +31,7 @@ impl MySocketAddr {
       family = (*sock).sa_family;
     }
 
-    match family as c::c_int {
+    match c::c_int::from(family) {
       c::AF_INET => {
         assert!(sock_len as usize >= mem::size_of::<c::sockaddr_in>());
         Ok(
@@ -76,7 +76,7 @@ impl From<MySocketAddr> for SocketAddr {
 }
 
 #[derive(Copy, Clone)]
-/// A wrapper around a libc sockaddr_in.
+/// A wrapper around a libc `sockaddr_in`.
 pub struct MySocketAddrV4 {
   inner: c::sockaddr_in
 }
@@ -103,7 +103,7 @@ impl MySocketAddrV4 {
     self.inner.sin_port.to_be()
   }
 
-  fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
+  fn as_ptr(&self) -> (*const c::sockaddr, c::socklen_t) {
     (&self.inner as *const c::sockaddr_in as  *const c::sockaddr,
      mem::size_of_val(&self.inner) as c::socklen_t)
   }
@@ -117,7 +117,7 @@ impl From<c::sockaddr_in> for MySocketAddrV4 {
 
 impl From<MySocketAddrV4> for SocketAddrV4 {
   fn from(sock: MySocketAddrV4) -> SocketAddrV4 {
-    SocketAddrV4::new(sock.ip().clone(), sock.port())
+    SocketAddrV4::new(*sock.ip(), sock.port())
   }
 }
 
@@ -128,7 +128,7 @@ impl From<SocketAddrV4> for MySocketAddrV4 {
 }
 
 #[derive(Copy, Clone)]
-/// A wrapper around a libc sockaddr_in6.
+/// A wrapper around a libc `sockaddr_in6`.
 pub struct MySocketAddrV6 {
   inner: c::sockaddr_in6
 }
@@ -142,7 +142,6 @@ impl MySocketAddrV6 {
         sin6_addr: ipv6_to_inner(ip),
         sin6_flowinfo: flowinfo,
         sin6_scope_id: scope_id,
-        .. unsafe { mem::zeroed() }
       }
     }
   }
@@ -157,7 +156,7 @@ impl MySocketAddrV6 {
     self.inner.sin6_port.to_be()
   }
 
-  fn into_inner(&self) -> (*const c::sockaddr, c::socklen_t) {
+  fn as_ptr(&self) -> (*const c::sockaddr, c::socklen_t) {
     (&self.inner as *const c::sockaddr_in6 as *const c::sockaddr,
      mem::size_of_val(&self.inner) as c::socklen_t)
   }
@@ -171,7 +170,7 @@ impl From<c::sockaddr_in6> for MySocketAddrV6 {
 
 impl From<MySocketAddrV6> for SocketAddrV6 {
   fn from(sock: MySocketAddrV6) -> SocketAddrV6 {
-    SocketAddrV6::new(sock.ip().clone(), sock.port(), 0, 0)
+    SocketAddrV6::new(*sock.ip(), sock.port(), 0, 0)
   }
 }
 
@@ -181,20 +180,20 @@ impl From<SocketAddrV6> for MySocketAddrV6 {
   }
 }
 
-/// Change an Ipv4Addr into a libc in_addr.
+/// Change an `Ipv4Addr` into a libc `in_addr`.
 fn ipv4_to_inner(ip: &Ipv4Addr) -> c::in_addr {
   let o = ip.octets();
   c::in_addr {
     s_addr: (
-      ((o[0] as u32) << 24) |
-      ((o[1] as u32) << 16) |
-      ((o[2] as u32) <<  8) |
-      (o[3] as u32)
+      ((u32::from(o[0])) << 24) |
+      ((u32::from(o[1])) << 16) |
+      ((u32::from(o[2])) <<  8) |
+      (u32::from(o[3]))
     ).to_be(),
   }
 }
 
-/// Change an Ipv6Addr into a libc in6_addr.
+/// Change an `Ipv6Addr` into a libc `in6_addr`.
 fn ipv6_to_inner(ip: &Ipv6Addr) -> c::in6_addr {
   let o = ip.octets();
   let mut addr: c::in6_addr = unsafe { mem::zeroed() };
@@ -202,13 +201,13 @@ fn ipv6_to_inner(ip: &Ipv6Addr) -> c::in6_addr {
   addr
 }
 
-/// Turn an IpAddr into a libc (socketaddr, length) pair.
+/// Turn an `IpAddr` into a libc (socketaddr, length) pair.
 pub fn ip_to_sockaddr(ip: &IpAddr) ->  MySocketAddr {
-  match ip {
-    &IpAddr::V4(ipv4) => {
+  match *ip {
+    IpAddr::V4(ipv4) => {
       MySocketAddr::V4(MySocketAddrV4::new(&ipv4, 0))
     },
-    &IpAddr::V6(ipv6) => {
+    IpAddr::V6(ipv6) => {
       MySocketAddr::V6(MySocketAddrV6::new(&ipv6, 0, 0, 0))
     },
   }

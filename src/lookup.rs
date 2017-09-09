@@ -26,7 +26,7 @@ use types::*;
 
 /// Lookup the address for a given hostname via DNS.
 ///
-/// Returns an iterator of IP Addresses, or an io::Error on failure.
+/// Returns an iterator of IP Addresses, or an `io::Error` on failure.
 pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
   // FIXME: Initialise windows sockets somehow :/
   // #[cfg(windows)]
@@ -60,10 +60,10 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
 
 /// Lookup the hostname of a given IP Address via DNS.
 ///
-/// Returns the hostname as a String, or an io::Error on failure.
+/// Returns the hostname as a String, or an `io::Error` on failure.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
   let socket = ip_to_sockaddr(addr);
-  let (inner, len) = socket.into_inner();
+  let (inner, len) = socket.as_ptr();
   let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
 
   // FIXME: We need some flags, IE: NI_NAMEREQD

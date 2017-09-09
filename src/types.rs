@@ -1,5 +1,7 @@
 use libc as c;
 
+#[allow(match_same_arms)]
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 /// Socket Type
 pub enum SockType {
@@ -48,7 +50,7 @@ impl SockType {
       SockType::SeqPacket => c::SOCK_SEQPACKET,
       SockType::DCCP => 6,
       SockType::Packet => 10,
-      SockType::Other(i) => i as c::c_int,
+      SockType::Other(i) => c::c_int::from(i),
     }
   }
 }
@@ -252,7 +254,7 @@ impl AddrFamily {
       AddrFamily::Nfc => c::AF_NFC,
       AddrFamily::Vsock => c::AF_VSOCK,
       AddrFamily::Max => c::AF_MAX,
-      AddrFamily::Other(i) => i as c::c_int,
+      AddrFamily::Other(i) => c::c_int::from(i),
     }
   }
 }
@@ -456,7 +458,7 @@ impl ProtoFamily {
       ProtoFamily::Nfc => c::PF_NFC,
       ProtoFamily::Vsock => c::PF_VSOCK,
       ProtoFamily::Max => c::PF_MAX,
-      ProtoFamily::Other(i) => i as c::c_int,
+      ProtoFamily::Other(i) => c::c_int::from(i),
     }
   }
 }

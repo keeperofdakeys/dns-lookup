@@ -76,7 +76,7 @@ impl AddrInfo {
   /// create a new AddrInfo struct with that information.
   ///
   /// Used for interfacing with libc::getaddrinfo.
-  unsafe fn from_ptr<'a>(a: *mut c::addrinfo) -> io::Result<Self> {
+  unsafe fn from_ptr(a: *mut c::addrinfo) -> io::Result<Self> {
     if a.is_null() {
       return Err(io::Error::new(io::ErrorKind::Other, "Supplied pointer is null."))?;
     }
@@ -84,19 +84,25 @@ impl AddrInfo {
 
     Ok(AddrInfo {
       socktype: SockType::from_int(addrinfo.ai_socktype)
-        .ok_or(
-          io::Error::new(io::ErrorKind::Other,
-          format!("Could not find socket type for: {}", addrinfo.ai_socktype))
+        .ok_or_else(||
+          io::Error::new(
+            io::ErrorKind::Other,
+            format!("Could not find socket type for: {}", addrinfo.ai_socktype)
+          )
         )?,
       protocol: ProtoFamily::from_int(addrinfo.ai_protocol)
-        .ok_or(
-          io::Error::new(io::ErrorKind::Other,
-          format!("Could not find protocol for: {}", addrinfo.ai_protocol))
+        .ok_or_else(||
+          io::Error::new(
+            io::ErrorKind::Other,
+            format!("Could not find protocol for: {}", addrinfo.ai_protocol)
+          )
         )?,
       address: AddrFamily::from_int(addrinfo.ai_family)
-        .ok_or(
-          io::Error::new(io::ErrorKind::Other,
-          format!("Could not find family for: {}", addrinfo.ai_family))
+        .ok_or_else(||
+          io::Error::new(
+            io::ErrorKind::Other,
+            format!("Could not find address for: {}", addrinfo.ai_family)
+          )
         )?,
       sockaddr: MySocketAddr::from_inner(addrinfo.ai_addr, addrinfo.ai_addrlen)?.into(),
       canonname: addrinfo.ai_canonname.as_ref().map(|s|
@@ -107,7 +113,7 @@ impl AddrInfo {
   }
 }
 
-/// An iterator of AddrInfo structs, wrapping a linked-list
+/// An iterator of `AddrInfo` structs, wrapping a linked-list
 /// returned by getaddrinfo.
 ///
 /// It's recommended to use `.collect<io::Result<..>>()` on this
