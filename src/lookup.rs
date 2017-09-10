@@ -70,7 +70,7 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
       unsafe {
         c::res_init();
       }
-      return Err(e)
+      Err(e)
     },
     // the cfg is needed here to avoid an "unreachable pattern" warning
     #[cfg(not(unix))]
