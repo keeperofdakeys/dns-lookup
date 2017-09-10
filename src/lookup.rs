@@ -1,13 +1,10 @@
 use libc as c;
-use std::ffi::{CStr};
 use std::io;
 use std::net::IpAddr;
-use std::ptr;
 use std::str;
 
-use addr::ip_to_sockaddr;
 use addrinfo::{getaddrinfo, AddrInfoHints};
-use err::lookup_errno;
+use nameinfo::getnameinfo;
 use types::*;
 
 // fn init_windows_sockets() {
@@ -62,24 +59,22 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
 ///
 /// Returns the hostname as a String, or an `io::Error` on failure.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
-  let socket = ip_to_sockaddr(addr);
-  let (inner, len) = socket.as_ptr();
-  let mut hostbuf = [0 as c::c_char; c::NI_MAXHOST as usize];
-
-  // FIXME: We need some flags, IE: NI_NAMEREQD
-  let data = unsafe {
-    lookup_errno(c::getnameinfo(inner, len,
-                  hostbuf.as_mut_ptr(),
-                  c::NI_MAXHOST,
-                  ptr::null_mut(), 0, 0))?;
-
-    CStr::from_ptr(hostbuf.as_ptr())
-  };
-
-  match str::from_utf8(data.to_bytes()) {
-    Ok(name) => Ok(name.to_owned()),
-    Err(_) => Err(io::Error::new(io::ErrorKind::Other,
-                   "failed to lookup address information"))
+  let sock = (*addr, 0).into();
+  match getnameinfo(&sock, 0) {
+    Ok((name, _)) => Ok(name),
+    #[cfg(unix)]
+    Err(e) => {
+      // The lookup failure could be caused by using a stale /etc/resolv.conf.
+      // See https://github.com/rust-lang/rust/issues/41570.
+      // We therefore force a reload of the nameserver information.
+      unsafe {
+        c::res_init();
+      }
+      return Err(e)
+    },
+    // the cfg is needed here to avoid an "unreachable pattern" warning
+    #[cfg(not(unix))]
+    Err(e) => Err(e),
   }
 }
 

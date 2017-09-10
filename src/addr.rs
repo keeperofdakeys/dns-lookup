@@ -202,7 +202,8 @@ fn ipv6_to_inner(ip: &Ipv6Addr) -> c::in6_addr {
 }
 
 /// Turn an `IpAddr` into a libc (socketaddr, length) pair.
-pub fn ip_to_sockaddr(ip: &IpAddr) ->  MySocketAddr {
+#[allow(dead_code)]
+fn ip_to_sockaddr(ip: &IpAddr) ->  MySocketAddr {
   match *ip {
     IpAddr::V4(ipv4) => {
       MySocketAddr::V4(MySocketAddrV4::new(&ipv4, 0))
