@@ -1,7 +1,5 @@
 use libc as c;
 
-#[allow(match_same_arms)]
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 /// Socket Type
 pub enum SockType {
