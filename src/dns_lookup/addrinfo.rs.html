@@ -255,6 +255,12 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">libc</span> <span class="kw">as</span> <span class="ident">c</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CStr</span>, <span class="ident">CString</span>};
@@ -334,7 +340,7 @@
   <span class="doccomment">/// create a new AddrInfo struct with that information.</span>
   <span class="doccomment">///</span>
   <span class="doccomment">/// Used for interfacing with libc::getaddrinfo.</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c</span>::<span class="ident">addrinfo</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">a</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c</span>::<span class="ident">addrinfo</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_null</span>() {
       <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Supplied pointer is null.&quot;</span>))<span class="question-mark">?</span>;
     }
@@ -342,19 +348,25 @@
 
     <span class="prelude-val">Ok</span>(<span class="ident">AddrInfo</span> {
       <span class="ident">socktype</span>: <span class="ident">SockType</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>)
-        .<span class="ident">ok_or</span>(
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
-          <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find socket type for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>))
+        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
+          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+            <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find socket type for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>)
+          )
         )<span class="question-mark">?</span>,
       <span class="ident">protocol</span>: <span class="ident">ProtoFamily</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
-        .<span class="ident">ok_or</span>(
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
-          <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find protocol for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>))
+        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
+          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+            <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find protocol for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
+          )
         )<span class="question-mark">?</span>,
       <span class="ident">address</span>: <span class="ident">AddrFamily</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_family</span>)
-        .<span class="ident">ok_or</span>(
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
-          <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find family for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_family</span>))
+        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
+          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+            <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find address for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_family</span>)
+          )
         )<span class="question-mark">?</span>,
       <span class="ident">sockaddr</span>: <span class="ident">MySocketAddr</span>::<span class="ident">from_inner</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_addr</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_addrlen</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
       <span class="ident">canonname</span>: <span class="ident">addrinfo</span>.<span class="ident">ai_canonname</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span>
@@ -365,7 +377,7 @@
   }
 }
 
-<span class="doccomment">/// An iterator of AddrInfo structs, wrapping a linked-list</span>
+<span class="doccomment">/// An iterator of `AddrInfo` structs, wrapping a linked-list</span>
 <span class="doccomment">/// returned by getaddrinfo.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// It&#39;s recommended to use `.collect&lt;io::Result&lt;..&gt;&gt;()` on this</span>

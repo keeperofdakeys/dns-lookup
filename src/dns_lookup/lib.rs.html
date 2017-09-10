@@ -124,8 +124,11 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
 </pre><pre class="rust ">
-<span class="doccomment">//! # dns_lookup</span>
+<span class="doccomment">//! # `dns_lookup`</span>
 <span class="doccomment">//! A small wrapper for libc to perform simple DNS lookups.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Two main functions are provided.</span>
@@ -192,6 +195,9 @@
 <span class="doccomment">//!   println!(&quot;{:?} {:?}&quot;, name, service);</span>
 <span class="doccomment">//!   let _ = (name, service);</span>
 <span class="doccomment">//! ```</span>
+
+<span class="attribute">#<span class="op">!</span>[<span class="ident">cfg_attr</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;clippy&quot;</span>, <span class="ident">feature</span>(<span class="ident">plugin</span>))]</span>
+<span class="attribute">#<span class="op">!</span>[<span class="ident">cfg_attr</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;clippy&quot;</span>, <span class="ident">plugin</span>(<span class="ident">clippy</span>))]</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
 

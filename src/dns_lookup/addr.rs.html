@@ -347,12 +347,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MySocketAddr</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
       <span class="ident">MySocketAddr</span>::<span class="ident">V4</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span>
-        <span class="ident">s</span>.<span class="ident">into_inner</span>(),
+        <span class="ident">s</span>.<span class="ident">as_ptr</span>(),
       <span class="ident">MySocketAddr</span>::<span class="ident">V6</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span>
-        <span class="ident">s</span>.<span class="ident">into_inner</span>()
+        <span class="ident">s</span>.<span class="ident">as_ptr</span>()
     }
   }
 
@@ -368,7 +368,7 @@
       <span class="ident">family</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">sock</span>).<span class="ident">sa_family</span>;
     }
 
-    <span class="kw">match</span> <span class="ident">family</span> <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+    <span class="kw">match</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">family</span>) {
       <span class="ident">c</span>::<span class="ident">AF_INET</span> <span class="op">=&gt;</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">sock_len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;=</span> <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">c</span>::<span class="ident">sockaddr_in</span><span class="op">&gt;</span>());
         <span class="prelude-val">Ok</span>(
@@ -413,7 +413,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="doccomment">/// A wrapper around a libc sockaddr_in.</span>
+<span class="doccomment">/// A wrapper around a libc `sockaddr_in`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySocketAddrV4</span> {
   <span class="ident">inner</span>: <span class="ident">c</span>::<span class="ident">sockaddr_in</span>
 }
@@ -440,7 +440,7 @@
     <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sin_port</span>.<span class="ident">to_be</span>()
   }
 
-  <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
+  <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
     (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr_in</span> <span class="kw">as</span>  <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>,
      <span class="ident">mem</span>::<span class="ident">size_of_val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>) <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">socklen_t</span>)
   }
@@ -454,7 +454,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MySocketAddrV4</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SocketAddrV4</span> {
   <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sock</span>: <span class="ident">MySocketAddrV4</span>) <span class="op">-&gt;</span> <span class="ident">SocketAddrV4</span> {
-    <span class="ident">SocketAddrV4</span>::<span class="ident">new</span>(<span class="ident">sock</span>.<span class="ident">ip</span>().<span class="ident">clone</span>(), <span class="ident">sock</span>.<span class="ident">port</span>())
+    <span class="ident">SocketAddrV4</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">sock</span>.<span class="ident">ip</span>(), <span class="ident">sock</span>.<span class="ident">port</span>())
   }
 }
 
@@ -465,7 +465,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="doccomment">/// A wrapper around a libc sockaddr_in6.</span>
+<span class="doccomment">/// A wrapper around a libc `sockaddr_in6`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySocketAddrV6</span> {
   <span class="ident">inner</span>: <span class="ident">c</span>::<span class="ident">sockaddr_in6</span>
 }
@@ -479,7 +479,6 @@
         <span class="ident">sin6_addr</span>: <span class="ident">ipv6_to_inner</span>(<span class="ident">ip</span>),
         <span class="ident">sin6_flowinfo</span>: <span class="ident">flowinfo</span>,
         <span class="ident">sin6_scope_id</span>: <span class="ident">scope_id</span>,
-        .. <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">zeroed</span>() }
       }
     }
   }
@@ -494,7 +493,7 @@
     <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sin6_port</span>.<span class="ident">to_be</span>()
   }
 
-  <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
+  <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>, <span class="ident">c</span>::<span class="ident">socklen_t</span>) {
     (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr_in6</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c</span>::<span class="ident">sockaddr</span>,
      <span class="ident">mem</span>::<span class="ident">size_of_val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>) <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">socklen_t</span>)
   }
@@ -508,7 +507,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MySocketAddrV6</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SocketAddrV6</span> {
   <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sock</span>: <span class="ident">MySocketAddrV6</span>) <span class="op">-&gt;</span> <span class="ident">SocketAddrV6</span> {
-    <span class="ident">SocketAddrV6</span>::<span class="ident">new</span>(<span class="ident">sock</span>.<span class="ident">ip</span>().<span class="ident">clone</span>(), <span class="ident">sock</span>.<span class="ident">port</span>(), <span class="number">0</span>, <span class="number">0</span>)
+    <span class="ident">SocketAddrV6</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">sock</span>.<span class="ident">ip</span>(), <span class="ident">sock</span>.<span class="ident">port</span>(), <span class="number">0</span>, <span class="number">0</span>)
   }
 }
 
@@ -518,20 +517,20 @@
   }
 }
 
-<span class="doccomment">/// Change an Ipv4Addr into a libc in_addr.</span>
+<span class="doccomment">/// Change an `Ipv4Addr` into a libc `in_addr`.</span>
 <span class="kw">fn</span> <span class="ident">ipv4_to_inner</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">in_addr</span> {
   <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>();
   <span class="ident">c</span>::<span class="ident">in_addr</span> {
     <span class="ident">s_addr</span>: (
-      ((<span class="ident">o</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">|</span>
-      ((<span class="ident">o</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">|</span>
-      ((<span class="ident">o</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span>  <span class="number">8</span>) <span class="op">|</span>
-      (<span class="ident">o</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u32</span>)
+      ((<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">o</span>[<span class="number">0</span>])) <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">|</span>
+      ((<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">o</span>[<span class="number">1</span>])) <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">|</span>
+      ((<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">o</span>[<span class="number">2</span>])) <span class="op">&lt;&lt;</span>  <span class="number">8</span>) <span class="op">|</span>
+      (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">o</span>[<span class="number">3</span>]))
     ).<span class="ident">to_be</span>(),
   }
 }
 
-<span class="doccomment">/// Change an Ipv6Addr into a libc in6_addr.</span>
+<span class="doccomment">/// Change an `Ipv6Addr` into a libc `in6_addr`.</span>
 <span class="kw">fn</span> <span class="ident">ipv6_to_inner</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv6Addr</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">in6_addr</span> {
   <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>();
   <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addr</span>: <span class="ident">c</span>::<span class="ident">in6_addr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">zeroed</span>() };
@@ -539,13 +538,14 @@
   <span class="ident">addr</span>
 }
 
-<span class="doccomment">/// Turn an IpAddr into a libc (socketaddr, length) pair.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ip_to_sockaddr</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>) <span class="op">-&gt;</span>  <span class="ident">MySocketAddr</span> {
-  <span class="kw">match</span> <span class="ident">ip</span> {
-    <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="ident">ipv4</span>) <span class="op">=&gt;</span> {
+<span class="doccomment">/// Turn an `IpAddr` into a libc (socketaddr, length) pair.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="kw">fn</span> <span class="ident">ip_to_sockaddr</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>) <span class="op">-&gt;</span>  <span class="ident">MySocketAddr</span> {
+  <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ip</span> {
+    <span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="ident">ipv4</span>) <span class="op">=&gt;</span> {
       <span class="ident">MySocketAddr</span>::<span class="ident">V4</span>(<span class="ident">MySocketAddrV4</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">ipv4</span>, <span class="number">0</span>))
     },
-    <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>::<span class="ident">V6</span>(<span class="ident">ipv6</span>) <span class="op">=&gt;</span> {
+    <span class="ident">IpAddr</span>::<span class="ident">V6</span>(<span class="ident">ipv6</span>) <span class="op">=&gt;</span> {
       <span class="ident">MySocketAddr</span>::<span class="ident">V6</span>(<span class="ident">MySocketAddrV6</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">ipv6</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
     },
   }

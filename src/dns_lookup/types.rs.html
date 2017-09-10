@@ -556,7 +556,7 @@
       <span class="ident">SockType</span>::<span class="ident">SeqPacket</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">SOCK_SEQPACKET</span>,
       <span class="ident">SockType</span>::<span class="ident">DCCP</span> <span class="op">=&gt;</span> <span class="number">6</span>,
       <span class="ident">SockType</span>::<span class="ident">Packet</span> <span class="op">=&gt;</span> <span class="number">10</span>,
-      <span class="ident">SockType</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">c_int</span>,
+      <span class="ident">SockType</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }
@@ -760,7 +760,7 @@
       <span class="ident">AddrFamily</span>::<span class="ident">Nfc</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_NFC</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Vsock</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_VSOCK</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Max</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_MAX</span>,
-      <span class="ident">AddrFamily</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">c_int</span>,
+      <span class="ident">AddrFamily</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }
@@ -964,7 +964,7 @@
       <span class="ident">ProtoFamily</span>::<span class="ident">Nfc</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">PF_NFC</span>,
       <span class="ident">ProtoFamily</span>::<span class="ident">Vsock</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">PF_VSOCK</span>,
       <span class="ident">ProtoFamily</span>::<span class="ident">Max</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">PF_MAX</span>,
-      <span class="ident">ProtoFamily</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">c_int</span>,
+      <span class="ident">ProtoFamily</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }
