@@ -17,7 +17,7 @@ use err::lookup_errno;
 /// Retrieving names or services that contain non-UTF8 locales is currently not
 /// supported (as String is returned). Raise an issue if this is a concern for
 /// you.
-pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<String>, Option<String>)> {
+pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(String, String)> {
   // Convert the socket into our type, so we can get a sockaddr_in{,6} ptr.
   let sock: MySocketAddr = (*sock).into();
   let (c_sock, c_sock_len) = sock.as_ptr();
@@ -28,7 +28,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<Str
   let mut c_service = [0 as c::c_char; 32 as usize];
 
   unsafe {
-    let res = lookup_errno(
+    lookup_errno(
       c::getnameinfo(
         c_sock, c_sock_len,
         c_host.as_mut_ptr(),
@@ -37,20 +37,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<Str
         c_service.len() as u32,
         flags
       )
-    );
-
-    match res {
-      Ok(_) => {},
-      #[cfg(unix)]
-      Err(e) => {
-        // Add workaround for getaddrinfo bug, as it might affect getnameinfo
-        // too. Refer to the getaddrinfo comment in this crate for details.
-        c::res_init();
-        return Err(e)
-      },
-      #[cfg(not(unix))]
-      Err(e) => return Err(e),
-    };
+    )?
   };
 
   let host = unsafe {
@@ -72,7 +59,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(Option<Str
                    "Service UTF8 parsing failed"))
   }?;
 
-  Ok((Some(host), Some(service)))
+  Ok((host, service))
 }
 
 #[test]
@@ -88,6 +75,6 @@ fn test_getnameinfo() {
      Err(e) => panic!("Failed to lookup socket {:?}", e),
    };
 
-   assert_eq!(name.unwrap(), "localhost");
-   assert_eq!(service.unwrap(), "ssh");
+   assert_eq!(name, "localhost");
+   assert_eq!(service, "ssh");
 }
