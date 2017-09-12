@@ -24,8 +24,6 @@ use dns_lookup::{lookup_host, lookup_addr};
 }
 
 {
-  use dns_lookup::{lookup_host, lookup_addr};
-
   let ip: std::net::IpAddr = "127.0.0.1".parse().unwrap();
   let hostname = lookup_addr(&ip).unwrap();
   assert_eq!(hostname, "localhost");
@@ -34,8 +32,6 @@ use dns_lookup::{lookup_host, lookup_addr};
 
 ### libc API
 ```rust
-use dns_lookup::{getaddrinfo, AddrInfoHints};
-
 {
   use dns_lookup::{getaddrinfo, AddrInfoHints};
 
@@ -53,21 +49,22 @@ use dns_lookup::{getaddrinfo, AddrInfoHints};
     // Try connecting to socket
     println!("{:?}", socket);
   }
-
-  {
-    use dns_lookup::getnameinfo;
-    use std::net::{IpAddr, SocketAddr};
-
-    let ip: IpAddr = "127.0.0.1".parse().unwrap();
-    let port = 22;
-    let socket: SocketAddr = (ip, port).into();
-
-    let (name, service) = match getnameinfo(&socket, 0) {
-      Ok((n, s)) => (n, s),
-      Err(e) => panic!("Failed to lookup socket {:?}", e),
-    };
-
-    println!("{:?} {:?}", name, service);
-    let _ = (name, service);
-  }
 }
+
+{
+  use dns_lookup::getnameinfo;
+  use std::net::{IpAddr, SocketAddr};
+
+  let ip: IpAddr = "127.0.0.1".parse().unwrap();
+  let port = 22;
+  let socket: SocketAddr = (ip, port).into();
+
+  let (name, service) = match getnameinfo(&socket, 0) {
+    Ok((n, s)) => (n, s),
+    Err(e) => panic!("Failed to lookup socket {:?}", e),
+  };
+
+  println!("{:?} {:?}", name, service);
+  let _ = (name, service);
+}
+```
