@@ -1,4 +1,6 @@
-# dns_lookup
+# dns-lookup
+[![Crates.io](https://img.shields.io/crates/v/dns-lookup.svg?maxAge=2592000)](https://crates.io/crates/dns-lookup)
+
 A small wrapper for libc to perform simple DNS lookups.
 
 You can use the `lookup_host` function to get a list of IP Addresses for a
