@@ -12,14 +12,14 @@ use types::*;
 #[derive(Copy, Clone, Debug, PartialEq)]
 /// A struct used as the hints argument to getaddrinfo.
 pub struct AddrInfoHints {
-  /// Type of this socket, Unspec for none.
+  /// Type of this socket, Unspec (0) for none.
   pub socktype: SockType,
-  /// Protcol family for this socket, Unspec for none.
-  pub protocol: ProtoFamily,
-  /// Address family for this socket. Unspec for none.
+  /// Protcol for this socket, IP (0) for none.
+  pub protocol: Protocol,
+  /// Address family for this socket. Unspec (0) for none.
   pub address: AddrFamily,
   /// Optional bitmask arguments. Bitwise OR bitflags to change the
-  /// behaviour of getaddrinfo.
+  /// behaviour of getaddrinfo. 0 for none.
   ///
   /// The actual bitflags are not provided by this crate, and are
   /// usually exported in the libc crate. Some backends have custom
@@ -44,7 +44,7 @@ impl Default for AddrInfoHints {
   fn default() -> Self {
     AddrInfoHints {
       socktype: SockType::Unspec,
-      protocol: ProtoFamily::Unspec,
+      protocol: Protocol::IP,
       address: AddrFamily::Unspec,
       flags: 0,
     }
@@ -59,7 +59,7 @@ pub struct AddrInfo {
   /// Type of this socket.
   pub socktype: SockType,
   /// Protcol family for this socket.
-  pub protocol: ProtoFamily,
+  pub protocol: Protocol,
   /// Address family for this socket (usually matches protocol family).
   pub address: AddrFamily,
   /// Socket address for this socket, usually containing an actual
@@ -90,7 +90,7 @@ impl AddrInfo {
             format!("Could not find socket type for: {}", addrinfo.ai_socktype)
           )
         )?,
-      protocol: ProtoFamily::from_int(addrinfo.ai_protocol)
+      protocol: Protocol::from_int(addrinfo.ai_protocol)
         .ok_or_else(||
           io::Error::new(
             io::ErrorKind::Other,
