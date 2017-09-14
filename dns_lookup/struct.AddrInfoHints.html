@@ -51,27 +51,27 @@
                </span><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#14-28' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct AddrInfoHints {
     pub socktype: <a class="enum" href="../dns_lookup/enum.SockType.html" title="enum dns_lookup::SockType">SockType</a>,
-    pub protocol: <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a>,
+    pub protocol: <a class="enum" href="../dns_lookup/enum.Protocol.html" title="enum dns_lookup::Protocol">Protocol</a>,
     pub address: <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a>,
     pub flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>,
 }</pre><div class='docblock'><p>A struct used as the hints argument to getaddrinfo.</p>
 </div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.socktype' class="structfield">
                            <span id='socktype.v' class='invisible'>
                            <code>socktype: <a class="enum" href="../dns_lookup/enum.SockType.html" title="enum dns_lookup::SockType">SockType</a></code>
-                           </span></span><div class='docblock'><p>Type of this socket, Unspec for none.</p>
+                           </span></span><div class='docblock'><p>Type of this socket, Unspec (0) for none.</p>
 </div><span id='structfield.protocol' class="structfield">
                            <span id='protocol.v' class='invisible'>
-                           <code>protocol: <a class="enum" href="../dns_lookup/enum.ProtoFamily.html" title="enum dns_lookup::ProtoFamily">ProtoFamily</a></code>
-                           </span></span><div class='docblock'><p>Protcol family for this socket, Unspec for none.</p>
+                           <code>protocol: <a class="enum" href="../dns_lookup/enum.Protocol.html" title="enum dns_lookup::Protocol">Protocol</a></code>
+                           </span></span><div class='docblock'><p>Protcol for this socket, IP (0) for none.</p>
 </div><span id='structfield.address' class="structfield">
                            <span id='address.v' class='invisible'>
                            <code>address: <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code>
-                           </span></span><div class='docblock'><p>Address family for this socket. Unspec for none.</p>
+                           </span></span><div class='docblock'><p>Address family for this socket. Unspec (0) for none.</p>
 </div><span id='structfield.flags' class="structfield">
                            <span id='flags.v' class='invisible'>
                            <code>flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code>
                            </span></span><div class='docblock'><p>Optional bitmask arguments. Bitwise OR bitflags to change the
-behaviour of getaddrinfo.</p>
+behaviour of getaddrinfo. 0 for none.</p>
 
 <p>The actual bitflags are not provided by this crate, and are
 usually exported in the libc crate. Some backends have custom

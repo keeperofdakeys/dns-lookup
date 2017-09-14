@@ -48,53 +48,15 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/types.rs.html#58-151' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/dns_lookup/types.rs.html#58-75' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum AddrFamily {
     Unspec,
     Local,
     Unix,
     File,
     Inet,
-    Ax25,
-    Ipx,
-    Appletalk,
-    Netrom,
-    Bridge,
-    Atmpvc,
-    X25,
     Inet6,
-    Rose,
-    Decnet,
-    Netbeui,
-    Security,
-    Key,
-    Netlink,
-    Route,
     Packet,
-    Ash,
-    Econet,
-    Atmsvc,
-    Rds,
-    Sna,
-    Irda,
-    Pppox,
-    Wanpipe,
-    Llc,
-    Ib,
-    Mpls,
-    Can,
-    Tipc,
-    Bluetooth,
-    Iucv,
-    Rxrpc,
-    Isdn,
-    Phonet,
-    Ieee802154,
-    Caif,
-    Alg,
-    Nfc,
-    Vsock,
-    Max,
     Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>),
 }</pre><div class='docblock'><p>Socket Address Family</p>
 </div><h2 id='variants' class='variants'>Variants</h2>
@@ -103,48 +65,10 @@
 </div><span id='variant.Unix' class='variant'><span id='Unix.v' class='invisible'><code>Unix</code></span></span><div class='docblock'><p>POSIX name for PF_LOCAL.</p>
 </div><span id='variant.File' class='variant'><span id='File.v' class='invisible'><code>File</code></span></span><div class='docblock'><p>Another non-standard name for PF_LOCAL.</p>
 </div><span id='variant.Inet' class='variant'><span id='Inet.v' class='invisible'><code>Inet</code></span></span><div class='docblock'><p>IP protocol family.</p>
-</div><span id='variant.Ax25' class='variant'><span id='Ax25.v' class='invisible'><code>Ax25</code></span></span><div class='docblock'><p>Amateur Radio AX.25.</p>
-</div><span id='variant.Ipx' class='variant'><span id='Ipx.v' class='invisible'><code>Ipx</code></span></span><div class='docblock'><p>Novell Internet Protocol.</p>
-</div><span id='variant.Appletalk' class='variant'><span id='Appletalk.v' class='invisible'><code>Appletalk</code></span></span><div class='docblock'><p>Appletalk DDP.</p>
-</div><span id='variant.Netrom' class='variant'><span id='Netrom.v' class='invisible'><code>Netrom</code></span></span><div class='docblock'><p>Amateur radio NetROM.</p>
-</div><span id='variant.Bridge' class='variant'><span id='Bridge.v' class='invisible'><code>Bridge</code></span></span><div class='docblock'><p>Multiprotocol bridge.</p>
-</div><span id='variant.Atmpvc' class='variant'><span id='Atmpvc.v' class='invisible'><code>Atmpvc</code></span></span><div class='docblock'><p>ATM PVCs.</p>
-</div><span id='variant.X25' class='variant'><span id='X25.v' class='invisible'><code>X25</code></span></span><div class='docblock'><p>Reserved for X.25 project.</p>
 </div><span id='variant.Inet6' class='variant'><span id='Inet6.v' class='invisible'><code>Inet6</code></span></span><div class='docblock'><p>IP version 6.</p>
-</div><span id='variant.Rose' class='variant'><span id='Rose.v' class='invisible'><code>Rose</code></span></span><div class='docblock'><p>Amateur Radio X.25 PLP.</p>
-</div><span id='variant.Decnet' class='variant'><span id='Decnet.v' class='invisible'><code>Decnet</code></span></span><div class='docblock'><p>Reserved for DECnet project.</p>
-</div><span id='variant.Netbeui' class='variant'><span id='Netbeui.v' class='invisible'><code>Netbeui</code></span></span><div class='docblock'><p>Reserved for 802.2LLC project.</p>
-</div><span id='variant.Security' class='variant'><span id='Security.v' class='invisible'><code>Security</code></span></span><div class='docblock'><p>Security callback pseudo AF.</p>
-</div><span id='variant.Key' class='variant'><span id='Key.v' class='invisible'><code>Key</code></span></span><div class='docblock'><p>PF_KEY key management API.</p>
-</div><span id='variant.Netlink' class='variant'><span id='Netlink.v' class='invisible'><code>Netlink</code></span></span><div class='docblock'><p>Alias to emulate 4.4BSD.</p>
-</div><span id='variant.Route' class='variant'><span id='Route.v' class='invisible'><code>Route</code></span></span><div class='docblock'><p>Alias to emulate 4.4BSD.</p>
 </div><span id='variant.Packet' class='variant'><span id='Packet.v' class='invisible'><code>Packet</code></span></span><div class='docblock'><p>Packet family.</p>
-</div><span id='variant.Ash' class='variant'><span id='Ash.v' class='invisible'><code>Ash</code></span></span><div class='docblock'><p>Ash.</p>
-</div><span id='variant.Econet' class='variant'><span id='Econet.v' class='invisible'><code>Econet</code></span></span><div class='docblock'><p>Acorn Econet.</p>
-</div><span id='variant.Atmsvc' class='variant'><span id='Atmsvc.v' class='invisible'><code>Atmsvc</code></span></span><div class='docblock'><p>ATM SVCs.</p>
-</div><span id='variant.Rds' class='variant'><span id='Rds.v' class='invisible'><code>Rds</code></span></span><div class='docblock'><p>RDS sockets.</p>
-</div><span id='variant.Sna' class='variant'><span id='Sna.v' class='invisible'><code>Sna</code></span></span><div class='docblock'><p>Linux SNA Project</p>
-</div><span id='variant.Irda' class='variant'><span id='Irda.v' class='invisible'><code>Irda</code></span></span><div class='docblock'><p>IRDA sockets.</p>
-</div><span id='variant.Pppox' class='variant'><span id='Pppox.v' class='invisible'><code>Pppox</code></span></span><div class='docblock'><p>PPPoX sockets.</p>
-</div><span id='variant.Wanpipe' class='variant'><span id='Wanpipe.v' class='invisible'><code>Wanpipe</code></span></span><div class='docblock'><p>Wanpipe API sockets.</p>
-</div><span id='variant.Llc' class='variant'><span id='Llc.v' class='invisible'><code>Llc</code></span></span><div class='docblock'><p>Linux LLC.</p>
-</div><span id='variant.Ib' class='variant'><span id='Ib.v' class='invisible'><code>Ib</code></span></span><div class='docblock'><p>Native InfiniBand address.</p>
-</div><span id='variant.Mpls' class='variant'><span id='Mpls.v' class='invisible'><code>Mpls</code></span></span><div class='docblock'><p>MPLS.</p>
-</div><span id='variant.Can' class='variant'><span id='Can.v' class='invisible'><code>Can</code></span></span><div class='docblock'><p>Controller Area Network.</p>
-</div><span id='variant.Tipc' class='variant'><span id='Tipc.v' class='invisible'><code>Tipc</code></span></span><div class='docblock'><p>TIPC sockets.</p>
-</div><span id='variant.Bluetooth' class='variant'><span id='Bluetooth.v' class='invisible'><code>Bluetooth</code></span></span><div class='docblock'><p>Bluetooth sockets.</p>
-</div><span id='variant.Iucv' class='variant'><span id='Iucv.v' class='invisible'><code>Iucv</code></span></span><div class='docblock'><p>IUCV sockets.</p>
-</div><span id='variant.Rxrpc' class='variant'><span id='Rxrpc.v' class='invisible'><code>Rxrpc</code></span></span><div class='docblock'><p>RxRPC sockets.</p>
-</div><span id='variant.Isdn' class='variant'><span id='Isdn.v' class='invisible'><code>Isdn</code></span></span><div class='docblock'><p>mISDN sockets.</p>
-</div><span id='variant.Phonet' class='variant'><span id='Phonet.v' class='invisible'><code>Phonet</code></span></span><div class='docblock'><p>Phonet sockets.</p>
-</div><span id='variant.Ieee802154' class='variant'><span id='Ieee802154.v' class='invisible'><code>Ieee802154</code></span></span><div class='docblock'><p>IEEE 802.15.4 sockets.</p>
-</div><span id='variant.Caif' class='variant'><span id='Caif.v' class='invisible'><code>Caif</code></span></span><div class='docblock'><p>CAIF sockets.</p>
-</div><span id='variant.Alg' class='variant'><span id='Alg.v' class='invisible'><code>Alg</code></span></span><div class='docblock'><p>Algorithm sockets.</p>
-</div><span id='variant.Nfc' class='variant'><span id='Nfc.v' class='invisible'><code>Nfc</code></span></span><div class='docblock'><p>NFC sockets.</p>
-</div><span id='variant.Vsock' class='variant'><span id='Vsock.v' class='invisible'><code>Vsock</code></span></span><div class='docblock'><p>vSockets.</p>
-</div><span id='variant.Max' class='variant'><span id='Max.v' class='invisible'><code>Max</code></span></span><div class='docblock'><p>For now..</p>
-</div><span id='variant.Other' class='variant'><span id='Other.v' class='invisible'><code>Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>)</code></span></span><div class='docblock'><p>Unknown (This variant is for error reporting, as undefined numbers may be later defined).</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#153-258' title='goto source code'>[src]</a></span></h3>
+</div><span id='variant.Other' class='variant'><span id='Other.v' class='invisible'><code>Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>)</code></span></span><div class='docblock'><p>Other variants, use libc symbols for matching on this.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#77-104' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.from_int' class="method"><span id='from_int.v' class='invisible'><code>fn <a href='#method.from_int' class='fnname'>from_int</a>(int: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Self&gt;</code></span></h4>
 <h4 id='method.to_int' class="method"><span id='to_int.v' class='invisible'><code>fn <a href='#method.to_int' class='fnname'>to_int</a>(&amp;self) -&gt; <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code></span></h4>
 </div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#56' title='goto source code'>[src]</a></span></h3>

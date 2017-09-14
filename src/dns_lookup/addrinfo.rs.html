@@ -276,14 +276,14 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="doccomment">/// A struct used as the hints argument to getaddrinfo.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddrInfoHints</span> {
-  <span class="doccomment">/// Type of this socket, Unspec for none.</span>
+  <span class="doccomment">/// Type of this socket, Unspec (0) for none.</span>
   <span class="kw">pub</span> <span class="ident">socktype</span>: <span class="ident">SockType</span>,
-  <span class="doccomment">/// Protcol family for this socket, Unspec for none.</span>
-  <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="ident">ProtoFamily</span>,
-  <span class="doccomment">/// Address family for this socket. Unspec for none.</span>
+  <span class="doccomment">/// Protcol for this socket, IP (0) for none.</span>
+  <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="ident">Protocol</span>,
+  <span class="doccomment">/// Address family for this socket. Unspec (0) for none.</span>
   <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">AddrFamily</span>,
   <span class="doccomment">/// Optional bitmask arguments. Bitwise OR bitflags to change the</span>
-  <span class="doccomment">/// behaviour of getaddrinfo.</span>
+  <span class="doccomment">/// behaviour of getaddrinfo. 0 for none.</span>
   <span class="doccomment">///</span>
   <span class="doccomment">/// The actual bitflags are not provided by this crate, and are</span>
   <span class="doccomment">/// usually exported in the libc crate. Some backends have custom</span>
@@ -308,7 +308,7 @@
   <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
     <span class="ident">AddrInfoHints</span> {
       <span class="ident">socktype</span>: <span class="ident">SockType</span>::<span class="ident">Unspec</span>,
-      <span class="ident">protocol</span>: <span class="ident">ProtoFamily</span>::<span class="ident">Unspec</span>,
+      <span class="ident">protocol</span>: <span class="ident">Protocol</span>::<span class="ident">IP</span>,
       <span class="ident">address</span>: <span class="ident">AddrFamily</span>::<span class="ident">Unspec</span>,
       <span class="ident">flags</span>: <span class="number">0</span>,
     }
@@ -323,7 +323,7 @@
   <span class="doccomment">/// Type of this socket.</span>
   <span class="kw">pub</span> <span class="ident">socktype</span>: <span class="ident">SockType</span>,
   <span class="doccomment">/// Protcol family for this socket.</span>
-  <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="ident">ProtoFamily</span>,
+  <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="ident">Protocol</span>,
   <span class="doccomment">/// Address family for this socket (usually matches protocol family).</span>
   <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">AddrFamily</span>,
   <span class="doccomment">/// Socket address for this socket, usually containing an actual</span>
@@ -354,7 +354,7 @@
             <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find socket type for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>)
           )
         )<span class="question-mark">?</span>,
-      <span class="ident">protocol</span>: <span class="ident">ProtoFamily</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
+      <span class="ident">protocol</span>: <span class="ident">Protocol</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
         .<span class="ident">ok_or_else</span>(<span class="op">||</span>
           <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
