@@ -20,13 +20,18 @@ pub enum SockType {
   /// Linux specific way of getting packets at the dev level.  For writing rarp
   /// and other similar things on the user level.
   Packet,
-  /// Unknown (This variant is for error reporting, as undefined numbers may be later defined).
-  Other(u16),
+  /// Other SockType.
+  ///
+  /// It's recommended not to match on this, or create this directly, as new
+  /// variants may break code depending on this variant. Instead you should
+  /// use the From/Into traits to convert libc symbols directly, if the desired
+  /// variant does not exist.
+  _Other(u16),
 }
 
-impl SockType {
-  pub fn from_int(int: c::c_int) -> Option<Self> {
-    Some(match int {
+impl From<c::c_int> for SockType {
+  fn from(int: c::c_int) -> Self {
+    match int {
       c::SOCK_STREAM => SockType::Stream,
       c::SOCK_DGRAM => SockType::DGram,
       c::SOCK_RAW => SockType::Raw,
@@ -34,12 +39,14 @@ impl SockType {
       c::SOCK_SEQPACKET => SockType::SeqPacket,
       6 => SockType::DCCP,
       10 => SockType::Packet,
-      _ => SockType::Other(int as u16),
-    })
+      _ => SockType::_Other(int as u16),
+    }
   }
+}
 
-  pub fn to_int(&self) -> c::c_int {
-    match *self {
+impl From<SockType> for c::c_int {
+  fn from(sock: SockType) -> c::c_int {
+    match sock {
       SockType::Unspec => 0,
       SockType::Stream => c::SOCK_STREAM,
       SockType::DGram => c::SOCK_DGRAM,
@@ -48,7 +55,7 @@ impl SockType {
       SockType::SeqPacket => c::SOCK_SEQPACKET,
       SockType::DCCP => 6,
       SockType::Packet => 10,
-      SockType::Other(i) => c::c_int::from(i),
+      SockType::_Other(i) => c::c_int::from(i),
     }
   }
 }
@@ -70,13 +77,18 @@ pub enum AddrFamily {
   Inet6,
   /// Packet family.
   Packet,
-  /// Other variants, use libc symbols for matching on this.
-  Other(u16),
+  /// Other Address Family.
+  ///
+  /// It's recommended not to match on this, or create this directly, as new
+  /// variants may break code depending on this variant. Instead you should
+  /// use the From/Into traits to convert libc symbols directly, if the desired
+  /// variant does not exist.
+  _Other(u16),
 }
 
-impl AddrFamily {
-  pub fn from_int(int: c::c_int) -> Option<Self> {
-    Some(match int {
+impl From<c::c_int> for AddrFamily {
+  fn from(int: c::c_int) -> Self {
+    match int {
       c::AF_UNSPEC => AddrFamily::Unspec,
       c::AF_LOCAL => AddrFamily::Local,
       // These variants will never match.
@@ -85,12 +97,14 @@ impl AddrFamily {
       c::AF_INET => AddrFamily::Inet,
       c::AF_INET6 => AddrFamily::Inet6,
       c::AF_PACKET => AddrFamily::Packet,
-      _ => AddrFamily::Other(int as u16),
-    })
+      _ => AddrFamily::_Other(int as u16),
+    }
   }
+}
 
-  pub fn to_int(&self) -> c::c_int {
-    match *self {
+impl From<AddrFamily> for c::c_int {
+  fn from(addr: AddrFamily) -> c::c_int {
+    match addr {
       AddrFamily::Unspec => c::AF_UNSPEC,
       AddrFamily::Local => c::AF_LOCAL,
       AddrFamily::Unix => c::AF_UNIX,
@@ -98,7 +112,7 @@ impl AddrFamily {
       AddrFamily::Inet => c::AF_INET,
       AddrFamily::Inet6 => c::AF_INET6,
       AddrFamily::Packet => c::AF_PACKET,
-      AddrFamily::Other(i) => c::c_int::from(i),
+      AddrFamily::_Other(i) => c::c_int::from(i),
     }
   }
 }
@@ -116,30 +130,37 @@ pub enum Protocol {
   UDP,
   /// Raw IP packets.
   RAW,
-  /// Other variants, use libc symbols for matching on this.
-  Other(u16),
+  /// Other Protocol.
+  ///
+  /// It's recommended not to match on this, or create this directly, as new
+  /// variants may break code depending on this variant. Instead you should
+  /// use the From/Into traits to convert libc symbols directly, if the desired
+  /// variant does not exist.
+  _Other(u16),
 }
 
-impl Protocol {
-  pub fn from_int(int: c::c_int) -> Option<Self> {
-    Some(match int {
+impl From<c::c_int> for Protocol {
+  fn from(int: c::c_int) -> Self {
+    match int {
       c::IPPROTO_IP => Protocol::IP,
       c::IPPROTO_ICMP => Protocol::ICMP,
       c::IPPROTO_TCP => Protocol::TCP,
       c::IPPROTO_UDP => Protocol::UDP,
       c::IPPROTO_RAW => Protocol::RAW,
-      _ => Protocol::Other(int as u16),
-    })
+      _ => Protocol::_Other(int as u16),
+    }
   }
+}
 
-  pub fn to_int(&self) -> c::c_int {
-    match *self {
+impl From<Protocol> for c::c_int {
+  fn from(proto: Protocol) -> c::c_int {
+    match proto {
       Protocol::IP => c::IPPROTO_IP,
       Protocol::ICMP => c::IPPROTO_ICMP,
       Protocol::TCP => c::IPPROTO_TCP,
       Protocol::UDP => c::IPPROTO_UDP,
       Protocol::RAW => c::IPPROTO_RAW,
-      Protocol::Other(i) => c::c_int::from(i),
+      Protocol::_Other(i) => c::c_int::from(i),
     }
   }
 }

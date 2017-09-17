@@ -30,9 +30,9 @@ pub struct AddrInfoHints {
 impl AddrInfoHints {
   unsafe fn as_addrinfo(&self) -> c::addrinfo {
     let mut addrinfo: c::addrinfo = mem::zeroed();
-    addrinfo.ai_socktype = self.socktype.to_int();
-    addrinfo.ai_protocol = self.protocol.to_int();
-    addrinfo.ai_family = self.address.to_int();
+    addrinfo.ai_socktype = self.socktype.into();
+    addrinfo.ai_protocol = self.protocol.into();
+    addrinfo.ai_family = self.address.into();
     addrinfo.ai_flags = self.flags as c::c_int;
     addrinfo
   }
@@ -83,27 +83,30 @@ impl AddrInfo {
     let addrinfo = *a;
 
     Ok(AddrInfo {
-      socktype: SockType::from_int(addrinfo.ai_socktype)
-        .ok_or_else(||
-          io::Error::new(
+      socktype: match addrinfo.ai_socktype.into() {
+        SockType::_Other(_) =>
+          return Err(io::Error::new(
             io::ErrorKind::Other,
             format!("Could not find socket type for: {}", addrinfo.ai_socktype)
-          )
-        )?,
-      protocol: Protocol::from_int(addrinfo.ai_protocol)
-        .ok_or_else(||
-          io::Error::new(
+          )),
+        a @ _ => a,
+      },
+      protocol: match addrinfo.ai_protocol.into() {
+        Protocol::_Other(_) =>
+          return Err(io::Error::new(
             io::ErrorKind::Other,
             format!("Could not find protocol for: {}", addrinfo.ai_protocol)
-          )
-        )?,
-      address: AddrFamily::from_int(addrinfo.ai_family)
-        .ok_or_else(||
-          io::Error::new(
+          )),
+        a @ _ => a,
+      },
+      address: match addrinfo.ai_family.into() {
+        AddrFamily::_Other(_) =>
+          return Err(io::Error::new(
             io::ErrorKind::Other,
             format!("Could not find address for: {}", addrinfo.ai_family)
-          )
-        )?,
+          )),
+        a @ _ => a,
+      },
       sockaddr: MySocketAddr::from_inner(addrinfo.ai_addr, addrinfo.ai_addrlen)?.into(),
       canonname: addrinfo.ai_canonname.as_ref().map(|s|
         CStr::from_ptr(s).to_str().unwrap().to_owned()
