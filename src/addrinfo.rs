@@ -80,8 +80,8 @@ impl AddrInfo {
     if a.is_null() {
       return Err(io::Error::new(io::ErrorKind::Other, "Supplied pointer is null."))?;
     }
-    let addrinfo = *a;
 
+    let addrinfo = *a;
     Ok(AddrInfo {
       socktype: match addrinfo.ai_socktype.into() {
         SockType::_Other(_) =>
