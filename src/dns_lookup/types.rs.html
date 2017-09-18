@@ -188,6 +188,27 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">libc</span> <span class="kw">as</span> <span class="ident">c</span>;
 
@@ -211,13 +232,18 @@
   <span class="doccomment">/// Linux specific way of getting packets at the dev level.  For writing rarp</span>
   <span class="doccomment">/// and other similar things on the user level.</span>
   <span class="ident">Packet</span>,
-  <span class="doccomment">/// Unknown (This variant is for error reporting, as undefined numbers may be later defined).</span>
-  <span class="ident">Other</span>(<span class="ident">u16</span>),
+  <span class="doccomment">/// Other SockType.</span>
+  <span class="doccomment">///</span>
+  <span class="doccomment">/// It&#39;s recommended not to match on this, or create this directly, as new</span>
+  <span class="doccomment">/// variants may break code depending on this variant. Instead you should</span>
+  <span class="doccomment">/// use the From/Into traits to convert libc symbols directly, if the desired</span>
+  <span class="doccomment">/// variant does not exist.</span>
+  <span class="ident">_Other</span>(<span class="ident">u16</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">SockType</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_int</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">int</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">c</span>::<span class="ident">c_int</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SockType</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">match</span> <span class="ident">int</span> {
       <span class="ident">c</span>::<span class="ident">SOCK_STREAM</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">Stream</span>,
       <span class="ident">c</span>::<span class="ident">SOCK_DGRAM</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">DGram</span>,
       <span class="ident">c</span>::<span class="ident">SOCK_RAW</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">Raw</span>,
@@ -225,12 +251,14 @@
       <span class="ident">c</span>::<span class="ident">SOCK_SEQPACKET</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">SeqPacket</span>,
       <span class="number">6</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">DCCP</span>,
       <span class="number">10</span> <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">Packet</span>,
-      _ <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
-    })
+      _ <span class="op">=&gt;</span> <span class="ident">SockType</span>::<span class="ident">_Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
+    }
   }
+}
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SockType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sock</span>: <span class="ident">SockType</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+    <span class="kw">match</span> <span class="ident">sock</span> {
       <span class="ident">SockType</span>::<span class="ident">Unspec</span> <span class="op">=&gt;</span> <span class="number">0</span>,
       <span class="ident">SockType</span>::<span class="ident">Stream</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">SOCK_STREAM</span>,
       <span class="ident">SockType</span>::<span class="ident">DGram</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">SOCK_DGRAM</span>,
@@ -239,7 +267,7 @@
       <span class="ident">SockType</span>::<span class="ident">SeqPacket</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">SOCK_SEQPACKET</span>,
       <span class="ident">SockType</span>::<span class="ident">DCCP</span> <span class="op">=&gt;</span> <span class="number">6</span>,
       <span class="ident">SockType</span>::<span class="ident">Packet</span> <span class="op">=&gt;</span> <span class="number">10</span>,
-      <span class="ident">SockType</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
+      <span class="ident">SockType</span>::<span class="ident">_Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }
@@ -261,13 +289,18 @@
   <span class="ident">Inet6</span>,
   <span class="doccomment">/// Packet family.</span>
   <span class="ident">Packet</span>,
-  <span class="doccomment">/// Other variants, use libc symbols for matching on this.</span>
-  <span class="ident">Other</span>(<span class="ident">u16</span>),
+  <span class="doccomment">/// Other Address Family.</span>
+  <span class="doccomment">///</span>
+  <span class="doccomment">/// It&#39;s recommended not to match on this, or create this directly, as new</span>
+  <span class="doccomment">/// variants may break code depending on this variant. Instead you should</span>
+  <span class="doccomment">/// use the From/Into traits to convert libc symbols directly, if the desired</span>
+  <span class="doccomment">/// variant does not exist.</span>
+  <span class="ident">_Other</span>(<span class="ident">u16</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">AddrFamily</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_int</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">int</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">c</span>::<span class="ident">c_int</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AddrFamily</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">match</span> <span class="ident">int</span> {
       <span class="ident">c</span>::<span class="ident">AF_UNSPEC</span> <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Unspec</span>,
       <span class="ident">c</span>::<span class="ident">AF_LOCAL</span> <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Local</span>,
       <span class="comment">// These variants will never match.</span>
@@ -276,12 +309,14 @@
       <span class="ident">c</span>::<span class="ident">AF_INET</span> <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Inet</span>,
       <span class="ident">c</span>::<span class="ident">AF_INET6</span> <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Inet6</span>,
       <span class="ident">c</span>::<span class="ident">AF_PACKET</span> <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Packet</span>,
-      _ <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
-    })
+      _ <span class="op">=&gt;</span> <span class="ident">AddrFamily</span>::<span class="ident">_Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
+    }
   }
+}
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AddrFamily</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">AddrFamily</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+    <span class="kw">match</span> <span class="ident">addr</span> {
       <span class="ident">AddrFamily</span>::<span class="ident">Unspec</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_UNSPEC</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Local</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_LOCAL</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Unix</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_UNIX</span>,
@@ -289,7 +324,7 @@
       <span class="ident">AddrFamily</span>::<span class="ident">Inet</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_INET</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Inet6</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_INET6</span>,
       <span class="ident">AddrFamily</span>::<span class="ident">Packet</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">AF_PACKET</span>,
-      <span class="ident">AddrFamily</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
+      <span class="ident">AddrFamily</span>::<span class="ident">_Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }
@@ -307,30 +342,37 @@
   <span class="ident">UDP</span>,
   <span class="doccomment">/// Raw IP packets.</span>
   <span class="ident">RAW</span>,
-  <span class="doccomment">/// Other variants, use libc symbols for matching on this.</span>
-  <span class="ident">Other</span>(<span class="ident">u16</span>),
+  <span class="doccomment">/// Other Protocol.</span>
+  <span class="doccomment">///</span>
+  <span class="doccomment">/// It&#39;s recommended not to match on this, or create this directly, as new</span>
+  <span class="doccomment">/// variants may break code depending on this variant. Instead you should</span>
+  <span class="doccomment">/// use the From/Into traits to convert libc symbols directly, if the desired</span>
+  <span class="doccomment">/// variant does not exist.</span>
+  <span class="ident">_Other</span>(<span class="ident">u16</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">Protocol</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_int</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">int</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">c</span>::<span class="ident">c_int</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Protocol</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">int</span>: <span class="ident">c</span>::<span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">match</span> <span class="ident">int</span> {
       <span class="ident">c</span>::<span class="ident">IPPROTO_IP</span> <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">IP</span>,
       <span class="ident">c</span>::<span class="ident">IPPROTO_ICMP</span> <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">ICMP</span>,
       <span class="ident">c</span>::<span class="ident">IPPROTO_TCP</span> <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">TCP</span>,
       <span class="ident">c</span>::<span class="ident">IPPROTO_UDP</span> <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">UDP</span>,
       <span class="ident">c</span>::<span class="ident">IPPROTO_RAW</span> <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">RAW</span>,
-      _ <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
-    })
+      _ <span class="op">=&gt;</span> <span class="ident">Protocol</span>::<span class="ident">_Other</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u16</span>),
+    }
   }
+}
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Protocol</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">proto</span>: <span class="ident">Protocol</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span> {
+    <span class="kw">match</span> <span class="ident">proto</span> {
       <span class="ident">Protocol</span>::<span class="ident">IP</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">IPPROTO_IP</span>,
       <span class="ident">Protocol</span>::<span class="ident">ICMP</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">IPPROTO_ICMP</span>,
       <span class="ident">Protocol</span>::<span class="ident">TCP</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">IPPROTO_TCP</span>,
       <span class="ident">Protocol</span>::<span class="ident">UDP</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">IPPROTO_UDP</span>,
       <span class="ident">Protocol</span>::<span class="ident">RAW</span> <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">IPPROTO_RAW</span>,
-      <span class="ident">Protocol</span>::<span class="ident">Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
+      <span class="ident">Protocol</span>::<span class="ident">_Other</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">c</span>::<span class="ident">c_int</span>::<span class="ident">from</span>(<span class="ident">i</span>),
     }
   }
 }

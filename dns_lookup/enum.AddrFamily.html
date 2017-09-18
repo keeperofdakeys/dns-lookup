@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Enum AddrFamily</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'AddrFamily', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Enum AddrFamily</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'AddrFamily', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/types.rs.html#58-75' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/dns_lookup/types.rs.html#65-87' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum AddrFamily {
     Unspec,
     Local,
@@ -57,7 +57,7 @@
     Inet,
     Inet6,
     Packet,
-    Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>),
+    _Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>),
 }</pre><div class='docblock'><p>Socket Address Family</p>
 </div><h2 id='variants' class='variants'>Variants</h2>
 <span id='variant.Unspec' class='variant'><span id='Unspec.v' class='invisible'><code>Unspec</code></span></span><div class='docblock'><p>Unspecified.</p>
@@ -67,24 +67,29 @@
 </div><span id='variant.Inet' class='variant'><span id='Inet.v' class='invisible'><code>Inet</code></span></span><div class='docblock'><p>IP protocol family.</p>
 </div><span id='variant.Inet6' class='variant'><span id='Inet6.v' class='invisible'><code>Inet6</code></span></span><div class='docblock'><p>IP version 6.</p>
 </div><span id='variant.Packet' class='variant'><span id='Packet.v' class='invisible'><code>Packet</code></span></span><div class='docblock'><p>Packet family.</p>
-</div><span id='variant.Other' class='variant'><span id='Other.v' class='invisible'><code>Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>)</code></span></span><div class='docblock'><p>Other variants, use libc symbols for matching on this.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#77-104' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.from_int' class="method"><span id='from_int.v' class='invisible'><code>fn <a href='#method.from_int' class='fnname'>from_int</a>(int: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Self&gt;</code></span></h4>
-<h4 id='method.to_int' class="method"><span id='to_int.v' class='invisible'><code>fn <a href='#method.to_int' class='fnname'>to_int</a>(&amp;self) -&gt; <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code></span></h4>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#56' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#56' title='goto source code'>[src]</a></span></h3>
+</div><span id='variant._Other' class='variant'><span id='_Other.v' class='invisible'><code>_Other(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>)</code></span></span><div class='docblock'><p>Other Address Family.</p>
+
+<p>It&#39;s recommended not to match on this, or create this directly, as new
+variants may break code depending on this variant. Instead you should
+use the From/Into traits to convert libc symbols directly, if the desired
+variant does not exist.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#63' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#63' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#56' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#63' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#56' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#63' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
 </div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.From.html" title="trait core::convert::From">From</a>&lt;<a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>&gt; for <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/types.rs.html#89-103' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from' class="method"><span id='from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(int: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>) -&gt; Self</code></span></h4>
+<div class='docblock'><p>Performs the conversion.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 

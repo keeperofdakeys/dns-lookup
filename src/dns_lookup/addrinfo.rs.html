@@ -261,6 +261,9 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">libc</span> <span class="kw">as</span> <span class="ident">c</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CStr</span>, <span class="ident">CString</span>};
@@ -294,9 +297,9 @@
 <span class="kw">impl</span> <span class="ident">AddrInfoHints</span> {
   <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_addrinfo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">c</span>::<span class="ident">addrinfo</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addrinfo</span>: <span class="ident">c</span>::<span class="ident">addrinfo</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">zeroed</span>();
-    <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">socktype</span>.<span class="ident">to_int</span>();
-    <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">protocol</span>.<span class="ident">to_int</span>();
-    <span class="ident">addrinfo</span>.<span class="ident">ai_family</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">to_int</span>();
+    <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">socktype</span>.<span class="ident">into</span>();
+    <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">protocol</span>.<span class="ident">into</span>();
+    <span class="ident">addrinfo</span>.<span class="ident">ai_family</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">into</span>();
     <span class="ident">addrinfo</span>.<span class="ident">ai_flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span> <span class="kw">as</span> <span class="ident">c</span>::<span class="ident">c_int</span>;
     <span class="ident">addrinfo</span>
   }
@@ -344,30 +347,33 @@
     <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_null</span>() {
       <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Supplied pointer is null.&quot;</span>))<span class="question-mark">?</span>;
     }
-    <span class="kw">let</span> <span class="ident">addrinfo</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">a</span>;
 
+    <span class="kw">let</span> <span class="ident">addrinfo</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">a</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">AddrInfo</span> {
-      <span class="ident">socktype</span>: <span class="ident">SockType</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>)
-        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+      <span class="ident">socktype</span>: <span class="kw">match</span> <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>.<span class="ident">into</span>() {
+        <span class="ident">SockType</span>::<span class="ident">_Other</span>(_) <span class="op">=&gt;</span>
+          <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
             <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find socket type for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_socktype</span>)
-          )
-        )<span class="question-mark">?</span>,
-      <span class="ident">protocol</span>: <span class="ident">Protocol</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
-        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+          )),
+        <span class="ident">a</span> @ _ <span class="op">=&gt;</span> <span class="ident">a</span>,
+      },
+      <span class="ident">protocol</span>: <span class="kw">match</span> <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>.<span class="ident">into</span>() {
+        <span class="ident">Protocol</span>::<span class="ident">_Other</span>(_) <span class="op">=&gt;</span>
+          <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
             <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find protocol for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_protocol</span>)
-          )
-        )<span class="question-mark">?</span>,
-      <span class="ident">address</span>: <span class="ident">AddrFamily</span>::<span class="ident">from_int</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_family</span>)
-        .<span class="ident">ok_or_else</span>(<span class="op">||</span>
-          <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+          )),
+        <span class="ident">a</span> @ _ <span class="op">=&gt;</span> <span class="ident">a</span>,
+      },
+      <span class="ident">address</span>: <span class="kw">match</span> <span class="ident">addrinfo</span>.<span class="ident">ai_family</span>.<span class="ident">into</span>() {
+        <span class="ident">AddrFamily</span>::<span class="ident">_Other</span>(_) <span class="op">=&gt;</span>
+          <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
             <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Could not find address for: {}&quot;</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_family</span>)
-          )
-        )<span class="question-mark">?</span>,
+          )),
+        <span class="ident">a</span> @ _ <span class="op">=&gt;</span> <span class="ident">a</span>,
+      },
       <span class="ident">sockaddr</span>: <span class="ident">MySocketAddr</span>::<span class="ident">from_inner</span>(<span class="ident">addrinfo</span>.<span class="ident">ai_addr</span>, <span class="ident">addrinfo</span>.<span class="ident">ai_addrlen</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
       <span class="ident">canonname</span>: <span class="ident">addrinfo</span>.<span class="ident">ai_canonname</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span>
         <span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">s</span>).<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>()
