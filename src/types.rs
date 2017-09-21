@@ -22,10 +22,9 @@ pub enum SockType {
   Packet,
   /// Other SockType.
   ///
-  /// It's recommended not to match on this, or create this directly, as new
-  /// variants may break code depending on this variant. Instead you should
-  /// use the From/Into traits to convert libc symbols directly, if the desired
-  /// variant does not exist.
+  /// It's recommended not to match or create this variant directly, as new
+  /// variants may be added in the future. Instead you should specify libc
+  /// symbols directly, and use the From/Into traits to convert to/from this type.
   _Other(u16),
 }
 
@@ -79,10 +78,9 @@ pub enum AddrFamily {
   Packet,
   /// Other Address Family.
   ///
-  /// It's recommended not to match on this, or create this directly, as new
-  /// variants may break code depending on this variant. Instead you should
-  /// use the From/Into traits to convert libc symbols directly, if the desired
-  /// variant does not exist.
+  /// It's recommended not to match or create this variant directly, as new
+  /// variants may be added in the future. Instead you should specify libc
+  /// symbols directly, and use the From/Into traits to convert to/from this type.
   _Other(u16),
 }
 
@@ -132,10 +130,9 @@ pub enum Protocol {
   RAW,
   /// Other Protocol.
   ///
-  /// It's recommended not to match on this, or create this directly, as new
-  /// variants may break code depending on this variant. Instead you should
-  /// use the From/Into traits to convert libc symbols directly, if the desired
-  /// variant does not exist.
+  /// It's recommended not to match or create this variant directly, as new
+  /// variants may be added in the future. Instead you should specify libc
+  /// symbols directly, and use the From/Into traits to convert to/from this type.
   _Other(u16),
 }
 

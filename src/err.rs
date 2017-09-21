@@ -4,6 +4,7 @@ use std::io;
 use std::str;
 
 #[cfg(all(not(windows), not(unix)))]
+/// Given an errno, return an std::io::Result with the error message.
 pub fn lookup_errno(err: c::c_int) -> io::Result<()> {
   match (err) {
     0 => Ok(()),
@@ -15,6 +16,7 @@ pub fn lookup_errno(err: c::c_int) -> io::Result<()> {
 }
 
 #[cfg(unix)]
+/// Given an errno, return an std::io::Result with the error message.
 pub fn lookup_errno(err: c::c_int) -> io::Result<()> {
   match err {
     0 => return Ok(()),
@@ -32,6 +34,7 @@ pub fn lookup_errno(err: c::c_int) -> io::Result<()> {
 }
 
 #[cfg(windows)]
+/// Given an errno, return an std::io::Result with the error message.
 pub fn lookup_errno(err: c::c_int) -> io::Result<()> {
   match err {
     0 => Ok(()),
