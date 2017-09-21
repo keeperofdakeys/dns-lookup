@@ -74,8 +74,6 @@ pub enum AddrFamily {
   Inet,
   /// IP version 6.
   Inet6,
-  /// Packet family.
-  Packet,
   /// Other Address Family.
   ///
   /// It's recommended not to match or create this variant directly, as new
@@ -94,7 +92,6 @@ impl From<c::c_int> for AddrFamily {
       // c::AF_LOCAL => AddrFamily::File,
       c::AF_INET => AddrFamily::Inet,
       c::AF_INET6 => AddrFamily::Inet6,
-      c::AF_PACKET => AddrFamily::Packet,
       _ => AddrFamily::_Other(int as u16),
     }
   }
@@ -109,7 +106,6 @@ impl From<AddrFamily> for c::c_int {
       AddrFamily::File => c::AF_LOCAL,
       AddrFamily::Inet => c::AF_INET,
       AddrFamily::Inet6 => c::AF_INET6,
-      AddrFamily::Packet => c::AF_PACKET,
       AddrFamily::_Other(i) => c::c_int::from(i),
     }
   }
