@@ -30,21 +30,37 @@
 //!
 //! # `getaddrinfo`
 //! ```rust
+//!   extern crate dns_lookup;
+//!
+//!   #[cfg(unix)]
+//!   extern crate libc;
+//!
+//!   #[cfg(windows)]
+//!   extern crate winapi;
+//!
 //!   use dns_lookup::{getaddrinfo, AddrInfoHints};
 //!
-//!   let hostname = "localhost";
-//!   let service = "ssh";
-//!   let hints = AddrInfoHints {
-//!     socktype: dns_lookup::SockType::Stream,
-//!     .. AddrInfoHints::default()
-//!   };
-//!   let sockets =
-//!     getaddrinfo(Some(hostname), Some(service), Some(hints))
-//!       .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
+//!   #[cfg(unix)]
+//!   use libc::SOCK_STREAM;
 //!
-//!   for socket in sockets {
-//!     // Try connecting to socket
-//!     let _ = socket;
+//!   #[cfg(windows)]
+//!   use winapi::SOCK_STREAM;
+//!
+//!   fn main() {
+//!     let hostname = "localhost";
+//!     let service = "ssh";
+//!     let hints = AddrInfoHints {
+//!       socktype: SOCK_STREAM,
+//!       .. AddrInfoHints::default()
+//!     };
+//!     let sockets =
+//!       getaddrinfo(Some(hostname), Some(service), Some(hints))
+//!         .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
+//!
+//!     for socket in sockets {
+//!       // Try connecting to socket
+//!       let _ = socket;
+//!     }
 //!   }
 //! ```
 //!
@@ -69,16 +85,20 @@
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
-extern crate libc;
+#[cfg(unix)] extern crate libc;
+#[cfg(unix)] extern crate cfg_if;
 
-mod addr;
+#[cfg(windows)] extern crate kernel32;
+#[cfg(windows)] extern crate winapi;
+#[cfg(windows)] extern crate ws2_32;
+
+extern crate socket2;
+
 mod addrinfo;
 mod nameinfo;
-mod types;
 mod err;
 mod lookup;
 
 pub use lookup::{lookup_host, lookup_addr};
 pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};
 pub use nameinfo::getnameinfo;
-pub use types::*;

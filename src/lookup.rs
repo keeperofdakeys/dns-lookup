@@ -1,22 +1,26 @@
-use libc as c;
 use std::io;
 use std::net::IpAddr;
 use std::str;
 
+#[cfg(unix)]
+use libc::{SOCK_STREAM};
+
+#[cfg(windows)]
+use winapi::{SOCK_STREAM};
+
 use addrinfo::{getaddrinfo, AddrInfoHints};
 use nameinfo::getnameinfo;
-use types::*;
 
 // fn init_windows_sockets() {
 //   use std::sync;
 //   static START: Once = sync::Once::new();
-// 
+//
 //   START.call_once(|| unsafe {
 //       let mut data: c::WSADATA = mem::zeroed();
 //       let ret = c::WSAStartup(0x202, // version 2.2
 //                               &mut data);
 //       assert_eq!(ret, 0);
-// 
+//
 //       let _ = sys_common::at_exit(|| { c::WSACleanup(); });
 //     });
 // }
@@ -30,7 +34,7 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
   // init_windows_sockets();
 
   let hints = AddrInfoHints {
-    socktype: SockType::Stream,
+    socktype: SOCK_STREAM,
     ..AddrInfoHints::default()
   };
 
@@ -41,11 +45,12 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
     },
     #[cfg(unix)]
     Err(e) => {
+        use libc;
         // The lookup failure could be caused by using a stale /etc/resolv.conf.
         // See https://github.com/rust-lang/rust/issues/41570.
         // We therefore force a reload of the nameserver information.
         unsafe {
-          c::res_init();
+          libc::res_init();
         }
         Err(e)
     },
@@ -64,11 +69,12 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
     Ok((name, _)) => Ok(name),
     #[cfg(unix)]
     Err(e) => {
+      use libc;
       // The lookup failure could be caused by using a stale /etc/resolv.conf.
       // See https://github.com/rust-lang/rust/issues/41570.
       // We therefore force a reload of the nameserver information.
       unsafe {
-        c::res_init();
+        libc::res_init();
       }
       Err(e)
     },

@@ -1,10 +1,15 @@
-use libc as c;
+use socket2::SockAddr;
 use std::ffi::CStr;
 use std::io;
 use std::net::SocketAddr;
 use std::str;
 
-use addr::MySocketAddr;
+#[cfg(unix)]
+use libc::{c_char, getnameinfo as c_getnameinfo};
+
+#[cfg(windows)]
+use winapi::{c_char, getnameinfo as c_getnameinfo};
+
 use err::lookup_errno;
 
 /// Retrieve the name for a given IP and Service. Acts as a thin wrapper around
@@ -17,19 +22,22 @@ use err::lookup_errno;
 /// Retrieving names or services that contain non-UTF8 locales is currently not
 /// supported (as String is returned). Raise an issue if this is a concern for
 /// you.
-pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(String, String)> {
+pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)> {
   // Convert the socket into our type, so we can get a sockaddr_in{,6} ptr.
-  let sock: MySocketAddr = (*sock).into();
-  let (c_sock, c_sock_len) = sock.as_ptr();
+  let sock: SockAddr = (*sock).into();
+  let c_sock = sock.as_ptr();
+  let c_sock_len = sock.len();
+
+  // Hard code maximums, as they aren't defined in libc/winapi.
 
   // Allocate buffers for name and service strings.
-  let mut c_host = [0 as c::c_char; c::NI_MAXHOST as usize];
+  let mut c_host = [0 as c_char; 1024 as usize];
   // No NI_MAXSERV, so use suggested value.
-  let mut c_service = [0 as c::c_char; 32 as usize];
+  let mut c_service = [0 as c_char; 32 as usize];
 
   unsafe {
     lookup_errno(
-      c::getnameinfo(
+      c_getnameinfo(
         c_sock, c_sock_len,
         c_host.as_mut_ptr(),
         c_host.len() as u32,
@@ -38,7 +46,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: c::c_int) -> io::Result<(String, St
         flags
       )
     )?
-  };
+  }
 
   let host = unsafe {
     CStr::from_ptr(c_host.as_ptr())

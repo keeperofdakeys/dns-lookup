@@ -1,39 +1,49 @@
-use libc as c;
+use socket2::SockAddr;
 use std::ffi::{CStr, CString};
 use std::io;
 use std::mem;
 use std::net::SocketAddr;
 use std::ptr;
 
-use addr::MySocketAddr;
+#[cfg(unix)]
+use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinfo as c_addrinfo,
+           AF_INET, AF_INET6};
+
+#[cfg(windows)]
+use winapi::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, ADDRINFOA as c_addrinfo,
+             AF_INET, AF_INET6};
+
 use err::lookup_errno;
-use types::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 /// A struct used as the hints argument to getaddrinfo.
 pub struct AddrInfoHints {
-  /// Type of this socket, Unspec (0) for none.
-  pub socktype: SockType,
-  /// Protcol for this socket, IP (0) for none.
-  pub protocol: Protocol,
-  /// Address family for this socket. Unspec (0) for none.
-  pub address: AddrFamily,
+  /// Type of this socket. 0 for none.
+  ///
+  /// Values are defined by the libc on your system.
+  pub socktype: i32,
+  /// Protcol for this socket. 0 for none.
+  ///
+  /// Values are defined by the libc on your system.
+  pub protocol: i32,
+  /// Address family for this socket. 0 for none.
+  ///
+  /// Values are defined by the libc on your system.
+  pub address: i32,
   /// Optional bitmask arguments. Bitwise OR bitflags to change the
   /// behaviour of getaddrinfo. 0 for none.
   ///
-  /// The actual bitflags are not provided by this crate, and are
-  /// usually exported in the libc crate. Some backends have custom
-  /// flags, which may be a portability issue.
-  pub flags: u32,
+  /// Values are defined by the libc on your system.
+  pub flags: i32,
 }
 
 impl AddrInfoHints {
-  unsafe fn as_addrinfo(&self) -> c::addrinfo {
-    let mut addrinfo: c::addrinfo = mem::zeroed();
-    addrinfo.ai_socktype = self.socktype.into();
-    addrinfo.ai_protocol = self.protocol.into();
-    addrinfo.ai_family = self.address.into();
-    addrinfo.ai_flags = self.flags as c::c_int;
+  unsafe fn as_addrinfo(&self) -> c_addrinfo {
+    let mut addrinfo: c_addrinfo = mem::zeroed();
+    addrinfo.ai_socktype = self.socktype;
+    addrinfo.ai_protocol = self.protocol;
+    addrinfo.ai_family = self.address;
+    addrinfo.ai_flags = self.flags;
     addrinfo
   }
 }
@@ -43,9 +53,9 @@ impl Default for AddrInfoHints {
   /// be specified.
   fn default() -> Self {
     AddrInfoHints {
-      socktype: SockType::Unspec,
-      protocol: Protocol::IP,
-      address: AddrFamily::Unspec,
+      socktype: 0,
+      protocol: 0,
+      address: 0,
       flags: 0,
     }
   }
@@ -57,57 +67,51 @@ impl Default for AddrInfoHints {
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddrInfo {
   /// Type of this socket.
-  pub socktype: SockType,
+  ///
+  /// Values are defined by the libc on your system.
+  pub socktype: i32,
   /// Protcol family for this socket.
-  pub protocol: Protocol,
+  ///
+  /// Values are defined by the libc on your system.
+  pub protocol: i32,
   /// Address family for this socket (usually matches protocol family).
-  pub address: AddrFamily,
+  ///
+  /// Values are defined by the libc on your system.
+  pub address: i32,
   /// Socket address for this socket, usually containing an actual
   /// IP Address and port.
   pub sockaddr: SocketAddr,
   /// If requested, this is the canonical name for this socket/host.
   pub canonname: Option<String>,
   /// Optional bitmask arguments, usually set to zero.
-  pub flags: u32,
+  pub flags: i32,
 }
 
 impl AddrInfo {
-  /// Copy the informataion from the given libc::addrinfo pointer, and
+  /// Copy the informataion from the given addrinfo pointer, and
   /// create a new AddrInfo struct with that information.
   ///
-  /// Used for interfacing with libc::getaddrinfo.
-  unsafe fn from_ptr(a: *mut c::addrinfo) -> io::Result<Self> {
+  /// Used for interfacing with getaddrinfo.
+  unsafe fn from_ptr(a: *mut c_addrinfo) -> io::Result<Self> {
     if a.is_null() {
       return Err(io::Error::new(io::ErrorKind::Other, "Supplied pointer is null."))?;
     }
 
     let addrinfo = *a;
+    let sockaddr = SockAddr::from_raw_parts(addrinfo.ai_addr, addrinfo.ai_addrlen);
+    let sock = match sockaddr.family().into() {
+      AF_INET => SocketAddr::V4(sockaddr.as_inet().expect("Failed to decode INET")),
+      AF_INET6 => SocketAddr::V6(sockaddr.as_inet6().expect("Failed to decode INET_6")),
+      e @ _ => return Err(io::Error::new(
+        io::ErrorKind::Other,
+        format!("Found unknown address family: {}", e)
+      )),
+    };
     Ok(AddrInfo {
-      socktype: match addrinfo.ai_socktype.into() {
-        SockType::_Other(_) =>
-          return Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("Could not find socket type for: {}", addrinfo.ai_socktype)
-          )),
-        a @ _ => a,
-      },
-      protocol: match addrinfo.ai_protocol.into() {
-        Protocol::_Other(_) =>
-          return Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("Could not find protocol for: {}", addrinfo.ai_protocol)
-          )),
-        a @ _ => a,
-      },
-      address: match addrinfo.ai_family.into() {
-        AddrFamily::_Other(_) =>
-          return Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("Could not find address for: {}", addrinfo.ai_family)
-          )),
-        a @ _ => a,
-      },
-      sockaddr: MySocketAddr::from_inner(addrinfo.ai_addr, addrinfo.ai_addrlen)?.into(),
+      socktype: addrinfo.ai_socktype,
+      protocol: addrinfo.ai_protocol,
+      address: addrinfo.ai_family,
+      sockaddr: sock,
       canonname: addrinfo.ai_canonname.as_ref().map(|s|
         CStr::from_ptr(s).to_str().unwrap().to_owned()
       ),
@@ -122,8 +126,8 @@ impl AddrInfo {
 /// It's recommended to use `.collect<io::Result<..>>()` on this
 /// to collapse possible errors.
 pub struct AddrInfoIter {
-  orig: *mut c::addrinfo,
-  cur: *mut c::addrinfo,
+  orig: *mut c_addrinfo,
+  cur: *mut c_addrinfo,
 }
 
 impl Iterator for AddrInfoIter {
@@ -133,7 +137,7 @@ impl Iterator for AddrInfoIter {
     unsafe {
       if self.cur.is_null() { return None; }
       let ret = AddrInfo::from_ptr(self.cur);
-      self.cur = (*self.cur).ai_next as *mut c::addrinfo;
+      self.cur = (*self.cur).ai_next as *mut c_addrinfo;
       Some(ret)
     }
   }
@@ -144,7 +148,7 @@ unsafe impl Send for AddrInfoIter {}
 
 impl Drop for AddrInfoIter {
     fn drop(&mut self) {
-        unsafe { c::freeaddrinfo(self.orig) }
+        unsafe { c_freeaddrinfo(self.orig) }
     }
 }
 
@@ -185,30 +189,21 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
   };
 
   let mut res = ptr::null_mut();
+
   unsafe {
-    match lookup_errno(c::getaddrinfo(c_host, c_service, &c_hints, &mut res)) {
-      Ok(_) => {
-        Ok(AddrInfoIter { orig: res, cur: res })
-      },
-      #[cfg(unix)]
-      Err(e) => {
-        // The lookup failure could be caused by using a stale /etc/resolv.conf.
-        // See https://github.com/rust-lang/rust/issues/41570.
-        // We therefore force a reload of the nameserver information.
-        // This was fixed in glibc 2.26, so this can probably be removed in five years.
-        c::res_init();
-        Err(e)
-      },
-      #[cfg(not(unix))]
-      Err(e) => Err(e),
-    }
+    lookup_errno(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
   }
+
+  Ok(AddrInfoIter { orig: res, cur: res })
 }
 
 #[test]
 fn test_getaddrinfo() {
+  #[cfg(unix)]
+  use libc;
+
   let hints = AddrInfoHints {
-    flags: c::AI_CANONNAME as u32,
+    flags: libc::AI_CANONNAME,
     ..AddrInfoHints::default()
   };
   for entry in getaddrinfo(Some("localhost"), Some("ssh"), Some(hints)).unwrap() {

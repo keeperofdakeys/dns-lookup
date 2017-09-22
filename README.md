@@ -33,21 +33,37 @@ use dns_lookup::{lookup_host, lookup_addr};
 ### libc API
 ```rust
 {
+  extern crate dns_lookup;
+
+  #[cfg(unix)]
+  extern crate libc;
+
+  #[cfg(windows)]
+  extern crate winapi;
+
   use dns_lookup::{getaddrinfo, AddrInfoHints};
 
-  let hostname = "localhost";
-  let service = "ssh";
-  let hints = AddrInfoHints {
-    socktype: dns_lookup::SockType::Stream,
-    .. AddrInfoHints::default()
-  };
-  let sockets =
-    getaddrinfo(Some(hostname), Some(service), Some(hints))
-      .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
-  println!("{:?}", sockets);
-  for socket in sockets {
-    // Try connecting to socket
-    println!("{:?}", socket);
+  #[cfg(unix)]
+  use libc::SOCK_STREAM;
+
+  #[cfg(windows)]
+  use winapi::SOCK_STREAM;
+
+  fn main() {
+    let hostname = "localhost";
+    let service = "ssh";
+    let hints = AddrInfoHints {
+      socktype: SOCK_STREAM,
+      .. AddrInfoHints::default()
+    };
+    let sockets =
+      getaddrinfo(Some(hostname), Some(service), Some(hints))
+        .unwrap().collect::<std::io::Result<Vec<_>>>().unwrap();
+
+    for socket in sockets {
+      // Try connecting to socket
+      println!("{:?}", socket);
+    }
   }
 }
 
