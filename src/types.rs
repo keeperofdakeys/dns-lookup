@@ -75,6 +75,7 @@ pub enum AddrFamily {
   /// IP version 6.
   Inet6,
   /// Packet family.
+  #[cfg(any(target_os = "android", target_os = "linux"))]
   Packet,
   /// Other Address Family.
   ///
@@ -94,6 +95,7 @@ impl From<c::c_int> for AddrFamily {
       // c::AF_LOCAL => AddrFamily::File,
       c::AF_INET => AddrFamily::Inet,
       c::AF_INET6 => AddrFamily::Inet6,
+      #[cfg(any(target_os = "android", target_os = "linux"))]
       c::AF_PACKET => AddrFamily::Packet,
       _ => AddrFamily::_Other(int as u16),
     }
@@ -109,6 +111,7 @@ impl From<AddrFamily> for c::c_int {
       AddrFamily::File => c::AF_LOCAL,
       AddrFamily::Inet => c::AF_INET,
       AddrFamily::Inet6 => c::AF_INET6,
+      #[cfg(any(target_os = "android", target_os = "linux"))]
       AddrFamily::Packet => c::AF_PACKET,
       AddrFamily::_Other(i) => c::c_int::from(i),
     }

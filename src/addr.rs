@@ -142,6 +142,7 @@ impl MySocketAddrV6 {
         sin6_addr: ipv6_to_inner(ip),
         sin6_flowinfo: flowinfo,
         sin6_scope_id: scope_id,
+        .. unsafe { mem::zeroed() }
       }
     }
   }
