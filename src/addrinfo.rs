@@ -199,11 +199,8 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
 
 #[test]
 fn test_getaddrinfo() {
-  #[cfg(unix)]
-  use libc;
-
   let hints = AddrInfoHints {
-    flags: libc::AI_CANONNAME,
+    flags: 0x0002,
     ..AddrInfoHints::default()
   };
   for entry in getaddrinfo(Some("localhost"), Some("ssh"), Some(hints)).unwrap() {
