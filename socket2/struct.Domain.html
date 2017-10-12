@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Domain` struct in crate `socket2`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Domain">
+
+    <title>socket2::Domain - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct Domain</p><div class="block items"><ul><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>socket2</a></p><script>window.sidebarCurrent = {name: 'Domain', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>socket2</a>::<wbr><a class="struct" href=''>Domain</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/socket2/lib.rs.html#108' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Domain(_);</pre><div class='docblock'><p>Specification of the communication domain for a socket.</p>
+
+<p>This is a newtype wrapper around an integer which provides a nicer API in
+addition to an injection point for documentation. Convenience constructors
+such as <code>Domain::ipv4</code>, <code>Domain::ipv6</code>, etc, are provided to avoid reaching
+into libc for various constants.</p>
+
+<p>This type is freely interconvertible with the <code>i32</code> type, however, if a raw
+value needs to be provided.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../socket2/struct.Domain.html" title="struct socket2::Domain">Domain</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/socket2/socket.rs.html#706-725' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.ipv4' class="method"><span id='ipv4.v' class='invisible'><code>fn <a href='#method.ipv4' class='fnname'>ipv4</a>() -&gt; <a class="struct" href="../socket2/struct.Domain.html" title="struct socket2::Domain">Domain</a></code></span></h4>
+<div class='docblock'><p>Domain for IPv4 communication, corresponding to <code>AF_INET</code>.</p>
+</div><h4 id='method.ipv6' class="method"><span id='ipv6.v' class='invisible'><code>fn <a href='#method.ipv6' class='fnname'>ipv6</a>() -&gt; <a class="struct" href="../socket2/struct.Domain.html" title="struct socket2::Domain">Domain</a></code></span></h4>
+<div class='docblock'><p>Domain for IPv6 communication, corresponding to <code>AF_INET6</code>.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.From.html" title="trait core::convert::From">From</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>&gt; for <a class="struct" href="../socket2/struct.Domain.html" title="struct socket2::Domain">Domain</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/socket2/socket.rs.html#727-731' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from' class="method"><span id='from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(a: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>) -&gt; <a class="struct" href="../socket2/struct.Domain.html" title="struct socket2::Domain">Domain</a></code></span></h4>
+<div class='docblock'><p>Performs the conversion.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "socket2";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

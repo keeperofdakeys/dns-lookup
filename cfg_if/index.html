@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `lookup_host` fn in crate `dns_lookup`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, lookup_host">
+    <meta name="description" content="API documentation for the Rust `cfg_if` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, cfg_if">
 
-    <title>dns_lookup::lookup_host - Rust</title>
+    <title>cfg_if - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc fn">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='index.html'>dns_lookup</a></p><script>window.sidebarCurrent = {name: 'lookup_host', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Crate cfg_if</p><div class="block items"><ul><li><a href="#macros">Macros</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'cfg_if', ty: 'mod', relpath: '../'};</script>
     </nav>
 
     <nav class="sub">
@@ -44,15 +44,44 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>dns_lookup</a>::<wbr><a class="fn" href=''>lookup_host</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>cfg_if</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/lookup.rs.html#31-61' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn lookup_host(host: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/std/net/ip/enum.IpAddr.html" title="enum std::net::ip::IpAddr">IpAddr</a>&gt;&gt;</pre><div class='docblock'><p>Lookup the address for a given hostname via DNS.</p>
+               </span><a class='srclink' href='../src/cfg_if/lib.rs.html#1-133' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>A macro for defining #[cfg] if-else statements.</p>
 
-<p>Returns an iterator of IP Addresses, or an <code>io::Error</code> on failure.</p>
-</div></section>
+<p>The macro provided by this crate, <code>cfg_if</code>, is similar to the <code>if/elif</code> C
+preprocessor macro by allowing definition of a cascade of <code>#[cfg]</code> cases,
+emitting the implementation which matches first.</p>
+
+<p>This allows you to conveniently provide a long list #[cfg]&#39;d blocks of code
+without having to rewrite each clause multiple times.</p>
+
+<h1 id='example' class='section-header'><a href='#example'>Example</a></h1>
+<pre class="rust rust-example-rendered">
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">cfg_if</span>;
+
+<span class="macro">cfg_if</span><span class="macro">!</span> {
+    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span> {
+        <span class="kw">fn</span> <span class="ident">foo</span>() { <span class="comment">/* unix specific functionality */</span> }
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span> {
+        <span class="kw">fn</span> <span class="ident">foo</span>() { <span class="comment">/* non-unix, 32-bit functionality */</span> }
+    } <span class="kw">else</span> {
+        <span class="kw">fn</span> <span class="ident">foo</span>() { <span class="comment">/* fallback implementation */</span> }
+    }
+}
+</pre>
+</div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="macro" href="macro.cfg_if.html"
+                                  title='macro cfg_if::cfg_if'>cfg_if</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -107,7 +136,7 @@
 
     <script>
         window.rootPath = "../";
-        window.currentCrate = "dns_lookup";
+        window.currentCrate = "cfg_if";
     </script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>

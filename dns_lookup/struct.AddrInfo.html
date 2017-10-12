@@ -48,29 +48,35 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#58-72' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#68-88' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct AddrInfo {
-    pub socktype: <a class="enum" href="../dns_lookup/enum.SockType.html" title="enum dns_lookup::SockType">SockType</a>,
-    pub protocol: <a class="enum" href="../dns_lookup/enum.Protocol.html" title="enum dns_lookup::Protocol">Protocol</a>,
-    pub address: <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a>,
+    pub socktype: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
+    pub protocol: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
+    pub address: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
     pub sockaddr: <a class="enum" href="https://doc.rust-lang.org/nightly/std/net/addr/enum.SocketAddr.html" title="enum std::net::addr::SocketAddr">SocketAddr</a>,
     pub canonname: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;,
-    pub flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>,
+    pub flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
 }</pre><div class='docblock'><p>Struct that stores socket information, as returned by getaddrinfo.</p>
 
 <p>This maps to the same definition provided by libc backends.</p>
 </div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.socktype' class="structfield">
                            <span id='socktype.v' class='invisible'>
-                           <code>socktype: <a class="enum" href="../dns_lookup/enum.SockType.html" title="enum dns_lookup::SockType">SockType</a></code>
+                           <code>socktype: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
                            </span></span><div class='docblock'><p>Type of this socket.</p>
+
+<p>Values are defined by the libc on your system.</p>
 </div><span id='structfield.protocol' class="structfield">
                            <span id='protocol.v' class='invisible'>
-                           <code>protocol: <a class="enum" href="../dns_lookup/enum.Protocol.html" title="enum dns_lookup::Protocol">Protocol</a></code>
+                           <code>protocol: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
                            </span></span><div class='docblock'><p>Protcol family for this socket.</p>
+
+<p>Values are defined by the libc on your system.</p>
 </div><span id='structfield.address' class="structfield">
                            <span id='address.v' class='invisible'>
-                           <code>address: <a class="enum" href="../dns_lookup/enum.AddrFamily.html" title="enum dns_lookup::AddrFamily">AddrFamily</a></code>
+                           <code>address: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
                            </span></span><div class='docblock'><p>Address family for this socket (usually matches protocol family).</p>
+
+<p>Values are defined by the libc on your system.</p>
 </div><span id='structfield.sockaddr' class="structfield">
                            <span id='sockaddr.v' class='invisible'>
                            <code>sockaddr: <a class="enum" href="https://doc.rust-lang.org/nightly/std/net/addr/enum.SocketAddr.html" title="enum std::net::addr::SocketAddr">SocketAddr</a></code>
@@ -82,17 +88,17 @@ IP Address and port.</p>
                            </span></span><div class='docblock'><p>If requested, this is the canonical name for this socket/host.</p>
 </div><span id='structfield.flags' class="structfield">
                            <span id='flags.v' class='invisible'>
-                           <code>flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code>
+                           <code>flags: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
                            </span></span><div class='docblock'><p>Optional bitmask arguments, usually set to zero.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#57' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#67' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#57' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#67' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#57' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/dns_lookup/addrinfo.rs.html#67' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
 </div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../dns_lookup/struct.AddrInfo.html" title="struct dns_lookup::AddrInfo">AddrInfo</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>

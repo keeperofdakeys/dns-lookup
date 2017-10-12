@@ -133,26 +133,36 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">libc</span> <span class="kw">as</span> <span class="ident">c</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+<span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">SOCK_STREAM</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+<span class="kw">use</span> <span class="ident">winapi</span>::{<span class="ident">SOCK_STREAM</span>};
+
 <span class="kw">use</span> <span class="ident">addrinfo</span>::{<span class="ident">getaddrinfo</span>, <span class="ident">AddrInfoHints</span>};
 <span class="kw">use</span> <span class="ident">nameinfo</span>::<span class="ident">getnameinfo</span>;
-<span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
 
 <span class="comment">// fn init_windows_sockets() {</span>
 <span class="comment">//   use std::sync;</span>
 <span class="comment">//   static START: Once = sync::Once::new();</span>
-<span class="comment">// </span>
+<span class="comment">//</span>
 <span class="comment">//   START.call_once(|| unsafe {</span>
 <span class="comment">//       let mut data: c::WSADATA = mem::zeroed();</span>
 <span class="comment">//       let ret = c::WSAStartup(0x202, // version 2.2</span>
 <span class="comment">//                               &amp;mut data);</span>
 <span class="comment">//       assert_eq!(ret, 0);</span>
-<span class="comment">// </span>
+<span class="comment">//</span>
 <span class="comment">//       let _ = sys_common::at_exit(|| { c::WSACleanup(); });</span>
 <span class="comment">//     });</span>
 <span class="comment">// }</span>
@@ -166,7 +176,7 @@
   <span class="comment">// init_windows_sockets();</span>
 
   <span class="kw">let</span> <span class="ident">hints</span> <span class="op">=</span> <span class="ident">AddrInfoHints</span> {
-    <span class="ident">socktype</span>: <span class="ident">SockType</span>::<span class="ident">Stream</span>,
+    <span class="ident">socktype</span>: <span class="ident">SOCK_STREAM</span>,
     ..<span class="ident">AddrInfoHints</span>::<span class="ident">default</span>()
   };
 
@@ -177,11 +187,12 @@
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
     <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+        <span class="kw">use</span> <span class="ident">libc</span>;
         <span class="comment">// The lookup failure could be caused by using a stale /etc/resolv.conf.</span>
         <span class="comment">// See https://github.com/rust-lang/rust/issues/41570.</span>
         <span class="comment">// We therefore force a reload of the nameserver information.</span>
         <span class="kw">unsafe</span> {
-          <span class="ident">c</span>::<span class="ident">res_init</span>();
+          <span class="ident">libc</span>::<span class="ident">res_init</span>();
         }
         <span class="prelude-val">Err</span>(<span class="ident">e</span>)
     },
@@ -200,11 +211,12 @@
     <span class="prelude-val">Ok</span>((<span class="ident">name</span>, _)) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>),
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
     <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+      <span class="kw">use</span> <span class="ident">libc</span>;
       <span class="comment">// The lookup failure could be caused by using a stale /etc/resolv.conf.</span>
       <span class="comment">// See https://github.com/rust-lang/rust/issues/41570.</span>
       <span class="comment">// We therefore force a reload of the nameserver information.</span>
       <span class="kw">unsafe</span> {
-        <span class="ident">c</span>::<span class="ident">res_init</span>();
+        <span class="ident">libc</span>::<span class="ident">res_init</span>();
       }
       <span class="prelude-val">Err</span>(<span class="ident">e</span>)
     },
