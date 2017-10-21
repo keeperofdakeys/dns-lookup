@@ -16,8 +16,8 @@ use ws2_32::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
 
 use err::lookup_errno;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
 /// A struct used as the hints argument to getaddrinfo.
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct AddrInfoHints {
   /// Type of this socket. 0 for none.
   ///
