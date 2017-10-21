@@ -37,6 +37,10 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)
   // No NI_MAXSERV, so use suggested value.
   let mut c_service = [0 as c_char; 32 as usize];
 
+  // Prime windows.
+  #[cfg(windows)]
+  ::init_winsock();
+
   unsafe {
     lookup_errno(
       c_getnameinfo(

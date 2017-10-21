@@ -191,6 +191,10 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
 
   let mut res = ptr::null_mut();
 
+  // Prime windows.
+  #[cfg(windows)]
+  ::init_winsock();
+
   unsafe {
     lookup_errno(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
   }
