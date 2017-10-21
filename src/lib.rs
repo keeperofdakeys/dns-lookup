@@ -32,25 +32,13 @@
 //! ```rust
 //!   extern crate dns_lookup;
 //!
-//!   #[cfg(unix)]
-//!   extern crate libc;
-//!
-//!   #[cfg(windows)]
-//!   extern crate winapi;
-//!
-//!   use dns_lookup::{getaddrinfo, AddrInfoHints};
-//!
-//!   #[cfg(unix)]
-//!   use libc::SOCK_STREAM;
-//!
-//!   #[cfg(windows)]
-//!   use winapi::SOCK_STREAM;
+//!   use dns_lookup::{getaddrinfo, AddrInfoHints, SockType};
 //!
 //!   fn main() {
 //!     let hostname = "localhost";
 //!     let service = "ssh";
 //!     let hints = AddrInfoHints {
-//!       socktype: SOCK_STREAM,
+//!       socktype: SockType::Stream.into(),
 //!       .. AddrInfoHints::default()
 //!     };
 //!     let sockets =
@@ -112,7 +100,9 @@ mod addrinfo;
 mod nameinfo;
 mod err;
 mod lookup;
+mod types;
 
 pub use lookup::{lookup_host, lookup_addr};
 pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};
 pub use nameinfo::getnameinfo;
+pub use types::{SockType, Protocol, AddrFamily};
