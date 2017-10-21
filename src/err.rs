@@ -1,5 +1,7 @@
+#[cfg(unix)]
 use std::ffi::{CStr};
 use std::io;
+#[cfg(unix)]
 use std::str;
 
 #[cfg(all(not(windows), not(unix)))]
@@ -37,13 +39,13 @@ pub fn lookup_errno(err: i32) -> io::Result<()> {
 #[cfg(windows)]
 /// Given an errno, return an std::io::Result with the error message.
 pub fn lookup_errno(err: i32) -> io::Result<()> {
-  use winapi::WSAGetLastError;
+  use ws2_32::WSAGetLastError;
   match err {
     0 => Ok(()),
     _ => {
-      io::Error::from_raw_os_error(
+      Err(io::Error::from_raw_os_error(
         unsafe { WSAGetLastError() }
-      )
+      ))
     }
   }
 }

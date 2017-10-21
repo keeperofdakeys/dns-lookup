@@ -7,11 +7,12 @@ use std::ptr;
 
 #[cfg(unix)]
 use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinfo as c_addrinfo,
-           AF_INET, AF_INET6};
+           AF_INET, AF_INET6, socklen_t};
 
 #[cfg(windows)]
-use winapi::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, ADDRINFOA as c_addrinfo,
-             AF_INET, AF_INET6};
+use winapi::{ADDRINFOA as c_addrinfo, AF_INET, AF_INET6, socklen_t};
+#[cfg(windows)]
+use ws2_32::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
 
 use err::lookup_errno;
 
@@ -98,7 +99,7 @@ impl AddrInfo {
     }
 
     let addrinfo = *a;
-    let sockaddr = SockAddr::from_raw_parts(addrinfo.ai_addr, addrinfo.ai_addrlen);
+    let sockaddr = SockAddr::from_raw_parts(addrinfo.ai_addr, addrinfo.ai_addrlen as socklen_t);
     let sock = match sockaddr.family().into() {
       AF_INET => SocketAddr::V4(sockaddr.as_inet().expect("Failed to decode INET")),
       AF_INET6 => SocketAddr::V6(sockaddr.as_inet6().expect("Failed to decode INET_6")),
