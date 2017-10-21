@@ -4,7 +4,6 @@ environment:
     CRATE_NAME: dns_lookup
   matrix:
   - TARGET: x86_64-pc-windows-msvc
-  - TARGET: x86_64-pc-windows-gnu
 
 install:
   - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
@@ -18,14 +17,6 @@ build: false
 test_script:
   - cargo test --target %TARGET%
 
-cache:
-  - C:\Users\appveyor\.cargo\registry
-  - target
-
 branches:
   only:
     - master
-
-notifications:
-  - provider: Email
-    on_build_success: false
