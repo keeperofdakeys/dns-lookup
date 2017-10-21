@@ -60,11 +60,21 @@ pub enum Protocol {
 }
 
 impl From<Protocol> for c::c_int {
+  #[cfg(unix)]
   fn from(sock: Protocol) -> c::c_int {
     match sock {
       Protocol::ICMP => c::IPPROTO_ICMP,
       Protocol::TCP => c::IPPROTO_TCP,
       Protocol::UDP => c::IPPROTO_UDP,
+    }
+  }
+
+  #[cfg(windows)]
+  fn from(sock: Protocol) -> c::c_int {
+    match sock {
+      Protocol::ICMP => c::IPPROTO_ICMP.0 as c::c_int,
+      Protocol::TCP => c::IPPROTO_TCP.0 as c::c_int,
+      Protocol::UDP => c::IPPROTO_UDP.0 as c::c_int,
     }
   }
 }
