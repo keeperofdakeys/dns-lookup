@@ -86,13 +86,13 @@
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
 #[cfg(unix)] extern crate libc;
-#[cfg(unix)] extern crate cfg_if;
 
 #[cfg(windows)] extern crate winapi;
 #[cfg(windows)] extern crate ws2_32;
 
 extern crate socket2;
 
+#[cfg(windows)]
 use std::sync::{Once, ONCE_INIT};
 
 // From socket2-rs
