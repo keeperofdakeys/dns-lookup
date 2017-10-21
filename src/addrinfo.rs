@@ -103,9 +103,9 @@ impl AddrInfo {
     let sock = match sockaddr.family().into() {
       AF_INET => SocketAddr::V4(sockaddr.as_inet().expect("Failed to decode INET")),
       AF_INET6 => SocketAddr::V6(sockaddr.as_inet6().expect("Failed to decode INET_6")),
-      e @ _ => return Err(io::Error::new(
+      err => return Err(io::Error::new(
         io::ErrorKind::Other,
-        format!("Found unknown address family: {}", e)
+        format!("Found unknown address family: {}", err)
       )),
     };
     Ok(AddrInfo {

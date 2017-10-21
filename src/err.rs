@@ -5,7 +5,7 @@ use std::io;
 use std::str;
 
 #[cfg(all(not(windows), not(unix)))]
-/// Given an errno, return an std::io::Result with the error message.
+/// Given an errno, return an `std::io::Result` with the error message.
 pub fn lookup_errno(err: i32) -> io::Result<()> {
   match (err) {
     0 => Ok(()),
@@ -17,7 +17,7 @@ pub fn lookup_errno(err: i32) -> io::Result<()> {
 }
 
 #[cfg(unix)]
-/// Given an errno, return an std::io::Result with the error message.
+/// Given an errno, return an `std::io::Result` with the error message.
 pub fn lookup_errno(err: i32) -> io::Result<()> {
   use libc::{EAI_SYSTEM, gai_strerror};
 
@@ -37,7 +37,7 @@ pub fn lookup_errno(err: i32) -> io::Result<()> {
 }
 
 #[cfg(windows)]
-/// Given an errno, return an std::io::Result with the error message.
+/// Given an errno, return an `std::io::Result` with the error message.
 pub fn lookup_errno(err: i32) -> io::Result<()> {
   use ws2_32::WSAGetLastError;
   match err {
