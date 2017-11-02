@@ -8,7 +8,7 @@ given hostname, and the `lookup_name` function to get the reverse dns entry for
 the given IP Address.
 
 
-[Documentation](https://keeperofdakeys.github.io/dns-lookup/dns_lookup)
+[Documentation](https://docs.rs/dns-lookup/)
 
 ## Usage
 
