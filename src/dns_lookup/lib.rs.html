@@ -147,6 +147,10 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! # `dns_lookup`</span>
 <span class="doccomment">//! A small wrapper for libc to perform simple DNS lookups.</span>
@@ -182,25 +186,13 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//!   extern crate dns_lookup;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!   #[cfg(unix)]</span>
-<span class="doccomment">//!   extern crate libc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   #[cfg(windows)]</span>
-<span class="doccomment">//!   extern crate winapi;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   use dns_lookup::{getaddrinfo, AddrInfoHints};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   #[cfg(unix)]</span>
-<span class="doccomment">//!   use libc::SOCK_STREAM;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   #[cfg(windows)]</span>
-<span class="doccomment">//!   use winapi::SOCK_STREAM;</span>
+<span class="doccomment">//!   use dns_lookup::{getaddrinfo, AddrInfoHints, SockType};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   fn main() {</span>
 <span class="doccomment">//!     let hostname = &quot;localhost&quot;;</span>
 <span class="doccomment">//!     let service = &quot;ssh&quot;;</span>
 <span class="doccomment">//!     let hints = AddrInfoHints {</span>
-<span class="doccomment">//!       socktype: SOCK_STREAM,</span>
+<span class="doccomment">//!       socktype: SockType::Stream.into(),</span>
 <span class="doccomment">//!       .. AddrInfoHints::default()</span>
 <span class="doccomment">//!     };</span>
 <span class="doccomment">//!     let sockets =</span>
@@ -236,22 +228,38 @@
 <span class="attribute">#<span class="op">!</span>[<span class="ident">cfg_attr</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;clippy&quot;</span>, <span class="ident">plugin</span>(<span class="ident">clippy</span>))]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">cfg_if</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">kernel32</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">winapi</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ws2_32</span>;
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">socket2</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Once</span>, <span class="ident">ONCE_INIT</span>};
+
+<span class="comment">// From socket2-rs</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+<span class="kw">fn</span> <span class="ident">init_winsock</span>() {
+    <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">ONCE_INIT</span>;
+
+    <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">||</span> {
+        <span class="comment">// Initialize winsock through the standard library by just creating a</span>
+        <span class="comment">// dummy socket. Whether this is successful or not we drop the result as</span>
+        <span class="comment">// libstd will be sure to have initialized winsock.</span>
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">UdpSocket</span>::<span class="ident">bind</span>(<span class="string">&quot;127.0.0.1:34254&quot;</span>);
+    });
+}
+
 <span class="kw">mod</span> <span class="ident">addrinfo</span>;
 <span class="kw">mod</span> <span class="ident">nameinfo</span>;
 <span class="kw">mod</span> <span class="ident">err</span>;
 <span class="kw">mod</span> <span class="ident">lookup</span>;
+<span class="kw">mod</span> <span class="ident">types</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lookup</span>::{<span class="ident">lookup_host</span>, <span class="ident">lookup_addr</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">addrinfo</span>::{<span class="ident">getaddrinfo</span>, <span class="ident">AddrInfoIter</span>, <span class="ident">AddrInfo</span>, <span class="ident">AddrInfoHints</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">nameinfo</span>::<span class="ident">getnameinfo</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">SockType</span>, <span class="ident">Protocol</span>, <span class="ident">AddrFamily</span>};
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

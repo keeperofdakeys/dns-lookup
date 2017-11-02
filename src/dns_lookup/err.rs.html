@@ -92,13 +92,17 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
 </pre><pre class="rust ">
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CStr</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">windows</span>), <span class="ident">not</span>(<span class="ident">unix</span>)))]</span>
-<span class="doccomment">/// Given an errno, return an std::io::Result with the error message.</span>
+<span class="doccomment">/// Given an errno, return an `std::io::Result` with the error message.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_errno</span>(<span class="ident">err</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
   <span class="kw">match</span> (<span class="ident">err</span>) {
     <span class="number">0</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
@@ -110,7 +114,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="doccomment">/// Given an errno, return an std::io::Result with the error message.</span>
+<span class="doccomment">/// Given an errno, return an `std::io::Result` with the error message.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_errno</span>(<span class="ident">err</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
   <span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">EAI_SYSTEM</span>, <span class="ident">gai_strerror</span>};
 
@@ -130,15 +134,15 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="doccomment">/// Given an errno, return an std::io::Result with the error message.</span>
+<span class="doccomment">/// Given an errno, return an `std::io::Result` with the error message.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_errno</span>(<span class="ident">err</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-  <span class="kw">use</span> <span class="ident">winapi</span>::<span class="ident">WSAGetLastError</span>;
+  <span class="kw">use</span> <span class="ident">ws2_32</span>::<span class="ident">WSAGetLastError</span>;
   <span class="kw">match</span> <span class="ident">err</span> {
     <span class="number">0</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
     _ <span class="op">=&gt;</span> {
-      <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(
+      <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(
         <span class="kw">unsafe</span> { <span class="ident">WSAGetLastError</span>() }
-      )
+      ))
     }
   }
 }
