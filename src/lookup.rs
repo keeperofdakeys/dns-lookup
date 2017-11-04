@@ -68,11 +68,26 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
 
 #[test]
 fn test_localhost() {
-  // TODO: Find a better test here?
   let ips = lookup_host("localhost").unwrap();
   assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
   assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
+}
 
+#[cfg(unix)]
+#[test]
+fn test_rev_localhost() {
   let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
   assert_eq!(name.unwrap(), "localhost");
+}
+
+#[cfg(windows)]
+#[test]
+fn test_hostname() {
+  // Get machine's hostname.
+  let hostname = ::win::get_hostname();
+
+  // Do reverse lookup of 127.0.0.1.
+  let rev_name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
+
+  assert_eq!(rev_name.unwrap(), hostname);
 }

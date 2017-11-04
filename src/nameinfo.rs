@@ -89,6 +89,16 @@ fn test_getnameinfo() {
      Err(e) => panic!("Failed to lookup socket {:?}", e),
    };
 
-   assert_eq!(name, "localhost");
    assert_eq!(service, "ssh");
+
+   #[cfg(unix)]
+   {
+     assert_eq!(name, "localhost");
+   }
+
+   #[cfg(windows)]
+   {
+     let hostname = ::win::get_hostname();
+     assert_eq!(name, hostname);
+   }
 }
