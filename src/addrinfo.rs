@@ -201,18 +201,3 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
 
   Ok(AddrInfoIter { orig: res, cur: res })
 }
-
-#[test]
-fn test_getaddrinfo() {
-  let hints = AddrInfoHints {
-    flags: 0x0002,
-    ..AddrInfoHints::default()
-  };
-  for entry in getaddrinfo(Some("localhost"), Some("ssh"), Some(hints)).unwrap() {
-    if entry.is_err() {
-      println!(":P {:?}", entry);
-      continue;
-    }
-    println!("{:?}", entry);
-  }
-}
