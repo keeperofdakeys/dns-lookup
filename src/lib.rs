@@ -80,27 +80,13 @@
 
 extern crate socket2;
 
-#[cfg(windows)]
-use std::sync::{Once, ONCE_INIT};
-
-// From socket2-rs
-#[cfg(windows)]
-fn init_winsock() {
-    static INIT: Once = ONCE_INIT;
-
-    INIT.call_once(|| {
-        // Initialize winsock through the standard library by just creating a
-        // dummy socket. Whether this is successful or not we drop the result as
-        // libstd will be sure to have initialized winsock.
-        let _ = std::net::UdpSocket::bind("127.0.0.1:34254");
-    });
-}
-
 mod addrinfo;
 mod nameinfo;
 mod err;
 mod lookup;
 mod types;
+#[cfg(windows)]
+mod win;
 
 pub use lookup::{lookup_host, lookup_addr};
 pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};

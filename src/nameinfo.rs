@@ -39,7 +39,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)
 
   // Prime windows.
   #[cfg(windows)]
-  ::init_winsock();
+  ::win::init_winsock();
 
   unsafe {
     lookup_errno(
