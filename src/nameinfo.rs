@@ -12,7 +12,7 @@ use winapi::c_char;
 #[cfg(windows)]
 use ws2_32::getnameinfo as c_getnameinfo;
 
-use err::lookup_errno;
+use err::LookupError;
 
 /// Retrieve the name for a given IP and Service. Acts as a thin wrapper around
 /// the libc getnameinfo.
@@ -24,7 +24,7 @@ use err::lookup_errno;
 /// Retrieving names or services that contain non-UTF8 locales is currently not
 /// supported (as String is returned). Raise an issue if this is a concern for
 /// you.
-pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)> {
+pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), LookupError> {
   // Convert the socket into our type, so we can get a sockaddr_in{,6} ptr.
   let sock: SockAddr = (*sock).into();
   let c_sock = sock.as_ptr();
@@ -42,7 +42,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)
   ::win::init_winsock();
 
   unsafe {
-    lookup_errno(
+    LookupError::match_gai_error(
       c_getnameinfo(
         c_sock, c_sock_len,
         c_host.as_mut_ptr(),
@@ -51,7 +51,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> io::Result<(String, String)
         c_service.len() as u32,
         flags
       )
-    )?
+    )?;
   }
 
   let host = unsafe {

@@ -34,11 +34,13 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
         unsafe {
           libc::res_init();
         }
-        Err(e)
+        // Use ? to convert to io::Result>
+        Err(e)?
     },
     // the cfg is needed here to avoid an "unreachable pattern" warning
     #[cfg(not(unix))]
-    Err(e) => Err(e),
+    // Use ? to convert to io::Result.
+    Err(e) => Err(e)?,
   }
 }
 
@@ -58,11 +60,11 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
       unsafe {
         libc::res_init();
       }
-      Err(e)
+      Err(e)?
     },
     // the cfg is needed here to avoid an "unreachable pattern" warning
     #[cfg(not(unix))]
-    Err(e) => Err(e),
+    Err(e) => Err(e)?,
   }
 }
 

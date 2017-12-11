@@ -14,7 +14,7 @@ use winapi::{ADDRINFOA as c_addrinfo, AF_INET, AF_INET6, socklen_t};
 #[cfg(windows)]
 use ws2_32::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
 
-use err::lookup_errno;
+use err::LookupError;
 
 /// A struct used as the hints argument to getaddrinfo.
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -95,7 +95,10 @@ impl AddrInfo {
   /// Used for interfacing with getaddrinfo.
   unsafe fn from_ptr(a: *mut c_addrinfo) -> io::Result<Self> {
     if a.is_null() {
-      return Err(io::Error::new(io::ErrorKind::Other, "Supplied pointer is null."))?;
+      return Err(
+        io::Error::new(io::ErrorKind::Other,
+        "Supplied pointer is null."
+      ))?;
     }
 
     let addrinfo = *a;
@@ -106,7 +109,7 @@ impl AddrInfo {
       err => return Err(io::Error::new(
         io::ErrorKind::Other,
         format!("Found unknown address family: {}", err)
-      )),
+      ))?,
     };
     Ok(AddrInfo {
       socktype: addrinfo.ai_socktype,
@@ -164,10 +167,13 @@ impl Drop for AddrInfoIter {
 /// Resolving names from non-UTF8 locales is currently not supported (as the
 /// interface uses &str). Raise an issue if this is a concern for you.
 pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<AddrInfoHints>)
-    -> io::Result<AddrInfoIter> {
+    -> Result<AddrInfoIter, LookupError> {
   // We must have at least host or service.
   if host.is_none() && service.is_none() {
-    return Err(io::Error::new(io::ErrorKind::Other, "Either host or service must be supplied"));
+    return Err(io::Error::new(
+      io::ErrorKind::Other,
+      "Either host or service must be supplied"
+    ))?;
   }
 
   // Allocate CStrings, and keep around to free.
@@ -196,7 +202,9 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
   ::win::init_winsock();
 
   unsafe {
-    lookup_errno(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
+    LookupError::match_gai_error(
+      c_getaddrinfo(c_host, c_service, &c_hints, &mut res)
+    )?;
   }
 
   Ok(AddrInfoIter { orig: res, cur: res })
