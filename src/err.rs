@@ -105,7 +105,7 @@ impl LookupErrorKind {
   /// Create a `LookupErrorKind` from a `gai` error.
   fn new(err: i32) -> Self {
     use winapi::winerror as e;
-    match err {
+    match err as u32 {
       e::WSATRY_AGAIN => LookupErrorKind::Again,
       e::WSAEINTVAL => LookupErrorKind::Badflags,
       e::WSANO_RECOVERY => LookupErrorKind::Fail,
