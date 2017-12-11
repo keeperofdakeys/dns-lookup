@@ -107,10 +107,10 @@ impl LookupErrorKind {
     use winapi::winerror as e;
     match err as u32 {
       e::WSATRY_AGAIN => LookupErrorKind::Again,
-      e::WSAEINTVAL => LookupErrorKind::Badflags,
+      e::WSAEINVAL => LookupErrorKind::Badflags,
       e::WSANO_RECOVERY => LookupErrorKind::Fail,
       e::WSAEAFNOSUPPORT => LookupErrorKind::Family,
-      e::WSA_NOT_ENOUGH_MEMORY => LookupErrorKind::Memory,
+      e::ERROR_NOT_ENOUGH_MEMORY => LookupErrorKind::Memory,
       e::WSAHOST_NOT_FOUND => LookupErrorKind::NoName,
       e::WSANO_DATA => LookupErrorKind::NoData,
       e::WSATYPE_NOT_FOUND => LookupErrorKind::Service,
