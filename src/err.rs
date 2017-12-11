@@ -1,5 +1,4 @@
-#[cfg(unix)]
-use std::ffi::{CStr, NulError};
+use std::ffi;
 use std::io;
 #[cfg(unix)]
 use std::str;
@@ -137,8 +136,8 @@ impl From<io::Error> for LookupError {
   }
 }
 
-impl From<NulError> for LookupError {
-  fn from(err: NulError) -> LookupError {
+impl From<ffi::NulError> for LookupError {
+  fn from(err: ffi::NulError) -> LookupError {
     let err: io::Error = err.into();
     err.into()
   }
@@ -178,7 +177,7 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
   }
 
   let detail = unsafe {
-    str::from_utf8(CStr::from_ptr(gai_strerror(err)).to_bytes()).unwrap()
+    str::from_utf8(ffi::CStr::from_ptr(gai_strerror(err)).to_bytes()).unwrap()
       .to_owned()
   };
   io::Error::new(io::ErrorKind::Other,
