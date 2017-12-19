@@ -124,7 +124,7 @@ impl LookupErrorKind {
   #[cfg(windows)]
   /// Create a `LookupErrorKind` from a `gai` error.
   fn new(err: i32) -> Self {
-    use winapi::winerror as e;
+    use winapi::shared::winerror as e;
     match err as u32 {
       e::WSATRY_AGAIN => LookupErrorKind::Again,
       e::WSAEINVAL => LookupErrorKind::Badflags,
@@ -210,7 +210,7 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
 /// the appropriate error message. Note `0` is not an
 /// error, but will still map to an error
 pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
-  use ws2_32::WSAGetLastError;
+  use winapi::um::winsock2::WSAGetLastError;
   match err {
     0 => io::Error::new(
       io::ErrorKind::Other,

@@ -3,10 +3,10 @@ use std::net::IpAddr;
 use std::str;
 
 #[cfg(unix)]
-use libc::{SOCK_STREAM};
+use libc::SOCK_STREAM;
 
 #[cfg(windows)]
-use winapi::{SOCK_STREAM};
+use winapi::shared::ws2def::SOCK_STREAM;
 
 use addrinfo::{getaddrinfo, AddrInfoHints};
 use nameinfo::getnameinfo;

@@ -8,9 +8,9 @@ use std::str;
 use libc::{c_char, getnameinfo as c_getnameinfo};
 
 #[cfg(windows)]
-use winapi::c_char;
+use winapi::ctypes::c_char;
 #[cfg(windows)]
-use ws2_32::getnameinfo as c_getnameinfo;
+use winapi::um::ws2tcpip::getnameinfo as c_getnameinfo;
 
 use err::LookupError;
 

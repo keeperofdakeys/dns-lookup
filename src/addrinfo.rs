@@ -10,9 +10,9 @@ use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinf
            AF_INET, AF_INET6, socklen_t};
 
 #[cfg(windows)]
-use winapi::{ADDRINFOA as c_addrinfo, AF_INET, AF_INET6, socklen_t};
+use winapi::shared::ws2def::{ADDRINFOA as c_addrinfo, AF_INET, AF_INET6};
 #[cfg(windows)]
-use ws2_32::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
+use winapi::um::ws2tcpip::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, socklen_t};
 
 use err::LookupError;
 

@@ -2,9 +2,9 @@ use std::ffi::CStr;
 use std::net::UdpSocket;
 use std::str;
 use std::sync::{Once, ONCE_INIT};
-use winapi::c_char;
-use ws2_32::{WSAGetLastError,
-             gethostname as c_gethostname};
+use winapi::ctypes::c_char;
+use winapi::um::winsock2::{WSAGetLastError,
+                          gethostname as c_gethostname};
 
 // Start windows socket library - From socket2-rs
 pub(crate) fn init_winsock() {

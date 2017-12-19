@@ -77,7 +77,6 @@
 #[cfg(unix)] extern crate libc;
 
 #[cfg(windows)] extern crate winapi;
-#[cfg(windows)] extern crate ws2_32;
 
 extern crate socket2;
 
