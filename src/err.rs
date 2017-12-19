@@ -46,17 +46,29 @@ impl LookupError {
   }
 }
 
+/// Different kinds of lookup errors that `getaddrinfo` and
+/// `getnameinfo` can return. These can be a little inconsitant
+/// between platforms, so it's recommended not to rely on them.
 #[derive(Copy, Clone, Debug)]
 pub enum LookupErrorKind {
   /// Temporary failure in name resolution.
+  ///
+  /// May also be returend when DNS server returns a SERVFAIL.
   Again,
   /// Invalid value for `ai_flags' field.
   Badflags,
   /// NAME or SERVICE is unknown.
+  ///
+  /// May also be returned when domain doesn't exist (NXDOMAIN) or domain
+  /// exists but contains no address records (NODATA).
   NoName,
   /// The specified network host exists, but has no data defined.
+  ///
+  /// This is no longer a POSIX standard, however it's still returned by
+  /// some platforms. Be warned that FreeBSD does not include the corresponding
+  /// `EAI_NODATA` symbol.
   NoData,
-  /// Non-recoverable failure in name res.
+  /// Non-recoverable failure in name resolution.
   Fail,
   /// `ai_family' not supported.
   Family,
@@ -68,8 +80,16 @@ pub enum LookupErrorKind {
   Memory,
   /// System error returned in `errno'.
   System,
-  /// Either a generic C error, or an unknown result
-  /// code.
+  /// An unknown result code was returned.
+  ///
+  /// For some platforms, you may wish to match on an unknown value directly.
+  /// Note that `gai_strerr` is used to get error messages, so the generated IO
+  /// error should contain the correct error message for the platform.
+  Unknown,
+  /// A generic C error or IO error occured.
+  ///
+  /// You should convert this `LookupError` into an IO error directly. Note
+  /// that the error code is set to 0 in the case this is returned.
   IO,
 }
 
@@ -91,9 +111,9 @@ impl LookupErrorKind {
       c::EAI_FAMILY => LookupErrorKind::Family,
       c::EAI_MEMORY => LookupErrorKind::Memory,
       c::EAI_NONAME => LookupErrorKind::NoName,
-      // Not defined in libc?
-      // -5 on linux and openbsd
-      -5 => LookupErrorKind::NoData,
+      // FreeBSD has no EAI_NODATA, so don't match it on that platform.
+      #[cfg(not(target_os="freebsd"))]
+      c::EAI_NODATA => LookupErrorKind::NoData,
       c::EAI_SERVICE => LookupErrorKind::Service,
       c::EAI_SOCKTYPE => LookupErrorKind::Socktype,
       c::EAI_SYSTEM => LookupErrorKind::System,
