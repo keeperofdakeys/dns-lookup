@@ -6,6 +6,7 @@ rust:
   - stable
   - beta
   - nightly
+sudo: required
 matrix:
   allow_failures:
     - rust: nightly
