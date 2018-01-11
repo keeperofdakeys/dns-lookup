@@ -46,9 +46,9 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
       c_getnameinfo(
         c_sock, c_sock_len,
         c_host.as_mut_ptr(),
-        c_host.len() as u32,
+        c_host.len() as _,
         c_service.as_mut_ptr(),
-        c_service.len() as u32,
+        c_service.len() as _,
         flags
       )
     )?;
