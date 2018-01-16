@@ -7,6 +7,10 @@ You can use the `lookup_host` function to get a list of IP Addresses for a
 given hostname, and the `lookup_name` function to get the reverse dns entry for
 the given IP Address.
 
+PS: If you only need a single result, consider [ToSocketAddrs]
+(https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html) in libstd.
+
+The library also includes a safe wrapper for `getaddrinfo` and `getnameinfo`.
 
 [Documentation](https://docs.rs/dns-lookup/)
 
