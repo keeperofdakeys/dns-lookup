@@ -8,8 +8,7 @@ use libc::{gethostname as c_gethostname, c_char};
 #[cfg(windows)]
 use winapi::ctypes::c_char;
 #[cfg(windows)]
-use winapi::um::winsock2::{WSAGetLastError,
-                          gethostname as c_gethostname};
+use winapi::um::winsock2::gethostname as c_gethostname;
 
 /// Fetch the local hostname.
 pub fn get_hostname() -> Result<String, io::Error> {
