@@ -89,10 +89,12 @@ mod nameinfo;
 mod err;
 mod lookup;
 mod types;
+mod hostname;
 #[cfg(windows)]
 mod win;
 
-pub use lookup::{lookup_host, lookup_addr};
 pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};
+pub use hostname::get_hostname;
+pub use lookup::{lookup_host, lookup_addr};
 pub use nameinfo::getnameinfo;
 pub use types::{SockType, Protocol, AddrFamily};

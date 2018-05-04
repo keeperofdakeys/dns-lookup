@@ -98,7 +98,7 @@ fn test_getnameinfo() {
 
    #[cfg(windows)]
    {
-     let hostname = ::win::get_hostname();
+     let hostname = ::hostname::get_hostname().unwrap();
      assert_eq!(name, hostname);
    }
 }

@@ -86,7 +86,7 @@ fn test_rev_localhost() {
 #[test]
 fn test_hostname() {
   // Get machine's hostname.
-  let hostname = ::win::get_hostname();
+  let hostname = ::hostname::get_hostname().unwrap();
 
   // Do reverse lookup of 127.0.0.1.
   let rev_name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
