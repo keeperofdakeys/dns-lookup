@@ -34,3 +34,9 @@ pub fn get_hostname() -> Result<String, io::Error> {
     .map(|h| h.to_owned())
     .map_err(|_| io::Error::new(io::ErrorKind::Other, "Non-UTF8 hostname"))
 }
+
+#[test]
+fn test_get_hostname() {
+  // We don't know the hostname of the local box, so just verify it doesn't return an error.
+  get_hostname().unwrap();
+}
