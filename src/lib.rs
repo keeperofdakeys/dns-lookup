@@ -98,3 +98,4 @@ pub use hostname::get_hostname;
 pub use lookup::{lookup_host, lookup_addr};
 pub use nameinfo::getnameinfo;
 pub use types::{SockType, Protocol, AddrFamily};
+pub use err::{LookupErrorKind, LookupError};

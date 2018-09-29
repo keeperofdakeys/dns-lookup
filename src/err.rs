@@ -96,13 +96,13 @@ pub enum LookupErrorKind {
 impl LookupErrorKind {
   #[cfg(all(not(windows), not(unix)))]
   /// Create a `LookupErrorKind` from a `gai` error.
-  fn new(err: i32) -> Self {
+  pub fn new(err: i32) -> Self {
     LookupErrorKind::IO
   }
 
   #[cfg(unix)]
   /// Create a `LookupErrorKind` from a `gai` error.
-  fn new(err: i32) -> Self {
+  pub fn new(err: i32) -> Self {
     use libc as c;
     match err {
       c::EAI_AGAIN => LookupErrorKind::Again,
@@ -123,7 +123,7 @@ impl LookupErrorKind {
 
   #[cfg(windows)]
   /// Create a `LookupErrorKind` from a `gai` error.
-  fn new(err: i32) -> Self {
+  pub fn new(err: i32) -> Self {
     use winapi::shared::winerror as e;
     match err as u32 {
       e::WSATRY_AGAIN => LookupErrorKind::Again,
