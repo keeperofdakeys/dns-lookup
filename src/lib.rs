@@ -3,8 +3,7 @@
 //!
 //! Two main functions are provided.
 //!
-//! PS: If you only need a single result, consider [ToSocketAddrs]
-//! (https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html) in libstd.
+//! PS: If you only need a single result, consider [ToSocketAddrs](https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html) in libstd.
 //!
 //!
 //! # `lookup_host`
