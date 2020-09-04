@@ -25,22 +25,10 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
       let addrs: io::Result<Vec<_>> = addrs.map(|r| r.map(|a| a.sockaddr.ip())).collect();
       addrs
     },
-    #[cfg(unix)]
-    Err(e) => {
-        use libc;
-        // The lookup failure could be caused by using a stale /etc/resolv.conf.
-        // See https://github.com/rust-lang/rust/issues/41570.
-        // We therefore force a reload of the nameserver information.
-        unsafe {
-          libc::res_init();
-        }
-        // Use ? to convert to io::Result>
-        Err(e)?
+    Err(e) =>  {
+      reload_dns_nameserver();
+      Err(e)?
     },
-    // the cfg is needed here to avoid an "unreachable pattern" warning
-    #[cfg(not(unix))]
-    // Use ? to convert to io::Result.
-    Err(e) => Err(e)?,
   }
 }
 
@@ -51,20 +39,27 @@ pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
   let sock = (*addr, 0).into();
   match getnameinfo(&sock, NI_NUMERICSERV) {
     Ok((name, _)) => Ok(name),
-    #[cfg(unix)]
-    Err(e) => {
+    Err(e) =>  {
+      reload_dns_nameserver();
+      Err(e)?
+    },
+  }
+}
+
+// The lookup failure could be caused by using a stale /etc/resolv.conf.
+// See https://github.com/rust-lang/rust/issues/41570.
+// We therefore force a reload of the nameserver information.
+// MacOS and IOS don't seem to have this problem.
+fn reload_dns_nameserver() {
+  cfg_if::cfg_if! {
+    if #[cfg(target_os = "macos")] {
+    } else if #[cfg(target_os = "ios")] {
+    } else if #[cfg(unix)] {
       use libc;
-      // The lookup failure could be caused by using a stale /etc/resolv.conf.
-      // See https://github.com/rust-lang/rust/issues/41570.
-      // We therefore force a reload of the nameserver information.
       unsafe {
         libc::res_init();
       }
-      Err(e)?
-    },
-    // the cfg is needed here to avoid an "unreachable pattern" warning
-    #[cfg(not(unix))]
-    Err(e) => Err(e)?,
+    }
   }
 }
 
