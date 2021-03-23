@@ -6,13 +6,12 @@ use std::net::SocketAddr;
 use std::ptr;
 
 #[cfg(unix)]
-use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinfo as c_addrinfo,
-           AF_INET, AF_INET6, socklen_t};
+use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinfo as c_addrinfo};
 
 #[cfg(windows)]
-use winapi::shared::ws2def::{ADDRINFOA as c_addrinfo, AF_INET, AF_INET6};
+use winapi::shared::ws2def::{ADDRINFOA as c_addrinfo};
 #[cfg(windows)]
-use winapi::um::ws2tcpip::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, socklen_t};
+use winapi::um::ws2tcpip::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
 
 use err::LookupError;
 
@@ -102,15 +101,19 @@ impl AddrInfo {
     }
 
     let addrinfo = *a;
-    let sockaddr = SockAddr::from_raw_parts(addrinfo.ai_addr, addrinfo.ai_addrlen as socklen_t);
-    let sock = match sockaddr.family().into() {
-      AF_INET => SocketAddr::V4(sockaddr.as_inet().expect("Failed to decode INET")),
-      AF_INET6 => SocketAddr::V6(sockaddr.as_inet6().expect("Failed to decode INET_6")),
-      err => return Err(io::Error::new(
-        io::ErrorKind::Other,
-        format!("Found unknown address family: {}", err)
-      ))?,
-    };
+    let ((), sockaddr) = SockAddr::init(|storage, len| {
+      *len = addrinfo.ai_addrlen as _;
+      std::ptr::copy_nonoverlapping(
+        addrinfo.ai_addr as *const u8,
+        storage as *mut u8,
+        addrinfo.ai_addrlen as usize
+      );
+      Ok(())
+    })?;
+    let sock = sockaddr.as_socket().ok_or_else(|| io::Error::new(
+      io::ErrorKind::Other,
+      format!("Found unknown address family: {}", sockaddr.family())
+    ))?;
     Ok(AddrInfo {
       socktype: addrinfo.ai_socktype,
       protocol: addrinfo.ai_protocol,
