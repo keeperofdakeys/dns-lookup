@@ -19,8 +19,10 @@ pub enum SockType {
   /// Connectionless, unreliable datagrams of fixed max length.
   DGram,
   /// Raw protocol interface.
+  #[cfg(not(target_os = "redox"))]
   Raw,
   /// Reliably-delivered messages.
+  #[cfg(not(target_os = "redox"))]
   RDM,
 }
 
@@ -29,7 +31,9 @@ impl From<SockType> for c_int {
     match sock {
       SockType::Stream => c::SOCK_STREAM,
       SockType::DGram => c::SOCK_DGRAM,
+      #[cfg(not(target_os = "redox"))]
       SockType::Raw => c::SOCK_RAW,
+      #[cfg(not(target_os = "redox"))]
       SockType::RDM => c::SOCK_RDM,
     }
   }
