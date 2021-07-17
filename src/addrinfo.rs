@@ -38,6 +38,24 @@ pub struct AddrInfoHints {
 }
 
 impl AddrInfoHints {
+  /// Create a new AddrInfoHints using built-in types.
+  ///
+  /// Included Enums only provide common values, for anything else
+  /// create this struct directly using appropriate values from the
+  /// libc crate.
+  #[allow(dead_code)]
+  fn new(flags: Option<i32>, address: Option<::AddrFamily>,
+         socktype: Option<::SockType>, protocol: Option<::Protocol>)
+    -> AddrInfoHints {
+    AddrInfoHints {
+      flags: flags.unwrap_or(0),
+      address: address.map_or(0, |a| a.into()),
+      socktype: socktype.map_or(0, |a| a.into()),
+      protocol: protocol.map_or(0, |a| a.into()),
+    }
+  }
+
+  // Create libc addrinfo from AddrInfoHints struct.
   unsafe fn as_addrinfo(&self) -> c_addrinfo {
     let mut addrinfo: c_addrinfo = mem::zeroed();
     addrinfo.ai_flags = self.flags;
@@ -209,4 +227,28 @@ pub fn getaddrinfo(host: Option<&str>, service: Option<&str>, hints: Option<Addr
   }
 
   Ok(AddrInfoIter { orig: res, cur: res })
+}
+
+#[test]
+fn test_addrinfohints() {
+  use ::{AddrFamily, SockType};
+
+  assert_eq!(
+    AddrInfoHints {
+      flags: 1,
+      address: AddrFamily::Inet.into(),
+      socktype: SockType::Stream.into(),
+      .. AddrInfoHints::default()
+    },
+    AddrInfoHints::new(Some(1), Some(AddrFamily::Inet), Some(SockType::Stream), None)
+  );
+
+  assert_eq!(
+    AddrInfoHints {
+      address: AddrFamily::Inet.into(),
+      socktype: SockType::Stream.into(),
+      .. AddrInfoHints::default()
+    },
+    AddrInfoHints::new(None, Some(AddrFamily::Inet), Some(SockType::Stream), None)
+  );
 }
