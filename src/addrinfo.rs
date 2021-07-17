@@ -18,32 +18,32 @@ use err::LookupError;
 /// A struct used as the hints argument to getaddrinfo.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct AddrInfoHints {
-  /// Type of this socket. 0 for none.
-  ///
-  /// Values are defined by the libc on your system.
-  pub socktype: i32,
-  /// Protcol for this socket. 0 for none.
-  ///
-  /// Values are defined by the libc on your system.
-  pub protocol: i32,
-  /// Address family for this socket. 0 for none.
-  ///
-  /// Values are defined by the libc on your system.
-  pub address: i32,
   /// Optional bitmask arguments. Bitwise OR bitflags to change the
-  /// behaviour of getaddrinfo. 0 for none.
+  /// behaviour of getaddrinfo. 0 for none. `ai_flags` in libc.
   ///
   /// Values are defined by the libc on your system.
   pub flags: i32,
+  /// Address family for this socket. 0 for none. `ai_family` in libc.
+  ///
+  /// Values are defined by the libc on your system.
+  pub address: i32,
+  /// Type of this socket. 0 for none. `ai_socktype` in libc.
+  ///
+  /// Values are defined by the libc on your system.
+  pub socktype: i32,
+  /// Protcol for this socket. 0 for none. `ai_protocol` in libc.
+  ///
+  /// Values are defined by the libc on your system.
+  pub protocol: i32,
 }
 
 impl AddrInfoHints {
   unsafe fn as_addrinfo(&self) -> c_addrinfo {
     let mut addrinfo: c_addrinfo = mem::zeroed();
+    addrinfo.ai_flags = self.flags;
+    addrinfo.ai_family = self.address;
     addrinfo.ai_socktype = self.socktype;
     addrinfo.ai_protocol = self.protocol;
-    addrinfo.ai_family = self.address;
-    addrinfo.ai_flags = self.flags;
     addrinfo
   }
 }
@@ -53,38 +53,36 @@ impl Default for AddrInfoHints {
   /// be specified.
   fn default() -> Self {
     AddrInfoHints {
+      flags: 0,
+      address: 0,
       socktype: 0,
       protocol: 0,
-      address: 0,
-      flags: 0,
     }
   }
 }
 
 /// Struct that stores socket information, as returned by getaddrinfo.
-///
-/// This maps to the same definition provided by libc backends.
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddrInfo {
-  /// Type of this socket.
-  ///
-  /// Values are defined by the libc on your system.
-  pub socktype: i32,
-  /// Protcol family for this socket.
-  ///
-  /// Values are defined by the libc on your system.
-  pub protocol: i32,
-  /// Address family for this socket (usually matches protocol family).
+  /// Optional bitmask arguments, usually set to zero. `ai_flags` in libc.
+  pub flags: i32,
+  /// Address family for this socket (usually matches protocol family). `ai_family` in libc.
   ///
   /// Values are defined by the libc on your system.
   pub address: i32,
+  /// Type of this socket. `ai_socktype` in libc.
+  ///
+  /// Values are defined by the libc on your system.
+  pub socktype: i32,
+  /// Protcol family for this socket. `ai_protocol` in libc.
+  ///
+  /// Values are defined by the libc on your system.
+  pub protocol: i32,
   /// Socket address for this socket, usually containing an actual
-  /// IP Address and port.
+  /// IP Address and port. Combination of `ai_addrlen` and `ai_addr` in libc.
   pub sockaddr: SocketAddr,
-  /// If requested, this is the canonical name for this socket/host.
+  /// If requested, this is the canonical name for this socket/host. `ai_canonname` in libc.
   pub canonname: Option<String>,
-  /// Optional bitmask arguments, usually set to zero.
-  pub flags: i32,
 }
 
 impl AddrInfo {
@@ -115,14 +113,14 @@ impl AddrInfo {
       format!("Found unknown address family: {}", sockaddr.family())
     ))?;
     Ok(AddrInfo {
+      flags: 0,
+      address: addrinfo.ai_family,
       socktype: addrinfo.ai_socktype,
       protocol: addrinfo.ai_protocol,
-      address: addrinfo.ai_family,
       sockaddr: sock,
       canonname: addrinfo.ai_canonname.as_ref().map(|s|
         CStr::from_ptr(s).to_str().unwrap().to_owned()
       ),
-      flags: 0,
     })
   }
 }
