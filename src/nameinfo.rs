@@ -5,12 +5,18 @@ use std::net::SocketAddr;
 use std::str;
 
 #[cfg(unix)]
-use libc::{c_char, getnameinfo as c_getnameinfo};
+use libc::getnameinfo as c_getnameinfo;
 
-#[cfg(windows)]
-use winapi::ctypes::c_char;
+/// Both libc and winapi define c_char as i8 `type c_char = i8;`
+type c_char = i8;
+
+/*
 #[cfg(windows)]
 use winapi::um::ws2tcpip::getnameinfo as c_getnameinfo;
+*/
+
+#[cfg(windows)]
+use windows_sys::Win32::Networking::WinSock::getnameinfo as c_getnameinfo;
 
 use err::LookupError;
 
@@ -45,9 +51,9 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
         LookupError::match_gai_error(c_getnameinfo(
             c_sock,
             c_sock_len,
-            c_host.as_mut_ptr(),
+            c_host.as_mut_ptr() as *mut u8,
             c_host.len() as _,
-            c_service.as_mut_ptr(),
+            c_service.as_mut_ptr() as *mut u8,
             c_service.len() as _,
             flags,
         ))?;

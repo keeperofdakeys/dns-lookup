@@ -80,8 +80,13 @@
 #[cfg(unix)]
 extern crate libc;
 
+/*
 #[cfg(windows)]
 extern crate winapi;
+*/
+
+#[cfg(windows)]
+extern crate windows_sys;
 
 extern crate socket2;
 

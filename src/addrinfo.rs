@@ -8,10 +8,20 @@ use std::ptr;
 #[cfg(unix)]
 use libc::{addrinfo as c_addrinfo, freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
 
+/*
 #[cfg(windows)]
 use winapi::shared::ws2def::ADDRINFOA as c_addrinfo;
+*/
+
+#[cfg(windows)]
+use windows_sys::Win32::Networking::WinSock::{
+    freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo, ADDRINFOA as c_addrinfo,
+};
+
+/*
 #[cfg(windows)]
 use winapi::um::ws2tcpip::{freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
+*/
 
 use err::LookupError;
 
@@ -144,7 +154,7 @@ impl AddrInfo {
             canonname: addrinfo
                 .ai_canonname
                 .as_ref()
-                .map(|s| CStr::from_ptr(s).to_str().unwrap().to_owned()),
+                .map(|s| CStr::from_ptr(*s as *mut i8).to_str().unwrap().to_owned()),
         })
     }
 }
@@ -232,7 +242,12 @@ pub fn getaddrinfo(
     ::win::init_winsock();
 
     unsafe {
-        LookupError::match_gai_error(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
+        LookupError::match_gai_error(c_getaddrinfo(
+            c_host as *mut u8,
+            c_service as *mut u8,
+            &c_hints,
+            &mut res,
+        ))?;
     }
 
     Ok(AddrInfoIter {
