@@ -17,3 +17,9 @@ Cargo.lock
 
 # Project Vim Configuration
 .vimdir
+
+# Jetbrains Clion Configuration
+/.idea
+
+# main.rs
+/src/main.rs

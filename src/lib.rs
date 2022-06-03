@@ -74,27 +74,34 @@
 //!   let _ = (name, service);
 //! ```
 
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", feature(plugin))]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 
-#[cfg(unix)] extern crate libc;
+#[cfg(unix)]
+extern crate libc;
 
-#[cfg(windows)] extern crate winapi;
+/*
+#[cfg(windows)]
+extern crate winapi;
+*/
+
+#[cfg(windows)]
+extern crate windows_sys;
 
 extern crate socket2;
 
 mod addrinfo;
-mod nameinfo;
 mod err;
-mod lookup;
-mod types;
 mod hostname;
+mod lookup;
+mod nameinfo;
+mod types;
 #[cfg(windows)]
 mod win;
 
-pub use addrinfo::{getaddrinfo, AddrInfoIter, AddrInfo, AddrInfoHints};
+pub use addrinfo::{getaddrinfo, AddrInfo, AddrInfoHints, AddrInfoIter};
+pub use err::{LookupError, LookupErrorKind};
 pub use hostname::get_hostname;
-pub use lookup::{lookup_host, lookup_addr};
+pub use lookup::{lookup_addr, lookup_host};
 pub use nameinfo::getnameinfo;
-pub use types::{SockType, Protocol, AddrFamily};
-pub use err::{LookupErrorKind, LookupError};
+pub use types::{AddrFamily, Protocol, SockType};
