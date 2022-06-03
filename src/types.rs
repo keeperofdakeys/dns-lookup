@@ -2,6 +2,7 @@
 use libc as c;
 
 /// Both libc and winapi define c_int as i32 `type c_int = i32;`
+#[allow(non_camel_case_types)]
 type c_int = i32;
 
 /*

@@ -8,6 +8,7 @@ use std::str;
 use libc::getnameinfo as c_getnameinfo;
 
 /// Both libc and winapi define c_char as i8 `type c_char = i8;`
+#[allow(non_camel_case_types)]
 type c_char = i8;
 
 /*
@@ -47,6 +48,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
     #[cfg(windows)]
     ::win::init_winsock();
 
+    #[cfg(windows)]
     unsafe {
         LookupError::match_gai_error(c_getnameinfo(
             c_sock,
@@ -54,6 +56,19 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
             c_host.as_mut_ptr() as *mut u8,
             c_host.len() as _,
             c_service.as_mut_ptr() as *mut u8,
+            c_service.len() as _,
+            flags,
+        ))?;
+    }
+
+    #[cfg(unix)]
+    unsafe {
+        LookupError::match_gai_error(c_getnameinfo(
+            c_sock,
+            c_sock_len,
+            c_host.as_mut_ptr(),
+            c_host.len() as _,
+            c_service.as_mut_ptr(),
             c_service.len() as _,
             flags,
         ))?;

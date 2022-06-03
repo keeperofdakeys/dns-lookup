@@ -241,6 +241,7 @@ pub fn getaddrinfo(
     #[cfg(windows)]
     ::win::init_winsock();
 
+    #[cfg(windows)]
     unsafe {
         LookupError::match_gai_error(c_getaddrinfo(
             c_host as *mut u8,
@@ -248,6 +249,11 @@ pub fn getaddrinfo(
             &c_hints,
             &mut res,
         ))?;
+    }
+
+    #[cfg(unix)]
+    unsafe {
+        LookupError::match_gai_error(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
     }
 
     Ok(AddrInfoIter {
