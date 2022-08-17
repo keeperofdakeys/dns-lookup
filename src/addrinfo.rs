@@ -4,6 +4,7 @@ use std::io;
 use std::mem;
 use std::net::SocketAddr;
 use std::ptr;
+use windows_sys;
 
 #[cfg(unix)]
 use libc::{addrinfo as c_addrinfo, freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
@@ -23,7 +24,7 @@ use windows_sys::Win32::Networking::WinSock::{
 use winapi::um::ws2tcpip::{freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
 */
 
-use err::LookupError;
+use crate::err::LookupError;
 
 /// A struct used as the hints argument to getaddrinfo.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -56,9 +57,9 @@ impl AddrInfoHints {
     #[allow(dead_code)]
     fn new(
         flags: Option<i32>,
-        address: Option<::AddrFamily>,
-        socktype: Option<::SockType>,
-        protocol: Option<::Protocol>,
+        address: Option<crate::AddrFamily>,
+        socktype: Option<crate::SockType>,
+        protocol: Option<crate::Protocol>,
     ) -> AddrInfoHints {
         AddrInfoHints {
             flags: flags.unwrap_or(0),
@@ -239,7 +240,7 @@ pub fn getaddrinfo(
 
     // Prime windows.
     #[cfg(windows)]
-    ::win::init_winsock();
+    crate::win::init_winsock();
 
     #[cfg(windows)]
     unsafe {
@@ -264,7 +265,7 @@ pub fn getaddrinfo(
 
 #[test]
 fn test_addrinfohints() {
-    use {AddrFamily, SockType};
+    use crate::{AddrFamily, SockType};
 
     assert_eq!(
         AddrInfoHints {

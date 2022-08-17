@@ -21,7 +21,7 @@ use windows_sys::Win32::Networking::WinSock::gethostname as c_gethostname;
 pub fn get_hostname() -> Result<String, io::Error> {
     // Prime windows.
     #[cfg(windows)]
-    ::win::init_winsock();
+    crate::win::init_winsock();
 
     let mut c_name = [0 as c_char; 256_usize];
 

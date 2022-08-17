@@ -19,7 +19,7 @@ use winapi::um::ws2tcpip::getnameinfo as c_getnameinfo;
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::getnameinfo as c_getnameinfo;
 
-use err::LookupError;
+use crate::err::LookupError;
 
 /// Retrieve the name for a given IP and Service. Acts as a thin wrapper around
 /// the libc getnameinfo.
@@ -46,7 +46,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
 
     // Prime windows.
     #[cfg(windows)]
-    ::win::init_winsock();
+    crate::win::init_winsock();
 
     #[cfg(windows)]
     unsafe {
@@ -118,7 +118,7 @@ fn test_getnameinfo() {
 
     #[cfg(windows)]
     {
-        let hostname = ::hostname::get_hostname().unwrap();
+        let hostname = crate::hostname::get_hostname().unwrap();
         assert_eq!(name, hostname);
     }
 }

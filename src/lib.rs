@@ -85,17 +85,13 @@ extern crate libc;
 extern crate winapi;
 */
 
-#[cfg(windows)]
-extern crate windows_sys;
-
-extern crate socket2;
-
 mod addrinfo;
 mod err;
 mod hostname;
 mod lookup;
 mod nameinfo;
 mod types;
+
 #[cfg(windows)]
 mod win;
 
