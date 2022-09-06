@@ -11,11 +11,6 @@ use libc::getnameinfo as c_getnameinfo;
 #[allow(non_camel_case_types)]
 type c_char = i8;
 
-/*
-#[cfg(windows)]
-use winapi::um::ws2tcpip::getnameinfo as c_getnameinfo;
-*/
-
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::getnameinfo as c_getnameinfo;
 

@@ -131,7 +131,7 @@ impl AddrInfo {
         }
 
         let addrinfo = *a;
-        let ((), sockaddr) = SockAddr::init(|storage, len| {
+        let ((), sockaddr) = SockAddr::try_init(|storage, len| {
             *len = addrinfo.ai_addrlen as _;
             std::ptr::copy_nonoverlapping(
                 addrinfo.ai_addr as *const u8,

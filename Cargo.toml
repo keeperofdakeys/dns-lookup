@@ -17,11 +17,11 @@ include = [
 ]
 
 [dependencies]
-socket2 = { git = "https://github.com/rust-lang/socket2", branch="v0.4.x" }
+socket2 = { git = "https://github.com/rust-lang/socket2", branch="master" }
 cfg-if = "^1.0"
 
 [target."cfg(windows)".dependencies.windows-sys]
-version = "0.36.1"
+version = "0.36"
 features = ["Win32_Networking_WinSock", "Win32_Foundation"]
 
 [target."cfg(unix)".dependencies]
