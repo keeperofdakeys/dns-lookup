@@ -4,25 +4,14 @@ use std::io;
 use std::mem;
 use std::net::SocketAddr;
 use std::ptr;
-use windows_sys;
 
 #[cfg(unix)]
 use libc::{addrinfo as c_addrinfo, freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
-
-/*
-#[cfg(windows)]
-use winapi::shared::ws2def::ADDRINFOA as c_addrinfo;
-*/
 
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::{
     freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo, ADDRINFOA as c_addrinfo,
 };
-
-/*
-#[cfg(windows)]
-use winapi::um::ws2tcpip::{freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
-*/
 
 use crate::err::LookupError;
 
