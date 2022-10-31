@@ -1,0 +1,105 @@
+#![allow(unused)]
+use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
+use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto, str::FromStr};
+use libc::{c_char,sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, socklen_t, recvfrom};
+// Flag of DNS header mask (OPCODE):
+pub const OPCODE_MASK: u16 = 0b0111_1000_0000_0000;
+// Flag of DNS header mask (RD):
+pub const RECURSION_DESIRED: u16 = 0b0000_0001_0000_0000;
+// Dns server address - Customize it by dns :
+pub const DNS_SERVER: Ipv4Addr = Ipv4Addr::new(8,8,8,8);
+#[derive(Debug)]
+pub struct DnsHeader {
+    pub id: u16,
+    pub query: bool,
+    pub opcode: u16,
+    pub authoritative: bool,
+    pub truncated: bool,
+    pub recursion_desired: bool,
+    pub recursion_available: bool,
+    pub authenticated_data: bool,
+    pub checking_disabled: bool,
+    pub response_code: u8,
+    pub questions: u16,
+    pub answers: u16,
+    pub nameservers: u16,
+    pub additional: u16,
+}
+// DNS Header Struct 
+impl DnsHeader {
+    // write query for TYPE A and CLASS IN
+    fn make(&self,data:&mut Vec<u8>,url:&str){
+        let mut flags = 0u16;
+        flags |= Into::<u16>::into(self.opcode) << OPCODE_MASK.trailing_zeros();
+        flags |= Into::<u8>::into(self.response_code) as u16;
+        flags |= RECURSION_DESIRED;
+        BigEndian::write_u16(&mut data[..2], self.id);
+        BigEndian::write_u16(&mut data[2..4], flags);
+        BigEndian::write_u16(&mut data[4..6], self.questions);
+        BigEndian::write_u16(&mut data[6..8], self.answers);
+        BigEndian::write_u16(&mut data[8..10], self.nameservers);
+        BigEndian::write_u16(&mut data[10..12], self.additional);
+        for part in url.split('.') {
+            let ln = part.len() as u8;
+            data.push(ln);
+            data.extend(part.as_bytes());
+        }
+        data.push(0);
+        data.write_u16::<BigEndian>(1 as u16).unwrap();
+        data.write_u16::<BigEndian>(1 as u16 | 0x0000).unwrap();
+    }
+}
+unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
+    let socket = socket(2,2,17);
+    let mut dest = sockaddr_in {
+        sin_family : 2,sin_port : 53 as u16,
+        sin_addr : in_addr { s_addr: u32::from(dns)},
+        sin_zero : [0;8],
+    };
+    let mut buf = Vec::with_capacity(512);
+    let header = DnsHeader {
+        id: (id()/10) as u16,
+        query:true,opcode:0 as u16,
+        authoritative:false,additional:0,authenticated_data:false,
+        truncated:false,recursion_available:false,recursion_desired:true,
+        response_code:0 as u8,answers:0,
+        questions:1 as u16,nameservers:0,checking_disabled:false
+    };
+    buf.extend([0u8;12].iter());
+    header.make(&mut buf,url);
+    let length = buf.len();
+    let bufs = buf.as_mut_ptr() as *const c_void;
+    let _sender = sendto(socket,bufs,(length as u64).try_into().unwrap(),0,
+            &mut dest as *mut sockaddr_in as *mut sockaddr,
+            size_of::<sockaddr_in>() as u64 as socklen_t);
+    let recieved = Vec::with_capacity(512);
+    let mut i = size_of::<sockaddr_in>() as u64 as i32;
+    let rec = recvfrom(
+        socket,buf.as_mut_ptr() as *mut c_char as *mut c_void,
+        (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
+        &mut i as *mut i32 as *mut socklen_t);
+    if rec > 0 {
+        Ok(recieved)
+    } else {
+        Err(rec.try_into().unwrap())
+    }
+}
+// Request to server DNS and retrieve an answer
+pub struct Raw {
+    dns:Ipv4Addr
+}
+impl Raw {
+    // Set DNS server
+    fn set_dns(&self,dns:&str)-> Raw {
+        Raw { dns: Ipv4Addr::from_str(dns).expect("Invalid Ip server") }
+    }
+    // Retreieve a buffer 
+    fn build(&mut self,url:&str) -> Option<Vec<u8>> {
+        if (self.dns.to_string().len() == 0) {
+            self.dns = DNS_SERVER;
+        }
+        unsafe {
+            builder(url,self.dns).ok()
+        }
+    }
+}
