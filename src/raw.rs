@@ -1,18 +1,18 @@
 #![allow(unused)]
 #[cfg(unix)]
-use libc::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
+use libc::{sockaddr_in,in_addr,close,socket, c_void, sockaddr, sendto, recvfrom, bind};
 
 #[cfg(windows)]
 use winapi::shared::inaddr::in_addr;
 #[cfg(windows)]
 use winapi::ctypes::c_void;
 #[cfg(windows)]
-use winapi::um::winsock2::{socket,sendto,recvfrom,bind};
+use winapi::um::winsock2::{socket,sendto,recvfrom,bind,closesocket as close};
 #[cfg(windows)]
 use winapi::shared::ws2def::{SOCKADDR_IN as sockaddr_in,SOCKADDR as sockaddr};
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
-use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto, str::FromStr};
+use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto,str::FromStr};
 // Flag of DNS header mask (OPCODE):
 pub const OPCODE_MASK: u16 = 0b0111_1000_0000_0000;
 // Flag of DNS header mask (RD):
@@ -65,7 +65,7 @@ impl DnsHeader {
 unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     let socket = socket(2,2,17);
     let mut dest = sockaddr_in {
-        sin_family : 2,sin_port : 53 as u16,
+        sin_family : 2,sin_port : 53u16.to_be() as u16,
         sin_addr : in_addr { s_addr: u32::from(dns)},
         sin_zero : [0;8],
     };
@@ -91,12 +91,11 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             &mut dest as *mut sockaddr_in as *mut sockaddr,
             size_of::<sockaddr_in>() as u64 as u32);
     let mut i = size_of::<sockaddr_in>() as u64 as i32;
-    println!("{:?}",i);
     let rec = recvfrom(
         socket,buf.as_mut_ptr() as *mut i8 as *mut c_void,
         (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
         &mut i as *mut i32 as *mut u32);
-    println!("{}",rec);
+    close(socket);
     if rec > 0 {
         Ok(buf)
     } else {
@@ -114,11 +113,12 @@ impl Raw {
     }
     // Retreieve a buffer with Default Address
     fn build(&mut self,url:&str) -> Option<Vec<u8>> {
-        if self.dns.to_string().len() == 0 {
-            self.dns = DNS_SERVER;
-        }
-        unsafe {
-            builder(url,self.dns).ok()
+        if self.dns.octets().len() == 4 {
+            unsafe {
+                builder(url,self.dns).ok()
+            }
+        } else {
+            None
         }
     }
     // Retreieve a buffer 
@@ -126,5 +126,16 @@ impl Raw {
         unsafe {
             builder(url,DNS_SERVER).ok()
         }
+    }
+}
+// Test
+#[cfg(test)]
+mod test {
+    use Raw;
+    #[test]
+    fn test(){
+        let const_result = [129, 128, 0, 1, 0, 1, 0, 0, 0, 0, 6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1].to_vec();
+        let result = Raw::set_dns("8.8.4.4").build("google.com").unwrap();
+        assert_eq!(&result[2..],&const_result[..]);
     }
 }
