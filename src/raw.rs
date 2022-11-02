@@ -5,7 +5,7 @@ use libc::{sockaddr_in,in_addr,close,socket, c_void, sockaddr, sendto, recvfrom,
 #[cfg(windows)]
 use winapi::ctypes::c_void;
 #[cfg(windows)]
-use winapi::shared::inaddr::IN_ADDR as in_addr;
+use winapi::shared::inaddr::{IN_ADDR as in_addr,in_addr_S_un};
 #[cfg(windows)]
 use winapi::um::winsock2::{socket,sendto,recvfrom,bind,closesocket as close};
 #[cfg(windows)]
@@ -65,7 +65,14 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     let socket = socket(2,2,17);
     let mut dest = sockaddr_in {
         sin_family : 2,sin_port : 53u16.to_be() as u16,
-        sin_addr : in_addr { s_addr: u32::from(dns)},
+        sin_addr : in_addr { 
+
+            #[cfg(unix)]
+            s_addr: u32::from(dns),
+            
+            #[cfg(window)]
+            S_un: in_addr_S_un { S_addr:u32::from(dns)}
+        },
         sin_zero : [0;8],
     };
     let mut buf = Vec::with_capacity(512);
