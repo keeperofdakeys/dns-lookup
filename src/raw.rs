@@ -3,7 +3,7 @@
 use libc::{sockaddr_in,in_addr,close,socket, c_void, sockaddr, sendto, recvfrom, bind};
 
 #[cfg(windows)]
-use winapi::shared::inaddr::in_addr;
+use winapi::shared::inaddr::in_addr_S_un as in_addr;
 #[cfg(windows)]
 use winapi::ctypes::c_void;
 #[cfg(windows)]
