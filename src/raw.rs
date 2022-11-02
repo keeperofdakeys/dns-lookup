@@ -70,7 +70,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             #[cfg(unix)]
             s_addr: u32::from(dns),
             
-            #[cfg(window)]
+            #[cfg(windows)]
             S_un: in_addr_S_un { S_addr:u32::from(dns)}
         },
         sin_zero : [0;8],
@@ -87,7 +87,13 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     buf.extend([0u8;12].iter());
     header.make(&mut buf,url);
     let length = buf.len();
+    
+    #[cfg(unix)]
     let bufs = buf.as_mut_ptr() as *const c_void;
+
+    #[cfg(windows)]
+    let bufs = buf.as_mut_ptr() as *const i8;
+
     bind(
         socket,
         &mut dest as *mut sockaddr_in as *mut sockaddr,
@@ -97,10 +103,19 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             &mut dest as *mut sockaddr_in as *mut sockaddr,
             (size_of::<sockaddr_in>() as u64 as u32).try_into().unwrap());
     let mut i = size_of::<sockaddr_in>() as u64 as i32;
+
+    #[cfg(unix)]
     let rec = recvfrom(
         socket,buf.as_mut_ptr() as *mut i8 as *mut c_void,
         (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
         &mut i as *mut i32 as *mut u32);
+
+    #[cfg(windows)]
+    let rec = recvfrom(
+        socket,buf.as_mut_ptr() as *mut i8,
+        (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
+        &mut i as *mut i32);
+        
     close(socket);
     if rec > 0 {
         Ok(buf)
