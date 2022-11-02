@@ -1,7 +1,7 @@
 #![allow(unused)]
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto, str::FromStr};
-use libc::{c_char,sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, socklen_t, recvfrom};
+use libc::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
 // Flag of DNS header mask (OPCODE):
 pub const OPCODE_MASK: u16 = 0b0111_1000_0000_0000;
 // Flag of DNS header mask (RD):
@@ -45,7 +45,9 @@ impl DnsHeader {
             data.extend(part.as_bytes());
         }
         data.push(0);
+        // Set CLASS flag
         data.write_u16::<BigEndian>(1 as u16).unwrap();
+        // Set TYPE flag
         data.write_u16::<BigEndian>(1 as u16 | 0x0000).unwrap();
     }
 }
@@ -69,17 +71,23 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     header.make(&mut buf,url);
     let length = buf.len();
     let bufs = buf.as_mut_ptr() as *const c_void;
+    bind(
+        socket,
+        &mut dest as *mut sockaddr_in as *mut sockaddr,
+        size_of::<sockaddr_in>() as u64 as u32,
+    );
     let _sender = sendto(socket,bufs,(length as u64).try_into().unwrap(),0,
             &mut dest as *mut sockaddr_in as *mut sockaddr,
-            size_of::<sockaddr_in>() as u64 as socklen_t);
-    let recieved = Vec::with_capacity(512);
+            size_of::<sockaddr_in>() as u64 as u32);
     let mut i = size_of::<sockaddr_in>() as u64 as i32;
+    println!("{:?}",i);
     let rec = recvfrom(
-        socket,buf.as_mut_ptr() as *mut c_char as *mut c_void,
+        socket,buf.as_mut_ptr() as *mut i8 as *mut c_void,
         (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
-        &mut i as *mut i32 as *mut socklen_t);
+        &mut i as *mut i32 as *mut u32);
+    println!("{}",rec);
     if rec > 0 {
-        Ok(recieved)
+        Ok(buf)
     } else {
         Err(rec.try_into().unwrap())
     }
@@ -90,16 +98,22 @@ pub struct Raw {
 }
 impl Raw {
     // Set DNS server
-    fn set_dns(&self,dns:&str)-> Raw {
+    fn set_dns(dns:&str)-> Raw {
         Raw { dns: Ipv4Addr::from_str(dns).expect("Invalid Ip server") }
     }
-    // Retreieve a buffer 
+    // Retreieve a buffer with Default Address
     fn build(&mut self,url:&str) -> Option<Vec<u8>> {
-        if (self.dns.to_string().len() == 0) {
+        if self.dns.to_string().len() == 0 {
             self.dns = DNS_SERVER;
         }
         unsafe {
             builder(url,self.dns).ok()
+        }
+    }
+    // Retreieve a buffer 
+    fn build_default(url:&str) -> Option<Vec<u8>> {
+        unsafe {
+            builder(url,DNS_SERVER).ok()
         }
     }
 }

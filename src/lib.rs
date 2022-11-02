@@ -82,6 +82,7 @@
 #[cfg(windows)] extern crate winapi;
 
 extern crate socket2;
+extern crate byteorder;
 
 mod addrinfo;
 mod nameinfo;
@@ -89,6 +90,7 @@ mod err;
 mod lookup;
 mod types;
 mod hostname;
+mod raw;
 #[cfg(windows)]
 mod win;
 
@@ -98,3 +100,4 @@ pub use lookup::{lookup_host, lookup_addr};
 pub use nameinfo::getnameinfo;
 pub use types::{SockType, Protocol, AddrFamily};
 pub use err::{LookupErrorKind, LookupError};
+pub use raw::Raw;
