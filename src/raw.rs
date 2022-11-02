@@ -71,7 +71,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             s_addr: u32::from(dns),
             
             #[cfg(windows)]
-            S_un: in_addr_S_un::S_addr(u32::from(dns)),
+            S_un: in_addr_S_un(u32::from(dns)).S_addr(),
         },
         sin_zero : [0;8],
     };
