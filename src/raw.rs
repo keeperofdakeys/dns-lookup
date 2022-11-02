@@ -3,7 +3,11 @@
 use libc::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
 
 #[cfg(windows)]
-use winapi::shared::ws2def::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
+use winapi::ctypes::c_void;
+#[cfg(windows)]
+use winapi::um::winsock2::{socket,sendto,recvfrom,bind};
+#[cfg(windows)]
+use winapi::shared::ws2def::{sockaddr_in,sockaddr};
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto, str::FromStr};
