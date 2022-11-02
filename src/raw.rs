@@ -71,7 +71,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             s_addr: u32::from(dns),
             
             #[cfg(windows)]
-            S_un: in_addr_S_un { S_addr:u32::from(dns)}
+            S_un: in_addr_S_un::S_addr(u32::from(dns)),
         },
         sin_zero : [0;8],
     };
@@ -115,7 +115,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
         socket,buf.as_mut_ptr() as *mut i8,
         (65536 as u64).try_into().unwrap(),0,&mut dest as *mut sockaddr_in as *mut sockaddr,
         &mut i as *mut i32);
-        
+
     close(socket);
     if rec > 0 {
         Ok(buf)
