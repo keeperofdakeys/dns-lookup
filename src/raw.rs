@@ -67,7 +67,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     let saddr = in_addr { s_addr: u32::from(dns)};
 
     #[cfg(window)]
-    let saddr = in_addr_S_un { s_addr : u32::from(dns)};
+    let saddr = in_addr_S_un { S_addr : u32::from(dns)};
 
     let mut dest = sockaddr_in {
         sin_family : 2,sin_port : 53u16.to_be() as u16,
