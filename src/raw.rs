@@ -19,7 +19,6 @@ pub const OPCODE_MASK: u16 = 0b0111_1000_0000_0000;
 pub const RECURSION_DESIRED: u16 = 0b0000_0001_0000_0000;
 // Dns server address - Customize it by dns :
 pub const DNS_SERVER: Ipv4Addr = Ipv4Addr::new(8,8,8,8);
-#[derive(Debug)]
 pub struct DnsHeader {
     pub id: u16,
     pub query: bool,
