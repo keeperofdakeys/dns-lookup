@@ -83,7 +83,7 @@
 
 extern crate socket2;
 extern crate byteorder;
-extern crate winapi;
+
 mod addrinfo;
 mod nameinfo;
 mod err;
