@@ -5,7 +5,9 @@ use libc::{sockaddr_in,in_addr,close,socket, c_void, sockaddr, sendto, recvfrom,
 #[cfg(windows)]
 use winapi::ctypes::c_void;
 #[cfg(windows)]
-use winapi::um::winsock2::{inet_addr,socket,sendto,recvfrom,bind,closesocket as close};
+use winapi::shared::inaddr::IN_ADDR as in_addr;
+#[cfg(windows)]
+use winapi::um::winsock2::{socket,sendto,recvfrom,bind,closesocket as close};
 #[cfg(windows)]
 use winapi::shared::ws2def::{SOCKADDR_IN as sockaddr_in,SOCKADDR as sockaddr};
 
@@ -61,20 +63,11 @@ impl DnsHeader {
 }
 unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     let socket = socket(2,2,17);
-    #[cfg(unix)]
     let mut dest = sockaddr_in {
         sin_family : 2,sin_port : 53u16.to_be() as u16,
         sin_addr : in_addr { s_addr: u32::from(dns)},
         sin_zero : [0;8],
     };
-
-    #[cfg(window)]
-    let mut dest = sockaddr_in {
-        sin_family : 2,sin_port : 53u16.to_be() as u16,
-        sin_addr : inet_addr(u32::from(dns)),
-        sin_zero : [0;8],
-    };
-
     let mut buf = Vec::with_capacity(512);
     let header = DnsHeader {
         id: (id()/10) as u16,
@@ -91,11 +84,11 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     bind(
         socket,
         &mut dest as *mut sockaddr_in as *mut sockaddr,
-        size_of::<sockaddr_in>() as u64 as u32,
+        (size_of::<sockaddr_in>() as u64 as u32).try_into().unwrap(),
     );
     let _sender = sendto(socket,bufs,(length as u64).try_into().unwrap(),0,
             &mut dest as *mut sockaddr_in as *mut sockaddr,
-            size_of::<sockaddr_in>() as u64 as u32);
+            (size_of::<sockaddr_in>() as u64 as u32).try_into().unwrap());
     let mut i = size_of::<sockaddr_in>() as u64 as i32;
     let rec = recvfrom(
         socket,buf.as_mut_ptr() as *mut i8 as *mut c_void,
