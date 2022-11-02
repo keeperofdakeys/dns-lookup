@@ -1,7 +1,12 @@
 #![allow(unused)]
+#[cfg(unix)]
+use libc::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
+
+#[cfg(windows)]
+use winapi::shared::ws2def::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
+
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto, str::FromStr};
-use libc::{sockaddr_in,in_addr,socket, c_void, sockaddr, sendto, recvfrom, bind};
 // Flag of DNS header mask (OPCODE):
 pub const OPCODE_MASK: u16 = 0b0111_1000_0000_0000;
 // Flag of DNS header mask (RD):
