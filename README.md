@@ -83,3 +83,16 @@ use dns_lookup::{lookup_host, lookup_addr};
   let hostname = gethostname().unwrap();
 }
 ```
+### Retrieve raw buffer as array
+```rust
+fn main(){
+    use dns_lookup::Raw;
+    
+    // Use specefic DNS address -> Vec(u8)
+    let buffer = Raw::set_dns("8.8.4.4")
+    .build("google.com").unwrap();
+
+    // Use default DNS address which is (8.8.8.8) -> Vec(u8)
+    let buffer = Raw::build_default("google.com").unwrap();
+}
+```
