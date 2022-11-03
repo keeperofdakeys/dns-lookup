@@ -159,13 +159,13 @@ impl Raw {
     }
 }
 // Test
-// #[cfg(test)]
-// mod test {
-//     use Raw;
-//     #[test]
-//     fn test(){
-//         let const_result = [129, 128, 0, 1, 0, 1, 0, 0, 0, 0, 6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1].to_vec();
-//         let result = Raw::set_dns("8.8.4.4").build("google.com").unwrap();
-//         assert_eq!(&result[2..],&const_result[..]);
-//     }
-// }
+#[cfg(test)]
+mod test {
+    use Raw;
+    #[test]
+    fn test(){
+        let const_result = [129, 128, 0, 1, 0, 1, 0, 0, 0, 0, 6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1].to_vec();
+        let result = Raw::set_dns("8.8.4.4").build("google.com").unwrap();
+        assert_eq!(&result[2..],&const_result[..]);
+    }
+}
