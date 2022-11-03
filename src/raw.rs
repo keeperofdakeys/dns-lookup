@@ -72,7 +72,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
     #[cfg(windows)]
     let mut dest = sockaddr_in {
         sin_family : 2,sin_port : 53u16.to_be() as u16,
-        sin_addr : inet_addr(u32::from(dns)),
+        sin_addr : inet_addr(u32::from(dns) as *const i8 ),
         sin_zero : [0;8],
     };
 
