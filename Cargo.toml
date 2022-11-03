@@ -25,7 +25,7 @@ byteorder = "1.4.3"
 version = "^0.3"
 default-features = false
 byteorder = "1.4.3"
-features = ["windef", "ws2def", "ws2tcpip"]
+features = ["windef", "ws2def", "ws2tcpip","winsock2"]
 
 [target."cfg(unix)".dependencies]
 byteorder = "1.4.3"
