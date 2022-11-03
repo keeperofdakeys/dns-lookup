@@ -83,6 +83,7 @@
 
 extern crate socket2;
 extern crate byteorder;
+extern crate core;
 
 mod addrinfo;
 mod nameinfo;
