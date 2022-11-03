@@ -5,11 +5,13 @@ use libc::{sockaddr_in,in_addr,close,socket, c_void, sockaddr, sendto, recvfrom,
 #[cfg(windows)]
 use winapi::ctypes::c_void;
 #[cfg(windows)]
-use winapi::shared::inaddr::{IN_ADDR as in_addr,in_addr_S_un};
+use winapi::shared::inaddr::{in_addr,in_addr_S_un};
 #[cfg(windows)]
 use winapi::um::winsock2::{socket,sendto,recvfrom,bind,closesocket as close};
 #[cfg(windows)]
 use winapi::shared::ws2def::{SOCKADDR_IN as sockaddr_in,SOCKADDR as sockaddr};
+#[cfg(windows)]
+use core::mem::zeroed;
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use std::{mem::size_of, process::id, net::Ipv4Addr, convert::TryInto,str::FromStr};
@@ -62,6 +64,13 @@ impl DnsHeader {
     }
 }
 unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
+    #[cfg(windows)]
+    let windows_addr = {
+        let mut addr_s_un = zeroed::<in_addr_S_un>();
+        *addr_s_un.S_addr_mut() = u32::from(dns);
+        addr_s_un
+    };
+
     let socket = socket(2,2,17);
     let mut dest = sockaddr_in {
         sin_family : 2,sin_port : 53u16.to_be() as u16,
@@ -71,7 +80,7 @@ unsafe fn builder(url:&str,dns:Ipv4Addr) -> Result<Vec<u8>,isize> {
             s_addr: u32::from(dns),
             
             #[cfg(windows)]
-            S_un: in_addr_S_un(u32::from(dns)).S_addr(),
+            S_un: windows_addr
         },
         sin_zero : [0;8],
     };
