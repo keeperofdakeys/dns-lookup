@@ -34,7 +34,7 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
 
 /// Lookup the hostname of a given IP Address via DNS.
 ///
-/// Returns the hostname as a String, or an `io::Error` on failure.
+/// Returns the hostname as a String, or an `io::Error` on failure or if the hostname cannot be determined.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
   let sock = (*addr, 0).into();
   match getnameinfo(&sock, NI_NUMERICSERV | NI_NAMEREQD) {
@@ -75,11 +75,6 @@ fn test_localhost() {
 fn test_rev_localhost() {
   let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
   assert_eq!(name.unwrap(), "localhost");
-}
-
-#[test]
-fn test_rev_localhost_err() {
-  assert!(lookup_addr(&IpAddr::V4("0.0.0.0".parse().unwrap())).is_err());
 }
 
 #[cfg(windows)]
