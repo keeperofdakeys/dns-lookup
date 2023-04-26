@@ -5,11 +5,6 @@ use std::str;
 #[cfg(unix)]
 use libc::{NI_NUMERICSERV, SOCK_STREAM};
 
-/*
-#[cfg(windows)]
-use winapi::shared::ws2def::{NI_NUMERICSERV, SOCK_STREAM};
-*/
-
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::{NI_NUMERICSERV, SOCK_STREAM};
 

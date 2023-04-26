@@ -77,20 +77,15 @@
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 
-#[cfg(unix)]
-extern crate libc;
-
-/*
-#[cfg(windows)]
-extern crate winapi;
-*/
-
 mod addrinfo;
 mod err;
 mod hostname;
 mod lookup;
 mod nameinfo;
 mod types;
+
+#[cfg(unix)]
+extern crate libc;
 
 #[cfg(windows)]
 mod win;

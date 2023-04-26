@@ -5,11 +5,6 @@ use libc as c;
 #[allow(non_camel_case_types)]
 type c_int = i32;
 
-/*
-#[cfg(windows)]
-use winapi::shared::ws2def as c;
-*/
-
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock as c;
 

@@ -9,11 +9,6 @@ type c_char = i8;
 #[cfg(unix)]
 use libc::gethostname as c_gethostname;
 
-/*
-#[cfg(windows)]
-use winapi::um::winsock2::gethostname as c_gethostname;
-*/
-
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::gethostname as c_gethostname;
 
