@@ -6,17 +6,17 @@ use std::net::SocketAddr;
 use std::ptr;
 
 #[cfg(unix)]
-use libc::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo, addrinfo as c_addrinfo};
+use libc::{addrinfo as c_addrinfo, freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
 
 #[cfg(windows)]
-use winapi::shared::ws2def::{ADDRINFOA as c_addrinfo};
-#[cfg(windows)]
-use winapi::um::ws2tcpip::{getaddrinfo as c_getaddrinfo, freeaddrinfo as c_freeaddrinfo};
+use windows_sys::Win32::Networking::WinSock::{
+    freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo, ADDRINFOA as c_addrinfo,
+};
 
-use err::LookupError;
+use crate::err::LookupError;
 
 /// A struct used as the hints argument to getaddrinfo.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct AddrInfoHints {
     /// Optional bitmask arguments. Bitwise OR bitflags to change the
     /// behaviour of getaddrinfo. 0 for none. `ai_flags` in libc.
@@ -46,9 +46,9 @@ impl AddrInfoHints {
     #[allow(dead_code)]
     fn new(
         flags: Option<i32>,
-        address: Option<::AddrFamily>,
-        socktype: Option<::SockType>,
-        protocol: Option<::Protocol>,
+        address: Option<crate::AddrFamily>,
+        socktype: Option<crate::SockType>,
+        protocol: Option<crate::Protocol>,
     ) -> AddrInfoHints {
         AddrInfoHints {
             flags: flags.unwrap_or(0),
@@ -83,7 +83,7 @@ impl Default for AddrInfoHints {
 }
 
 /// Struct that stores socket information, as returned by getaddrinfo.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AddrInfo {
     /// Optional bitmask arguments, usually set to zero. `ai_flags` in libc.
     pub flags: i32,
@@ -120,7 +120,7 @@ impl AddrInfo {
         }
 
         let addrinfo = *a;
-        let ((), sockaddr) = SockAddr::init(|storage, len| {
+        let ((), sockaddr) = SockAddr::try_init(|storage, len| {
             *len = addrinfo.ai_addrlen as _;
             std::ptr::copy_nonoverlapping(
                 addrinfo.ai_addr as *const u8,
@@ -144,7 +144,7 @@ impl AddrInfo {
             canonname: addrinfo
                 .ai_canonname
                 .as_ref()
-                .map(|s| CStr::from_ptr(s).to_str().unwrap().to_owned()),
+                .map(|s| CStr::from_ptr(*s as *mut i8).to_str().unwrap().to_owned()),
         })
     }
 }
@@ -229,8 +229,19 @@ pub fn getaddrinfo(
 
     // Prime windows.
     #[cfg(windows)]
-    ::win::init_winsock();
+    crate::win::init_winsock();
 
+    #[cfg(windows)]
+    unsafe {
+        LookupError::match_gai_error(c_getaddrinfo(
+            c_host as *mut u8,
+            c_service as *mut u8,
+            &c_hints,
+            &mut res,
+        ))?;
+    }
+
+    #[cfg(unix)]
     unsafe {
         LookupError::match_gai_error(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
     }
@@ -243,7 +254,7 @@ pub fn getaddrinfo(
 
 #[test]
 fn test_addrinfohints() {
-    use {AddrFamily, SockType};
+    use crate::{AddrFamily, SockType};
 
     assert_eq!(
         AddrInfoHints {

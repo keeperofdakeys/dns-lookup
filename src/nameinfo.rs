@@ -5,14 +5,16 @@ use std::net::SocketAddr;
 use std::str;
 
 #[cfg(unix)]
-use libc::{c_char, getnameinfo as c_getnameinfo};
+use libc::getnameinfo as c_getnameinfo;
+
+/// Both libc and winapi define c_char as i8 `type c_char = i8;`
+#[allow(non_camel_case_types)]
+type c_char = i8;
 
 #[cfg(windows)]
-use winapi::ctypes::c_char;
-#[cfg(windows)]
-use winapi::um::ws2tcpip::getnameinfo as c_getnameinfo;
+use windows_sys::Win32::Networking::WinSock::getnameinfo as c_getnameinfo;
 
-use err::LookupError;
+use crate::err::LookupError;
 
 /// Retrieve the name for a given IP and Service. Acts as a thin wrapper around
 /// the libc getnameinfo.
@@ -33,14 +35,28 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
     // Hard code maximums, as they aren't defined in libc/winapi.
 
     // Allocate buffers for name and service strings.
-    let mut c_host = [0 as c_char; 1024 as usize];
+    let mut c_host = [0 as c_char; 1024_usize];
     // No NI_MAXSERV, so use suggested value.
-    let mut c_service = [0 as c_char; 32 as usize];
+    let mut c_service = [0 as c_char; 32_usize];
 
     // Prime windows.
     #[cfg(windows)]
-    ::win::init_winsock();
+    crate::win::init_winsock();
 
+    #[cfg(windows)]
+    unsafe {
+        LookupError::match_gai_error(c_getnameinfo(
+            c_sock,
+            c_sock_len,
+            c_host.as_mut_ptr() as *mut u8,
+            c_host.len() as _,
+            c_service.as_mut_ptr() as *mut u8,
+            c_service.len() as _,
+            flags,
+        ))?;
+    }
+
+    #[cfg(unix)]
     unsafe {
         LookupError::match_gai_error(c_getnameinfo(
             c_sock,
@@ -97,7 +113,7 @@ fn test_getnameinfo() {
 
     #[cfg(windows)]
     {
-        let hostname = ::hostname::get_hostname().unwrap();
+        let hostname = crate::hostname::get_hostname().unwrap();
         assert_eq!(name, hostname);
     }
 }

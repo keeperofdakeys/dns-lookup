@@ -5,18 +5,23 @@ use std::str;
 #[cfg(unix)]
 use libc::{NI_NUMERICSERV, SOCK_STREAM};
 
+/*
 #[cfg(windows)]
 use winapi::shared::ws2def::{NI_NUMERICSERV, SOCK_STREAM};
+*/
 
-use addrinfo::{getaddrinfo, AddrInfoHints};
-use nameinfo::getnameinfo;
+#[cfg(windows)]
+use windows_sys::Win32::Networking::WinSock::{NI_NUMERICSERV, SOCK_STREAM};
+
+use crate::addrinfo::{getaddrinfo, AddrInfoHints};
+use crate::nameinfo::getnameinfo;
 
 /// Lookup the address for a given hostname via DNS.
 ///
 /// Returns an iterator of IP Addresses, or an `io::Error` on failure.
 pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
     let hints = AddrInfoHints {
-        socktype: SOCK_STREAM,
+        socktype: SOCK_STREAM as i32,
         ..AddrInfoHints::default()
     };
 
@@ -37,7 +42,7 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
 /// Returns the hostname as a String, or an `io::Error` on failure.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
     let sock = (*addr, 0).into();
-    match getnameinfo(&sock, NI_NUMERICSERV) {
+    match getnameinfo(&sock, NI_NUMERICSERV as i32) {
         Ok((name, _)) => Ok(name),
         Err(e) => {
             reload_dns_nameserver();
@@ -81,7 +86,7 @@ fn test_rev_localhost() {
 #[test]
 fn test_hostname() {
     // Get machine's hostname.
-    let hostname = ::hostname::get_hostname().unwrap();
+    let hostname = crate::hostname::get_hostname().unwrap();
 
     // Do reverse lookup of 127.0.0.1.
     let rev_name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));

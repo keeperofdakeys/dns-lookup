@@ -1,9 +1,9 @@
 use std::net::UdpSocket;
-use std::sync::{Once, ONCE_INIT};
+use std::sync::Once;
 
 // Start windows socket library - From socket2-rs
 pub(crate) fn init_winsock() {
-    static INIT: Once = ONCE_INIT;
+    static INIT: Once = Once::new();
 
     INIT.call_once(|| {
         // Initialize winsock through the standard library by just creating a
