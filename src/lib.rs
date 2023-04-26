@@ -74,21 +74,23 @@
 //!   let _ = (name, service);
 //! ```
 
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", feature(plugin))]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 
-#[cfg(unix)] extern crate libc;
+#[cfg(unix)]
+extern crate libc;
 
-#[cfg(windows)] extern crate winapi;
+#[cfg(windows)]
+extern crate winapi;
 
 extern crate socket2;
 
 mod addrinfo;
-mod nameinfo;
 mod err;
-mod lookup;
-mod types;
 mod hostname;
+mod lookup;
+mod nameinfo;
+mod types;
 #[cfg(windows)]
 mod win;
 
