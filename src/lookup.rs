@@ -3,10 +3,10 @@ use std::net::IpAddr;
 use std::str;
 
 #[cfg(unix)]
-use libc::{NI_NUMERICSERV, SOCK_STREAM};
+use libc::{NI_NUMERICSERV, NI_NAMEREQD, SOCK_STREAM};
 
 #[cfg(windows)]
-use windows_sys::Win32::Networking::WinSock::{NI_NUMERICSERV, SOCK_STREAM};
+use windows_sys::Win32::Networking::WinSock::{NI_NUMERICSERV, NI_NAMEREQD, SOCK_STREAM};
 
 use crate::addrinfo::{getaddrinfo, AddrInfoHints};
 use crate::nameinfo::getnameinfo;
@@ -34,10 +34,10 @@ pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
 
 /// Lookup the hostname of a given IP Address via DNS.
 ///
-/// Returns the hostname as a String, or an `io::Error` on failure.
+/// Returns the hostname as a String, or an `io::Error` on failure or if the hostname cannot be determined.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
     let sock = (*addr, 0).into();
-    match getnameinfo(&sock, NI_NUMERICSERV as i32) {
+    match getnameinfo(&sock, (NI_NUMERICSERV | NI_NAMEREQD) as i32) {
         Ok((name, _)) => Ok(name),
         Err(e) => {
             reload_dns_nameserver();
