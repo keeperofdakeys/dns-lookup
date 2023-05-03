@@ -23,7 +23,7 @@ cfg-if = "^1.0"
 # Note that version of windows-sys is pinned to version used in socket2 release
 # due to use of shared variables like SOCKADDR.
 [target."cfg(windows)".dependencies.windows-sys]
-version = "0.48"
+version = "^0.48"
 features = ["Win32_Networking_WinSock", "Win32_Foundation"]
 
 [target."cfg(unix)".dependencies]
