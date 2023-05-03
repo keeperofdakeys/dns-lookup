@@ -2,7 +2,7 @@ use std::ffi::CStr;
 use std::io;
 use std::str;
 
-/// Both libc and winapi define c_char as i8 `type c_char = i8;`
+/// Both libc and windows-sys define c_char as i8 `type c_char = i8;`
 #[allow(non_camel_case_types)]
 type c_char = i8;
 

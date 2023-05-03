@@ -7,7 +7,7 @@ use std::str;
 #[cfg(unix)]
 use libc::getnameinfo as c_getnameinfo;
 
-/// Both libc and winapi define c_char as i8 `type c_char = i8;`
+/// Both libc and windows-sys define c_char as i8 `type c_char = i8;`
 #[allow(non_camel_case_types)]
 type c_char = i8;
 
@@ -32,7 +32,7 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
     let c_sock = sock.as_ptr();
     let c_sock_len = sock.len();
 
-    // Hard code maximums, as they aren't defined in libc/winapi.
+    // Hard code maximums, as they aren't defined in libc/windows-sys.
 
     // Allocate buffers for name and service strings.
     let mut c_host = [0 as c_char; 1024_usize];

@@ -1,7 +1,7 @@
 #[cfg(unix)]
 use libc as c;
 
-/// Both libc and winapi define c_int as i32 `type c_int = i32;`
+/// Both libc and windows-sys define c_int as i32 `type c_int = i32;`
 #[allow(non_camel_case_types)]
 type c_int = i32;
 
@@ -11,7 +11,7 @@ use windows_sys::Win32::Networking::WinSock as c;
 /// Socket Type
 ///
 /// Cross platform enum of common Socket Types. For missing types use
-/// the `libc` and `winapi` crates, depending on platform.
+/// the `libc` and `windows-sys` crates, depending on platform.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum SockType {
     /// Sequenced, reliable, connection-based byte streams.
@@ -56,7 +56,7 @@ impl PartialEq<SockType> for c_int {
 /// Socket Protocol
 ///
 /// Cross platform enum of common Socket Protocols. For missing types use
-/// the `libc` and `winapi` crates, depending on platform.
+/// the `libc` and `windows-sys` crates, depending on platform.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Protocol {
     /// Internet Control Message Protocol.
@@ -104,7 +104,7 @@ impl PartialEq<Protocol> for c_int {
 /// Address Family
 ///
 /// Cross platform enum of common Address Families. For missing types use
-/// the `libc` and `winapi` crates, depending on platform.
+/// the `libc` and `windows-sys` crates, depending on platform.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AddrFamily {
     /// Local to host (pipes and file-domain)

@@ -124,8 +124,6 @@ impl LookupErrorKind {
     #[cfg(windows)]
     /// Create a `LookupErrorKind` from a `gai` error.
     pub fn new(err: i32) -> Self {
-        // use winapi::shared::winerror as e;
-
         use windows_sys::Win32::Networking::WinSock;
         match err {
             WinSock::WSATRY_AGAIN => LookupErrorKind::Again,
@@ -205,7 +203,6 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
 /// the appropriate error message. Note `0` is not an
 /// error, but will still map to an error
 pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
-    // use winapi::um::winsock2::WSAGetLastError;
     use windows_sys::Win32::Networking::WinSock::WSAGetLastError;
     match err {
         0 => io::Error::new(io::ErrorKind::Other, "address information lookup success"),
