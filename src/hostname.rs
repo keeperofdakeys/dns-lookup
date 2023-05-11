@@ -24,14 +24,14 @@ pub fn get_hostname() -> Result<String, io::Error> {
     let res = unsafe { c_gethostname(c_name.as_mut_ptr() as *mut u8, c_name.len() as _) };
 
     #[cfg(unix)]
-    let res = unsafe { c_gethostname(c_name.as_mut_ptr(), c_name.len() as _) };
+    let res = unsafe { c_gethostname(c_name.as_mut_ptr() as *mut u8, c_name.len() as _) };
 
     // If an error occured, check errno for error message.
     if res != 0 {
         return Err(io::Error::last_os_error());
     }
 
-    let hostname = unsafe { CStr::from_ptr(c_name.as_ptr()) };
+    let hostname = unsafe { CStr::from_ptr(c_name.as_ptr() as *mut u8) };
 
     str::from_utf8(hostname.to_bytes())
         .map(|h| h.to_owned())

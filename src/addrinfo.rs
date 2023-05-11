@@ -144,7 +144,7 @@ impl AddrInfo {
             canonname: addrinfo
                 .ai_canonname
                 .as_ref()
-                .map(|s| CStr::from_ptr(*s as *mut i8).to_str().unwrap().to_owned()),
+                .map(|s| CStr::from_ptr(*s as *mut u8).to_str().unwrap().to_owned()),
         })
     }
 }

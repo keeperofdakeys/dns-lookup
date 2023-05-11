@@ -61,16 +61,16 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
         LookupError::match_gai_error(c_getnameinfo(
             c_sock as _,
             c_sock_len,
-            c_host.as_mut_ptr(),
+            c_host.as_mut_ptr() as *mut u8,
             c_host.len() as _,
-            c_service.as_mut_ptr(),
+            c_service.as_mut_ptr() as *mut u8,
             c_service.len() as _,
             flags,
         ))?;
     }
 
-    let host = unsafe { CStr::from_ptr(c_host.as_ptr()) };
-    let service = unsafe { CStr::from_ptr(c_service.as_ptr()) };
+    let host = unsafe { CStr::from_ptr(c_host.as_ptr() as *mut u8) };
+    let service = unsafe { CStr::from_ptr(c_service.as_ptr() as *mut u8) };
 
     let host = match str::from_utf8(host.to_bytes()) {
         Ok(name) => Ok(name.to_owned()),
