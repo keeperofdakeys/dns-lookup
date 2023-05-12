@@ -3,10 +3,10 @@ use std::net::IpAddr;
 use std::str;
 
 #[cfg(unix)]
-use libc::{NI_NUMERICSERV, NI_NAMEREQD, SOCK_STREAM};
+use libc::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
 
 #[cfg(windows)]
-use windows_sys::Win32::Networking::WinSock::{NI_NUMERICSERV, NI_NAMEREQD, SOCK_STREAM};
+use windows_sys::Win32::Networking::WinSock::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
 
 use crate::addrinfo::{getaddrinfo, AddrInfoHints};
 use crate::nameinfo::getnameinfo;
