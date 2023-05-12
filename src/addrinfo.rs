@@ -3,11 +3,18 @@ use std::ffi::{CStr, CString};
 use std::io;
 use std::mem;
 use std::net::SocketAddr;
+use std::os::raw::c_char;
 use std::ptr;
 
 #[cfg(unix)]
-use libc::{addrinfo as c_addrinfo, freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo};
+use libc::{
+    addrinfo as c_addrinfo, c_char as libc_c_char, freeaddrinfo as c_freeaddrinfo,
+    getaddrinfo as c_getaddrinfo,
+};
 
+#[cfg(windows)]
+#[allow(non_camel_case_types)]
+type libc_c_char = u8;
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::{
     freeaddrinfo as c_freeaddrinfo, getaddrinfo as c_getaddrinfo, ADDRINFOA as c_addrinfo,
@@ -141,10 +148,12 @@ impl AddrInfo {
             socktype: addrinfo.ai_socktype,
             protocol: addrinfo.ai_protocol,
             sockaddr: sock,
-            canonname: addrinfo
-                .ai_canonname
-                .as_ref()
-                .map(|s| CStr::from_ptr(*s as *mut i8).to_str().unwrap().to_owned()),
+            canonname: addrinfo.ai_canonname.as_ref().map(|s| {
+                CStr::from_ptr(*s as *const c_char)
+                    .to_str()
+                    .unwrap()
+                    .to_owned()
+            }),
         })
     }
 }
@@ -211,12 +220,12 @@ pub fn getaddrinfo(
         Some(host_str) => Some(CString::new(host_str)?),
         None => None,
     };
-    let c_host = host.as_ref().map_or(ptr::null(), |s| s.as_ptr());
+    let c_host = host.as_ref().map_or(ptr::null(), |s| s.as_ptr()) as *const libc_c_char;
     let service = match service {
         Some(service_str) => Some(CString::new(service_str)?),
         None => None,
     };
-    let c_service = service.as_ref().map_or(ptr::null(), |s| s.as_ptr());
+    let c_service = service.as_ref().map_or(ptr::null(), |s| s.as_ptr()) as *const libc_c_char;
 
     let c_hints = unsafe {
         match hints {
@@ -231,17 +240,6 @@ pub fn getaddrinfo(
     #[cfg(windows)]
     crate::win::init_winsock();
 
-    #[cfg(windows)]
-    unsafe {
-        LookupError::match_gai_error(c_getaddrinfo(
-            c_host as *mut u8,
-            c_service as *mut u8,
-            &c_hints,
-            &mut res,
-        ))?;
-    }
-
-    #[cfg(unix)]
     unsafe {
         LookupError::match_gai_error(c_getaddrinfo(c_host, c_service, &c_hints, &mut res))?;
     }

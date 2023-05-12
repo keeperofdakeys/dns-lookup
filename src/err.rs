@@ -1,7 +1,7 @@
 use std::ffi;
 use std::io;
 #[cfg(unix)]
-use std::str;
+use {std::os::raw::c_char, std::str};
 
 /// Struct that stores a lookup error from `getaddrinfo`
 /// or `getnameinfo`. Can automatically be coerced to an io::Error using `?`.
@@ -188,7 +188,7 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
     }
 
     let detail = unsafe {
-        str::from_utf8(ffi::CStr::from_ptr(gai_strerror(err)).to_bytes())
+        str::from_utf8(ffi::CStr::from_ptr(gai_strerror(err) as *const c_char).to_bytes())
             .unwrap()
             .to_owned()
     };

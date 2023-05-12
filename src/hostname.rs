@@ -1,14 +1,14 @@
 use std::ffi::CStr;
 use std::io;
+use std::os::raw::c_char;
 use std::str;
 
-/// Both libc and windows-sys define c_char as i8 `type c_char = i8;`
-#[allow(non_camel_case_types)]
-type c_char = i8;
-
 #[cfg(unix)]
-use libc::gethostname as c_gethostname;
+use libc::{c_char as libc_c_char, gethostname as c_gethostname};
 
+#[cfg(windows)]
+#[allow(non_camel_case_types)]
+type libc_c_char = u8;
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::gethostname as c_gethostname;
 
@@ -20,18 +20,14 @@ pub fn get_hostname() -> Result<String, io::Error> {
 
     let mut c_name = [0 as c_char; 256_usize];
 
-    #[cfg(windows)]
-    let res = unsafe { c_gethostname(c_name.as_mut_ptr() as *mut u8, c_name.len() as _) };
-
-    #[cfg(unix)]
-    let res = unsafe { c_gethostname(c_name.as_mut_ptr(), c_name.len() as _) };
+    let res = unsafe { c_gethostname(c_name.as_mut_ptr() as *mut libc_c_char, c_name.len() as _) };
 
     // If an error occured, check errno for error message.
     if res != 0 {
         return Err(io::Error::last_os_error());
     }
 
-    let hostname = unsafe { CStr::from_ptr(c_name.as_ptr()) };
+    let hostname = unsafe { CStr::from_ptr(c_name.as_ptr() as *const c_char) };
 
     str::from_utf8(hostname.to_bytes())
         .map(|h| h.to_owned())

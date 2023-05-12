@@ -2,15 +2,15 @@ use socket2::SockAddr;
 use std::ffi::CStr;
 use std::io;
 use std::net::SocketAddr;
+use std::os::raw::c_char;
 use std::str;
 
 #[cfg(unix)]
-use libc::getnameinfo as c_getnameinfo;
+use libc::{c_char as libc_c_char, getnameinfo as c_getnameinfo};
 
-/// Both libc and windows-sys define c_char as i8 `type c_char = i8;`
+#[cfg(windows)]
 #[allow(non_camel_case_types)]
-type c_char = i8;
-
+type libc_c_char = u8;
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::getnameinfo as c_getnameinfo;
 
@@ -35,42 +35,28 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
     // Hard code maximums, as they aren't defined in libc/windows-sys.
 
     // Allocate buffers for name and service strings.
-    let mut c_host = [0 as c_char; 1024_usize];
+    let mut c_host = [0 as u8; 1024_usize];
     // No NI_MAXSERV, so use suggested value.
-    let mut c_service = [0 as c_char; 32_usize];
+    let mut c_service = [0 as u8; 32_usize];
 
     // Prime windows.
     #[cfg(windows)]
     crate::win::init_winsock();
 
-    #[cfg(windows)]
     unsafe {
         LookupError::match_gai_error(c_getnameinfo(
-            c_sock as _,
+            c_sock as *const _,
             c_sock_len,
-            c_host.as_mut_ptr() as *mut u8,
+            c_host.as_mut_ptr() as *mut libc_c_char,
             c_host.len() as _,
-            c_service.as_mut_ptr() as *mut u8,
+            c_service.as_mut_ptr() as *mut libc_c_char,
             c_service.len() as _,
             flags,
         ))?;
     }
 
-    #[cfg(unix)]
-    unsafe {
-        LookupError::match_gai_error(c_getnameinfo(
-            c_sock as _,
-            c_sock_len,
-            c_host.as_mut_ptr(),
-            c_host.len() as _,
-            c_service.as_mut_ptr(),
-            c_service.len() as _,
-            flags,
-        ))?;
-    }
-
-    let host = unsafe { CStr::from_ptr(c_host.as_ptr()) };
-    let service = unsafe { CStr::from_ptr(c_service.as_ptr()) };
+    let host = unsafe { CStr::from_ptr(c_host.as_ptr() as *const c_char) };
+    let service = unsafe { CStr::from_ptr(c_service.as_ptr() as *const c_char) };
 
     let host = match str::from_utf8(host.to_bytes()) {
         Ok(name) => Ok(name.to_owned()),
