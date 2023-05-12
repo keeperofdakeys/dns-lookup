@@ -24,3 +24,5 @@ jobs:
     - uses: actions/checkout@master
     - name: Run tests
       run: cargo test --verbose
+
+    timeout-minutes: 10
