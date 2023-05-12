@@ -1,12 +1,12 @@
 #[cfg(unix)]
 use libc as c;
 
-/// Both libc and windows-sys define c_int as i32 `type c_int = i32;`
-#[allow(non_camel_case_types)]
-type c_int = i32;
-
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock as c;
+
+// Parameters of addrinfo are c_int / i32 on libc and winsys on all architectures.
+#[allow(non_camel_case_types)]
+type c_int = i32;
 
 /// Socket Type
 ///
@@ -28,14 +28,15 @@ pub enum SockType {
 
 impl From<SockType> for c_int {
     fn from(sock: SockType) -> c_int {
-        match sock {
-            SockType::Stream => c::SOCK_STREAM as i32,
-            SockType::DGram => c::SOCK_DGRAM as i32,
+        (match sock {
+            SockType::Stream => c::SOCK_STREAM,
+            SockType::DGram => c::SOCK_DGRAM,
             #[cfg(not(target_os = "redox"))]
-            SockType::Raw => c::SOCK_RAW as i32,
+            SockType::Raw => c::SOCK_RAW,
             #[cfg(not(target_os = "redox"))]
-            SockType::RDM => c::SOCK_RDM as i32,
-        }
+            SockType::RDM => c::SOCK_RDM,
+        })
+        .into()
     }
 }
 
@@ -68,22 +69,13 @@ pub enum Protocol {
 }
 
 impl From<Protocol> for c_int {
-    #[cfg(unix)]
     fn from(sock: Protocol) -> c_int {
-        match sock {
+        (match sock {
             Protocol::ICMP => c::IPPROTO_ICMP,
             Protocol::TCP => c::IPPROTO_TCP,
             Protocol::UDP => c::IPPROTO_UDP,
-        }
-    }
-
-    #[cfg(windows)]
-    fn from(sock: Protocol) -> c_int {
-        match sock {
-            Protocol::ICMP => c::IPPROTO_ICMP as c_int,
-            Protocol::TCP => c::IPPROTO_TCP as c_int,
-            Protocol::UDP => c::IPPROTO_UDP as c_int,
-        }
+        })
+        .into()
     }
 }
 
@@ -117,11 +109,12 @@ pub enum AddrFamily {
 
 impl From<AddrFamily> for c_int {
     fn from(sock: AddrFamily) -> c_int {
-        match sock {
-            AddrFamily::Unix => c::AF_UNIX as i32,
-            AddrFamily::Inet => c::AF_INET as i32,
-            AddrFamily::Inet6 => c::AF_INET6 as i32,
-        }
+        (match sock {
+            AddrFamily::Unix => c::AF_UNIX,
+            AddrFamily::Inet => c::AF_INET,
+            AddrFamily::Inet6 => c::AF_INET6,
+        })
+        .into()
     }
 }
 
