@@ -149,7 +149,7 @@ impl AddrInfo {
             protocol: addrinfo.ai_protocol,
             sockaddr: sock,
             canonname: addrinfo.ai_canonname.as_ref().map(|s| {
-                CStr::from_ptr(s as *const c_char)
+                CStr::from_ptr(s as *const libc_c_char as *const c_char)
                     .to_str()
                     .unwrap()
                     .to_owned()
