@@ -1,6 +1,7 @@
 use socket2::SockAddr;
 use std::ffi::{CStr, CString};
 use std::io;
+use std::iter::FusedIterator;
 use std::mem;
 use std::net::SocketAddr;
 use std::os::raw::c_char;
@@ -183,6 +184,7 @@ impl Iterator for AddrInfoIter {
     }
 }
 
+impl FusedIterator for AddrInfoIter {}
 unsafe impl Sync for AddrInfoIter {}
 unsafe impl Send for AddrInfoIter {}
 
