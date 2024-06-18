@@ -7,8 +7,7 @@
 //!
 //!
 //! # `lookup_host`
-//! Given a hostname, return an Iterator the IP Addresses associated with
-//! it.
+//! Given a hostname, return a Vec the IP Addresses associated with it.
 //!
 //! ```rust
 //!   use dns_lookup::lookup_host;
