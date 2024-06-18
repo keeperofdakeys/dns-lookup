@@ -14,17 +14,18 @@ use crate::nameinfo::getnameinfo;
 /// Lookup the address for a given hostname via DNS.
 ///
 /// Returns an iterator of IP Addresses, or an `io::Error` on failure.
-pub fn lookup_host(host: &str) -> io::Result<Vec<IpAddr>> {
+pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr>> {
+    #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
     let hints = AddrInfoHints {
         socktype: SOCK_STREAM as i32,
         ..AddrInfoHints::default()
     };
 
     match getaddrinfo(Some(host), None, Some(hints)) {
-        Ok(addrs) => {
-            let addrs: io::Result<Vec<_>> = addrs.map(|r| r.map(|a| a.sockaddr.ip())).collect();
-            addrs
-        }
+        Ok(addrs) => addrs
+            .map(|r| r.map(|a| a.sockaddr.ip()))
+            .collect::<io::Result<Vec<_>>>()
+            .map(|vec| vec.into_iter()),
         Err(e) => {
             reload_dns_nameserver();
             Err(e)?
@@ -66,7 +67,7 @@ fn reload_dns_nameserver() {
 
 #[test]
 fn test_localhost() {
-    let ips = lookup_host("localhost").unwrap();
+    let ips = lookup_host("localhost").unwrap().collect::<Vec<_>>();
     assert!(ips.contains(&IpAddr::V4("127.0.0.1".parse().unwrap())));
     assert!(!ips.contains(&IpAddr::V4("10.0.0.1".parse().unwrap())));
 }
