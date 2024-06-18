@@ -130,6 +130,7 @@ impl AddrInfo {
         let addrinfo = *a;
         let ((), sockaddr) = SockAddr::try_init(|storage, len| {
             *len = addrinfo.ai_addrlen as _;
+            #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
             std::ptr::copy_nonoverlapping(
                 addrinfo.ai_addr as *const u8,
                 storage as *mut u8,
@@ -178,7 +179,10 @@ impl Iterator for AddrInfoIter {
                 return None;
             }
             let ret = AddrInfo::from_ptr(self.cur);
-            self.cur = (*self.cur).ai_next as *mut c_addrinfo;
+            #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
+            {
+                self.cur = (*self.cur).ai_next as *mut c_addrinfo;
+            }
             Some(ret)
         }
     }
