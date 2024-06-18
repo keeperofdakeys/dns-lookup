@@ -35,9 +35,9 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
     // Hard code maximums, as they aren't defined in libc/windows-sys.
 
     // Allocate buffers for name and service strings.
-    let mut c_host = [0 as u8; 1024_usize];
+    let mut c_host = [0_u8; 1024];
     // No NI_MAXSERV, so use suggested value.
-    let mut c_service = [0 as u8; 32_usize];
+    let mut c_service = [0_u8; 32];
 
     // Prime windows.
     #[cfg(windows)]
