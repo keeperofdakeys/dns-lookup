@@ -215,7 +215,7 @@ pub fn getaddrinfo(
 ) -> Result<AddrInfoIter, LookupError> {
     // We must have at least host or service.
     if host.is_none() && service.is_none() {
-        return Err(io::Error::new(
+        Err(io::Error::new(
             io::ErrorKind::Other,
             "Either host or service must be supplied",
         ))?;
