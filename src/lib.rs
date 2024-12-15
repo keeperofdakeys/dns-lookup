@@ -7,14 +7,14 @@
 //!
 //!
 //! # `lookup_host`
-//! Given a hostname, return an Iterator the IP Addresses associated with
+//! Given a hostname, return an Iterator of the IP Addresses associated with
 //! it.
 //!
 //! ```rust
 //!   use dns_lookup::lookup_host;
 //!
 //!   let hostname = "localhost";
-//!   let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+//!   let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap().collect();
 //!   assert!(ips.contains(&"127.0.0.1".parse().unwrap()));
 //! ```
 //!
