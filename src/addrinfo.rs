@@ -179,7 +179,7 @@ impl Iterator for AddrInfoIter {
                 return None;
             }
             let ret = AddrInfo::from_ptr(self.cur);
-            #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
+            #[allow(clippy::unnecessary_cast)]
             {
                 self.cur = (*self.cur).ai_next as *mut c_addrinfo;
             }
