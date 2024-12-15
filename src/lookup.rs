@@ -15,7 +15,7 @@ use crate::nameinfo::getnameinfo;
 ///
 /// Returns an iterator of IP Addresses, or an `io::Error` on failure.
 pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr>> {
-    #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
+    #[allow(clippy::unnecessary_cast)]
     let hints = AddrInfoHints {
         socktype: SOCK_STREAM as i32,
         ..AddrInfoHints::default()
@@ -38,6 +38,7 @@ pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr>> {
 /// Returns the hostname as a String, or an `io::Error` on failure or if the hostname cannot be determined.
 pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
     let sock = (*addr, 0).into();
+    #[allow(clippy::unnecessary_cast)]
     match getnameinfo(&sock, (NI_NUMERICSERV | NI_NAMEREQD) as i32) {
         Ok((name, _)) => Ok(name),
         Err(e) => {

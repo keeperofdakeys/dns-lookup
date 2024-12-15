@@ -28,7 +28,7 @@ pub enum SockType {
 
 impl From<SockType> for c_int {
     fn from(sock: SockType) -> c_int {
-        #[cfg_attr(windows, allow(clippy::useless_conversion))]
+        #[allow(clippy::useless_conversion)]
         (match sock {
             SockType::Stream => c::SOCK_STREAM,
             SockType::DGram => c::SOCK_DGRAM,
@@ -71,7 +71,7 @@ pub enum Protocol {
 
 impl From<Protocol> for c_int {
     fn from(sock: Protocol) -> c_int {
-        #[cfg_attr(windows, allow(clippy::useless_conversion))]
+        #[allow(clippy::useless_conversion)]
         (match sock {
             Protocol::ICMP => c::IPPROTO_ICMP,
             Protocol::TCP => c::IPPROTO_TCP,
@@ -111,6 +111,7 @@ pub enum AddrFamily {
 
 impl From<AddrFamily> for c_int {
     fn from(sock: AddrFamily) -> c_int {
+        #[allow(clippy::useless_conversion)]
         (match sock {
             AddrFamily::Unix => c::AF_UNIX,
             AddrFamily::Inet => c::AF_INET,
