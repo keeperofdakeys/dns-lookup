@@ -60,18 +60,12 @@ pub fn getnameinfo(sock: &SocketAddr, flags: i32) -> Result<(String, String), Lo
 
     let host = match str::from_utf8(host.to_bytes()) {
         Ok(name) => Ok(name.to_owned()),
-        Err(_) => Err(io::Error::new(
-            io::ErrorKind::Other,
-            "Host UTF8 parsing failed",
-        )),
+        Err(_) => Err(io::Error::other("Host UTF8 parsing failed")),
     }?;
 
     let service = match str::from_utf8(service.to_bytes()) {
         Ok(service) => Ok(service.to_owned()),
-        Err(_) => Err(io::Error::new(
-            io::ErrorKind::Other,
-            "Service UTF8 parsing failed",
-        )),
+        Err(_) => Err(io::Error::other("Service UTF8 parsing failed")),
     }?;
 
     Ok((host, service))

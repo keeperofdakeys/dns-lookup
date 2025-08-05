@@ -31,7 +31,7 @@ pub fn get_hostname() -> Result<String, io::Error> {
 
     str::from_utf8(hostname.to_bytes())
         .map(|h| h.to_owned())
-        .map_err(|_| io::Error::new(io::ErrorKind::Other, "Non-UTF8 hostname"))
+        .map_err(|_| io::Error::other("Non-UTF8 hostname"))
 }
 
 #[test]
