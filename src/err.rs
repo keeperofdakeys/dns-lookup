@@ -182,7 +182,7 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
     use libc::{gai_strerror, EAI_SYSTEM};
 
     match err {
-        0 => return io::Error::new(io::ErrorKind::Other, "address information lookup success"),
+        0 => return io::Error::other("address information lookup success"),
         EAI_SYSTEM => return io::Error::last_os_error(),
         _ => {}
     }
@@ -192,10 +192,7 @@ pub(crate) fn gai_err_to_io_err(err: i32) -> io::Error {
             .unwrap()
             .to_owned()
     };
-    io::Error::new(
-        io::ErrorKind::Other,
-        &format!("failed to lookup address information: {}", detail)[..],
-    )
+    io::Error::other(&format!("failed to lookup address information: {detail}")[..])
 }
 
 #[cfg(windows)]
