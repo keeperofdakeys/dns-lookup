@@ -68,12 +68,14 @@ impl AddrInfoHints {
 
     // Create libc addrinfo from AddrInfoHints struct.
     unsafe fn as_addrinfo(&self) -> c_addrinfo {
-        let mut addrinfo: c_addrinfo = mem::zeroed();
-        addrinfo.ai_flags = self.flags;
-        addrinfo.ai_family = self.address;
-        addrinfo.ai_socktype = self.socktype;
-        addrinfo.ai_protocol = self.protocol;
-        addrinfo
+        unsafe {
+            let mut addrinfo: c_addrinfo = mem::zeroed();
+            addrinfo.ai_flags = self.flags;
+            addrinfo.ai_family = self.address;
+            addrinfo.ai_socktype = self.socktype;
+            addrinfo.ai_protocol = self.protocol;
+            addrinfo
+        }
     }
 }
 
@@ -120,40 +122,42 @@ impl AddrInfo {
     ///
     /// Used for interfacing with getaddrinfo.
     unsafe fn from_ptr(a: *mut c_addrinfo) -> io::Result<Self> {
-        if a.is_null() {
-            return Err(io::Error::other("Supplied pointer is null."))?;
-        }
+        unsafe {
+            if a.is_null() {
+                return Err(io::Error::other("Supplied pointer is null."))?;
+            }
 
-        let addrinfo = *a;
-        let ((), sockaddr) = SockAddr::try_init(|storage, len| {
-            *len = addrinfo.ai_addrlen as _;
-            #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
-            std::ptr::copy_nonoverlapping(
-                addrinfo.ai_addr as *const u8,
-                storage as *mut u8,
-                addrinfo.ai_addrlen as usize,
-            );
-            Ok(())
-        })?;
-        let sock = sockaddr.as_socket().ok_or_else(|| {
-            io::Error::other(format!(
-                "Found unknown address family: {}",
-                sockaddr.family()
-            ))
-        })?;
-        Ok(AddrInfo {
-            flags: 0,
-            address: addrinfo.ai_family,
-            socktype: addrinfo.ai_socktype,
-            protocol: addrinfo.ai_protocol,
-            sockaddr: sock,
-            canonname: addrinfo.ai_canonname.as_ref().map(|s| {
-                CStr::from_ptr(s as *const libc_c_char as *const c_char)
-                    .to_str()
-                    .unwrap()
-                    .to_owned()
-            }),
-        })
+            let addrinfo = *a;
+            let ((), sockaddr) = SockAddr::try_init(|storage, len| {
+                *len = addrinfo.ai_addrlen as _;
+                #[cfg_attr(windows, allow(clippy::unnecessary_cast))]
+                std::ptr::copy_nonoverlapping(
+                    addrinfo.ai_addr as *const u8,
+                    storage as *mut u8,
+                    addrinfo.ai_addrlen as usize,
+                );
+                Ok(())
+            })?;
+            let sock = sockaddr.as_socket().ok_or_else(|| {
+                io::Error::other(format!(
+                    "Found unknown address family: {}",
+                    sockaddr.family()
+                ))
+            })?;
+            Ok(AddrInfo {
+                flags: 0,
+                address: addrinfo.ai_family,
+                socktype: addrinfo.ai_socktype,
+                protocol: addrinfo.ai_protocol,
+                sockaddr: sock,
+                canonname: addrinfo.ai_canonname.as_ref().map(|s| {
+                    CStr::from_ptr(s as *const libc_c_char as *const c_char)
+                        .to_str()
+                        .unwrap()
+                        .to_owned()
+                }),
+            })
+        }
     }
 }
 
