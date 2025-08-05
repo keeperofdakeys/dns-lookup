@@ -14,7 +14,7 @@ use crate::nameinfo::getnameinfo;
 /// Lookup the address for a given hostname via DNS.
 ///
 /// Returns an iterator of IP Addresses, or an `io::Error` on failure.
-pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr>> {
+pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr> + use<>> {
     #[allow(clippy::unnecessary_cast)]
     let hints = AddrInfoHints {
         socktype: SOCK_STREAM as i32,
