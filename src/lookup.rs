@@ -56,6 +56,7 @@ fn reload_dns_nameserver() {
     cfg_if::cfg_if! {
       if #[cfg(target_os = "macos")] {
       } else if #[cfg(target_os = "ios")] {
+      } else if #[cfg(target_os = "visionos")] {
       } else if #[cfg(target_os = "tvos")] {
       } else if #[cfg(unix)] {
         use libc;
