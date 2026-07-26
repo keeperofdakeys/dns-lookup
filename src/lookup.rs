@@ -9,12 +9,13 @@ use libc::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
 use windows_sys::Win32::Networking::WinSock::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
 
 use crate::addrinfo::{getaddrinfo, AddrInfoHints};
+use crate::err::LookupError;
 use crate::nameinfo::getnameinfo;
 
 /// Lookup the address for a given hostname via DNS.
 ///
 /// Returns an iterator of IP Addresses, or an `io::Error` on failure.
-pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr> + use<>> {
+pub fn lookup_host(host: &str) -> Result<impl Iterator<Item = IpAddr> + use<>, LookupError> {
     #[allow(clippy::unnecessary_cast)]
     let hints = AddrInfoHints {
         socktype: SOCK_STREAM as i32,
@@ -25,7 +26,8 @@ pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr> + use<
         Ok(addrs) => addrs
             .map(|r| r.map(|a| a.sockaddr.ip()))
             .collect::<io::Result<Vec<_>>>()
-            .map(|vec| vec.into_iter()),
+            .map(|vec| vec.into_iter())
+            .map_err(|err| err.into()),
         Err(e) => {
             reload_dns_nameserver();
             Err(e)?
@@ -36,7 +38,7 @@ pub fn lookup_host(host: &str) -> io::Result<impl Iterator<Item = IpAddr> + use<
 /// Lookup the hostname of a given IP Address via DNS.
 ///
 /// Returns the hostname as a String, or an `io::Error` on failure or if the hostname cannot be determined.
-pub fn lookup_addr(addr: &IpAddr) -> io::Result<String> {
+pub fn lookup_addr(addr: &IpAddr) -> Result<String, LookupError> {
     let sock = (*addr, 0).into();
     #[allow(clippy::unnecessary_cast)]
     match getnameinfo(&sock, (NI_NUMERICSERV | NI_NAMEREQD) as i32) {
