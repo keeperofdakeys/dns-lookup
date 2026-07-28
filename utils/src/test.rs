@@ -2,23 +2,21 @@ extern crate libc;
 extern crate dns_lookup as dns;
 
 use std::io;
-use dns::LookupErrorKind;
+use crate::dns::LookupErrorKind;
 
 fn main() {
-  let mut hints = dns::AddrInfoHints::default();
-  hints.flags = 0x0040;
-  // hints.socktype = dns::SockType::Stream;
-  // hints.address = dns::AddrFamily::Inet;
-  // hints.protocol = dns::ProtoFamily::Inet;
+  let hints = dns::AddrInfoHints {
+    flags: 0x0040,
+    ..Default::default()
+  };
   unsafe {
     let cstr = std::ffi::CString::new("").unwrap();
-    libc::setlocale(libc::LC_ALL, cstr.as_ptr() as *const _ as *const i8);
+    libc::setlocale(libc::LC_ALL, cstr.as_ptr() as *const _);
   }
   let list: io::Result<Vec<_>> =
     dns::getaddrinfo(Some("☃.net"), Some("http"), Some(hints)).unwrap().collect();
   println!("{:?}", list);
-  let foo = dns::getaddrinfo(Some("☃.net"), Some("foobar"), Some(hints));
-  match foo {
+  match dns::getaddrinfo(Some("☃.net"), Some("foobar"), Some(hints)) {
     Ok(_) => {},
     Err(e) => match e.kind() {
       LookupErrorKind::NoName => println!("NoName"),
