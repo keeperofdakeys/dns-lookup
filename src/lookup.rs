@@ -14,7 +14,11 @@ use crate::nameinfo::getnameinfo;
 
 /// Lookup the address for a given hostname via DNS.
 ///
-/// Returns an iterator of IP Addresses, or an `io::Error` on failure.
+/// Returns an iterator of IP Addresses, or a `LookupError` on failure.
+///
+/// Errors from `getaddrinfo` itself carry the underlying `gai` error code and
+/// kind. Errors hit while reading the returned addresses are plain IO errors,
+/// and have a kind of `LookupErrorKind::IO` and an error number of `0`.
 pub fn lookup_host(host: &str) -> Result<impl Iterator<Item = IpAddr>, LookupError> {
     #[allow(clippy::unnecessary_cast)]
     let hints = AddrInfoHints {
@@ -37,7 +41,7 @@ pub fn lookup_host(host: &str) -> Result<impl Iterator<Item = IpAddr>, LookupErr
 
 /// Lookup the hostname of a given IP Address via DNS.
 ///
-/// Returns the hostname as a String, or an `io::Error` on failure or if the hostname cannot be determined.
+/// Returns the hostname as a String, or a `LookupError` on failure or if the hostname cannot be determined.
 pub fn lookup_addr(addr: &IpAddr) -> Result<String, LookupError> {
     let sock = (*addr, 0).into();
     #[allow(clippy::unnecessary_cast)]
