@@ -124,7 +124,10 @@ impl AddrInfo {
     unsafe fn from_ptr(a: *mut c_addrinfo) -> io::Result<Self> {
         unsafe {
             if a.is_null() {
-                return Err(io::Error::other("Supplied pointer is null."))?;
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "Supplied pointer is null.",
+                ))?;
             }
 
             let addrinfo = *a;
@@ -139,10 +142,10 @@ impl AddrInfo {
                 Ok(())
             })?;
             let sock = sockaddr.as_socket().ok_or_else(|| {
-                io::Error::other(format!(
-                    "Found unknown address family: {}",
-                    sockaddr.family()
-                ))
+                io::Error::new(
+                    io::ErrorKind::Other,
+                    format!("Found unknown address family: {}", sockaddr.family()),
+                )
             })?;
             Ok(AddrInfo {
                 flags: 0,
@@ -216,7 +219,10 @@ pub fn getaddrinfo(
 ) -> Result<AddrInfoIter, LookupError> {
     // We must have at least host or service.
     if host.is_none() && service.is_none() {
-        Err(io::Error::other("Either host or service must be supplied"))?;
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            "Either host or service must be supplied",
+        ))?;
     }
 
     // Allocate CStrings, and keep around to free.
