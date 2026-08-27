@@ -1,4 +1,6 @@
+use std::error;
 use std::ffi;
+use std::fmt;
 use std::io;
 #[cfg(unix)]
 use {std::os::raw::c_char, std::str};
@@ -139,6 +141,14 @@ impl LookupErrorKind {
         }
     }
 }
+
+impl fmt::Display for LookupError {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.fmt(fmt)
+    }
+}
+
+impl error::Error for LookupError {}
 
 impl From<LookupError> for io::Error {
     fn from(err: LookupError) -> io::Error {
