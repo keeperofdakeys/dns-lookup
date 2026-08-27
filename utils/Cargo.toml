@@ -6,8 +6,8 @@ version = "0.1.0"
 authors = ["Josh <keeperofdakeys@gmail.com>"]
 
 [dependencies]
-argparse = "0.2"
-libc = "*"
+argparse = "0.2.1"
+libc = "^0.2"
 dns-lookup = { path = ".." }
 
 [[bin]]
