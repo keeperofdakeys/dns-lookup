@@ -26,3 +26,23 @@ jobs:
       run: cargo test --verbose
 
     timeout-minutes: 10
+
+  msrv:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - name: Install tools
+      uses: taiki-e/install-action@v2
+      with:
+        tool: |
+          cargo-hack
+          cargo-minimal-versions
+      
+    - uses: actions/checkout@master
+    - name: Run tests
+      run: cargo minimal-versions test --rust-version --verbose
+
+    timeout-minutes: 10
