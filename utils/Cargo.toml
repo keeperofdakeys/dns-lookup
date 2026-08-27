@@ -3,7 +3,6 @@ name = "dns-utils"
 edition.workspace = true
 rust-version.workspace = true
 version = "0.1.0"
-authors = ["Josh <keeperofdakeys@gmail.com>"]
 
 [dependencies]
 argparse = "0.2.1"

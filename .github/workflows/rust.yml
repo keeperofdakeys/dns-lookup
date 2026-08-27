@@ -45,4 +45,5 @@ jobs:
     - name: Run tests
       run: cargo minimal-versions test --rust-version --verbose
 
+
     timeout-minutes: 10
