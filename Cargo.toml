@@ -1,8 +1,8 @@
 [package]
 name = "dns-lookup"
 version = "4.0.1"
-edition.workspace = true
-rust-version.workspace = true
+edition = "2021"
+rust-version = "1.63"
 description = "A simple dns resolving api, much like rust's unstable api. Also includes getaddrinfo and getnameinfo wrappers for libc variants."
 documentation = "https://docs.rs/dns-lookup"
 repository = "https://github.com/keeperofdakeys/dns-lookup/"
@@ -21,12 +21,8 @@ members = [
     "utils",
 ]
 
-[workspace.package]
-edition = "2021"
-rust-version = "1.71"
-
 [dependencies]
-socket2 = "^0.6.0"
+socket2 = ">=0.5.10, <0.7.0"
 cfg-if = "^1.0"
 
 # Note that version of windows-sys is pinned to version used in socket2 release
