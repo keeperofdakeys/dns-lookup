@@ -26,3 +26,19 @@ jobs:
       run: cargo test --verbose
 
     timeout-minutes: 10
+
+  msrv:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: 1.71
+    - uses: actions/checkout@master
+    - name: Check MSRV
+      run: cargo check --verbose
+
+    timeout-minutes: 10
