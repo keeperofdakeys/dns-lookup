@@ -1,5 +1,6 @@
 # dns-lookup
-[![Crates.io](https://img.shields.io/crates/v/dns-lookup.svg?maxAge=2592000)](https://crates.io/crates/dns-lookup)
+
+[![Crates.io](https://img.shields.io/crates/v/dns-lookup.svg)](https://crates.io/crates/dns-lookup)
 
 A small wrapper for libc to perform simple DNS lookups.
 
