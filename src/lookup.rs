@@ -1,3 +1,5 @@
+#![cfg(not(target_os = "haiku"))]
+
 use std::io;
 use std::net::IpAddr;
 use std::str;

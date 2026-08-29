@@ -22,7 +22,7 @@ pub enum SockType {
     #[cfg(not(target_os = "redox"))]
     Raw,
     /// Reliably-delivered messages.
-    #[cfg(not(target_os = "redox"))]
+    #[cfg(not(any(target_os = "haiku", target_os = "redox")))]
     RDM,
 }
 
@@ -34,7 +34,7 @@ impl From<SockType> for c_int {
             SockType::DGram => c::SOCK_DGRAM,
             #[cfg(not(target_os = "redox"))]
             SockType::Raw => c::SOCK_RAW,
-            #[cfg(not(target_os = "redox"))]
+            #[cfg(not(any(target_os = "haiku", target_os = "redox")))]
             SockType::RDM => c::SOCK_RDM,
         })
         .into()
