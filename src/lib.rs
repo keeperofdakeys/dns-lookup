@@ -74,6 +74,8 @@
 //!   let _ = (name, service);
 //! ```
 
+#![cfg(any(unix, windows))]
+
 mod addrinfo;
 mod err;
 mod hostname;

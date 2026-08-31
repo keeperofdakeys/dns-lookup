@@ -1,3 +1,5 @@
+#![cfg(any(unix, windows))]
+
 extern crate libc;
 extern crate dns_lookup as dns;
 
