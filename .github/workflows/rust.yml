@@ -27,6 +27,29 @@ jobs:
 
     timeout-minutes: 10
 
+  haiku:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: cpa.sh {0}
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Start Haiku VM
+      uses: cross-platform-actions/action@v1.5.0
+      with:
+        operating_system: haiku
+        architecture: x86-64
+        version: 'r1beta6'
+        shell: bash
+        environment_variables: CARGO_TERM_COLOR
+    - name: Install Rust
+      run: pkgman install -y rust_bin
+    - name: Run tests
+      run: cargo test --verbose
+
+    timeout-minutes: 30
+
   msrv:
     runs-on: ${{ matrix.os }}
     strategy:
