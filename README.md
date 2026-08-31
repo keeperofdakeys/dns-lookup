@@ -1,6 +1,7 @@
 # dns-lookup
 
-[![Crates.io](https://img.shields.io/crates/v/dns-lookup.svg)](https://crates.io/crates/dns-lookup)
+[![crates.io](https://img.shields.io/crates/v/dns-lookup.svg)](https://crates.io/crates/dns-lookup)
+[![docs.rs](https://docs.rs/dns-lookup/badge.svg)](https://docs.rs/dns-lookup)
 
 A small wrapper for libc to perform simple DNS lookups.
 
