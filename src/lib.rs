@@ -10,7 +10,7 @@
 //! Given a hostname, return an Iterator of the IP Addresses associated with
 //! it.
 //!
-//! ```rust
+//! ```rust,ignore-haiku
 //!   use dns_lookup::lookup_host;
 //!
 //!   let hostname = "localhost";
@@ -23,7 +23,7 @@
 //! given IP Address.
 //!
 //!
-//! ```rust
+//! ```rust,ignore-haiku
 //!   use dns_lookup::lookup_addr;
 //!
 //!   let ip: std::net::IpAddr = "127.0.0.1".parse().unwrap();
@@ -57,7 +57,7 @@
 //! ```
 //!
 //! # `getnameinfo`
-//! ```rust
+//! ```rust,ignore-haiku
 //!   use dns_lookup::getnameinfo;
 //!   use std::net::{IpAddr, SocketAddr};
 //!
@@ -77,7 +77,9 @@
 mod addrinfo;
 mod err;
 mod hostname;
+#[cfg(not(target_os = "haiku"))]
 mod lookup;
+#[cfg(not(target_os = "haiku"))]
 mod nameinfo;
 mod types;
 
@@ -92,5 +94,6 @@ pub use err::{LookupError, LookupErrorKind};
 pub use hostname::get_hostname;
 #[cfg(not(target_os = "haiku"))]
 pub use lookup::{lookup_addr, lookup_host};
+#[cfg(not(target_os = "haiku"))]
 pub use nameinfo::getnameinfo;
 pub use types::{AddrFamily, Protocol, SockType};
