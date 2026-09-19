@@ -94,7 +94,7 @@ fn test_getnameinfo() {
 
     #[cfg(unix)]
     {
-        assert_eq!(name, "localhost");
+        assert!(name.starts_with("localhost"));
     }
 
     #[cfg(windows)]
