@@ -21,7 +21,7 @@ members = [
     "utils",
 ]
 
-[dependencies]
+[target."cfg(any(unix, windows))".dependencies]
 socket2 = ">=0.5.10, <0.7.0"
 cfg-if = "^1.0"
 
@@ -33,3 +33,6 @@ features = ["Win32_Networking_WinSock", "Win32_Foundation"]
 
 [target."cfg(unix)".dependencies]
 libc = "^0.2"
+
+[features]
+default = []

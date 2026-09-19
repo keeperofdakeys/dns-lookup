@@ -4,7 +4,7 @@ edition = "2021"
 rust-version = "1.63"
 version = "0.1.0"
 
-[dependencies]
+[target."cfg(any(unix, windows))".dependencies]
 argparse = "0.2.1"
 libc = "^0.2"
 dns-lookup = { path = ".." }
@@ -12,3 +12,4 @@ dns-lookup = { path = ".." }
 [[bin]]
 path="src/test.rs"
 name="test"
+required-features = ["dns-lookup/default"]
