@@ -92,9 +92,10 @@ fn test_getnameinfo() {
 
     assert_eq!(service, "ssh");
 
+    // Some Unix's return localhost.localdomain
     #[cfg(unix)]
     {
-        assert_eq!(name, "localhost");
+        assert!(matches!(name.as_str(), "localhost" | "localhost.localdomain"));
     }
 
     #[cfg(windows)]

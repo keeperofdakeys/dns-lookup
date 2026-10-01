@@ -1,11 +1,17 @@
-#![cfg(not(target_os = "haiku"))]
-
 use std::io;
 use std::net::IpAddr;
 use std::str;
 
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "haiku")))]
 use libc::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
+
+// The libc crate doesn't export these for Haiku yet; values from Haiku's <netdb.h>.
+#[cfg(target_os = "haiku")]
+use libc::SOCK_STREAM;
+#[cfg(target_os = "haiku")]
+const NI_NAMEREQD: libc::c_int = 0x04;
+#[cfg(target_os = "haiku")]
+const NI_NUMERICSERV: libc::c_int = 0x08;
 
 #[cfg(windows)]
 use windows_sys::Win32::Networking::WinSock::{NI_NAMEREQD, NI_NUMERICSERV, SOCK_STREAM};
@@ -86,7 +92,8 @@ fn test_localhost() {
 #[test]
 fn test_rev_localhost() {
     let name = lookup_addr(&IpAddr::V4("127.0.0.1".parse().unwrap()));
-    assert_eq!(name.unwrap(), "localhost");
+    // Some Unix's return localhost.localdomain
+    assert!(matches!(name.unwrap().as_str(), "localhost" | "localhost.localdomain"));
 }
 
 #[cfg(windows)]

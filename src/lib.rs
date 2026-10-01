@@ -92,7 +92,6 @@ mod win;
 pub use addrinfo::{getaddrinfo, AddrInfo, AddrInfoHints, AddrInfoIter};
 pub use err::{LookupError, LookupErrorKind};
 pub use hostname::get_hostname;
-#[cfg(not(target_os = "haiku"))]
 pub use lookup::{lookup_addr, lookup_host};
 pub use nameinfo::getnameinfo;
 pub use types::{AddrFamily, Protocol, SockType};
