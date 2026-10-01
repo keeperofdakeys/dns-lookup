@@ -1,6 +1,6 @@
 [package]
 name = "dns-lookup"
-version = "4.0.1"
+version = "4.0.2"
 edition = "2021"
 rust-version = "1.63"
 description = "A simple DNS resolving API, including getaddrinfo and getnameinfo wrappers for libc variants."
